@@ -1,0 +1,1207 @@
+* Introduction
+- All program analyzers uses approximations
+	- It should either output yes or maybe for a given property i.e. it
+    should be sound but it cannot be complete since that is impossible
+- The ideal program correctness analyzer $P$ does not exists for a
+  terminating program
+
+* A Tiny Imperative Programming Language
+** The Syntax
+*** Introduction
+- TIP programs interact with the world by reading input from a stream
+  of integers and writing the output to another steam of integers
+	- It lacks e.g. global variable, nested functions, objects and type
+    annotations
+
+*** Expressions
+- The basic expressions all denote integer values:
+[[file:A Tiny Imperative Programming Language/screenshot_2019-08-25_11-41-20.png]]
+[[file:A Tiny Imperative Programming Language/screenshot_2019-08-25_11-42-06.png]]
+- Expressions $E$ include integers constants $I$ and variable
+  identifiers $X$
+- The ~input~ expression reads an integer for the input stream
+- The comparison operator yield $0$ false and $1$ for true
+- Function calls record operations and pointer expressions will be
+  added later
+
+*** Statements
+- The simple statements $S$ are 
+[[file:A Tiny Imperative Programming Language/screenshot_2019-08-25_11-44-41.png]]	
+- The notation $[\dots]^?$ are used to indicate optional parts
+- The conditions interpret $0$ are false and all other values as true
+- The ~output~ statement writes an integer value to the output stream
+
+*** Functions
+- A function declaration $F$ contains
+	- A function name
+	- A list of parameters
+	- Local variable declarations
+	- A body statement
+	- A return expression
+[[file:A Tiny Imperative Programming Language/screenshot_2019-08-25_11-47-17.png]]
+
+- Function names and parameters are identifiers like variables
+	- The ~var~ block declares a collection of uninitialized local
+    variables
+
+- Function calls are an extra kind of expression:
+[[file:A Tiny Imperative Programming Language/screenshot_2019-08-25_11-48-32.png]]
+	
+- ~var~ blocks and ~return~ instructions are sometimes treated as
+  statements
+	
+*** Records
+- A record is a collection of fields, each having a name and a value
+- The syntax for creating records and for reading field values looks
+  as follows:
+[[file:A Tiny Imperative Programming Language/screenshot_2019-08-25_11-50-27.png]]
+- Records are immutable	
+
+*** Head Pointers
+- Head pointers are included to allow dynamic memory allocation:
+[[file:A Tiny Imperative Programming Language/screenshot_2019-08-25_11-51-31.png]]
+- $\mathsf{alloc} \ E$ allocates a new cell in the heap with the given
+  expression and results in a pointer to the cell
+- $\& X$ creates a pointer to a program variables
+	- These pointers are refered to as heap pointers
+- $^*E$ dereferences a pointer value
+
+- In order to assign values through pointers another form of
+  assignment is allowed:
+
+[[file:A Tiny Imperative Programming
+Language/screenshot_2019-08-25_12-13-46.png]]
+- If the variable on the left-hand-side holds a pointer to a call,
+  then the value of the RHS expression is stored in that cell
+
+- Pointers and integers are distinct values
+	- This means that pointer arithmetic is not possible
+ 
+*** Function pointers
+- Function pointers is also allowed which makes functions first-class
+  values
+	- The name of the function can be used as a variable that points to
+    the function
+
+- To use function pointer, a generalized form of function calls is
+  allowed
+	- is sometimes called computed or indirect function calls
+[[file:A Tiny Imperative Programming Language/screenshot_2019-08-25_12-17-18.png]]
+- The function is now, unlike simple function calls, being called as
+  an expression that evaluates to a function pointer
+	- Function pointer helps illustrate the main challenges that arise
+    with methods in object-oriented languages and with higher-order
+    function in functional languages
+
+*** Programs
+- A complete program is just a collection of functions:
+[[file:A Tiny Imperative Programming
+Language/screenshot_2019-08-25_12-21-51.png]]
+
+- For a complete program the function named ~main~ is the one that
+  initiates execution
+	- Its arguments are given in sequences from the beginning of the
+    input stream
+	- The value that it returns is appended to the output stream
+
+** Normalization
+- When implementing static analyses, it is often convenient to work
+  with a syntactically simpler language
+	- Therefore programs are often normalized by transforming them into
+    equivalent but syntactically simpler ones
+
+- TIP uses lexical scoping but a nationally simplifying assumption is
+  that all declared variables and function names are unique in a
+  program is used
+	- i.e. no identifiers is declared more than ones
+
+** Abstract Syntax Trees
+- Abstract syntax trees provide a representation of programs that is
+  suitable for flow-insensitive analysis
+	- It is e.g. used for type analysis, control flow analysis and
+    pointer analysis
+
+- Example program ~ite~:
+[[file:A Tiny Imperative Programming Language/screenshot_2019-08-25_12-36-05.png]]
+
+** Control Flow Graphs
+- For flow-sensitive analysis (in particular dataflow analysis), where
+  the statement order matters it is more convenient to view the
+  program as a *control flow graph*
+- A subset of the TIP language is considered consisting of a single
+  function body without bodies
+- A control flow graph (CFG) is a directed graph, in which nodes
+  correspond to statement and edges represent possible flow of control
+
+- Without loss of generality it is that a CFG always has
+	- a single point of entry denoted ~entry~
+	- a single point of exit, denoted ~exit~
+
+- If $v$ is a node in a CFG then
+	- $pred(v)$ denotes the set of predecessor nodes
+	- $succ(v)$ denotes the set of successor nodes
+
+- Only simple statements are considered for which CFGs may be
+  constructed in an inductive manner.
+	- The CFGs for assignments, ~output~, ~return~ statements look as
+    follows:
+[[file:A Tiny Imperative Programming
+Language/screenshot_2019-08-25_12-44-39.png]]
+- For a sequence $S_1$ $S_2$ the exit node of $S_1$ is eliminated and
+  the entry node of $S_2$ and the statements is glued together
+
+- The other control structures are modeled by inductive graph
+  constructions
+[[file:A Tiny Imperative Programming
+Language/screenshot_2019-08-25_12-52-12.png]]
+
+* Type Analysis
+** Introduction
+- A program is typable if it satisfies a collection of type
+  constraints that is systematically derived
+	- This is typically done from the program AST
+	- The type constraints are constructed in such away that the
+    requirements are guaranteed to hold during execution
+
+** Types
+- A language of types is defined that will describe possible values:
+[[file:Type Analysis/screenshot_2019-08-25_17-50-45.png]]
+- These type terms describe respectively
+	1) Integers
+	2) Heap pointers
+	3) Functions
+
+- Each kind of term is characterized by a *term constructor* with some
+  arity
+	- ~&~ is a term constructor with arity 1 since it has one sub-term
+	- The function type constructor is the number of function parameters
+    plus one for the return type
+
+- The grammar would normally generate finite types, but for recursive
+  functions and data structures regular types are needed
+	- Those are defined as regular trees using the type constructors
+	- A possible infinite tree is regular if it contains only finitely
+    many different subtrees
+
+- To express recursive type consisely, the $\mu$ operator and type
+  variables are added to the language of types:
+[[file:Type Analysis/screenshot_2019-08-25_17-58-09.png]]
+- A type of the form $\mu \alpha . \tau$ is considered identical to
+  the type $\tau[\mu \alpha . \tau / \alpha]$
+	- called recursive types
+- Free type variables are allowed i.e. types that are not bound by an
+  enclosing $\mu$
+	- called polymorphic types
+	
+** Type Constraints
+- For a given program a constraint system is generated
+	- A program is defined to be typable when the constraints are
+    solvable
+
+- In this case only equality constraints over regular type term with
+  variables are considered
+	- This class can be efficiently solved using a unification algorithm
+
+- For each program variable, function parameter and function name $X$
+  a type variable $[[X]]$ is introduced
+- For each occurrence of a non-identifier expression $E$ a type
+  variable $[[E]]$ is defined
+	- $E$ refers to a concrete node in the abstract syntax tree, not the
+    concrete syntax
+
+- The constraints are systematically defined for each construct in the
+  language:
+[[file:Type Analysis/screenshot_2019-08-25_18-21-43.png]]
+
+- For a complete program constraints are added to ensure that the
+  parameters and the return value of the ~main~ function are ~int~:
+[[file:Type Analysis/screenshot_2019-08-25_18-27-40.png]]
+- All term constructor must satisfy the general term equality axiom:
+[[file:Type Analysis/screenshot_2019-08-25_18-27-58.png]]
+
+- A *solution* assigns a type to each type variable, such that all
+  equality constraints are satisfied
+	- The correctness claim for the type analysis is that the existence
+    of a solution implies that the specified runtime error cannot
+    occur during execution
+
+** Solving Constraints with Unification
+- If solutions exists then they can be computed in near linear time
+  using the unification algorithm
+	- Type analysis is quite efficient since the constraints may also be
+    extracted in linear time
+
+- The unification algorithm is based on the union find data structure
+  for representing and manipulating equivalence relations
+	- The union find data structure consists of a directed graph of
+    nodes that each have exactly one edge to its *parent* node
+		- Two nodes are equivalent if the have a common ancestor
+	- Each root is the canonical representative of its equivalence class
+	- Three operations are provided:
+		- $\text{MakeSet}(X)$: adds a new node $x$ that is initially its
+      own parent
+		- $\text{Find}(X$): finds the canonical representative of $x$ by
+      traversing the path to the root, performing path compression on
+      the way
+			- The parent of each node on the traversed path is set to the
+        canonical representative
+		- $\text{Union}(x,y)$: finds the canonical representative of $x$
+      and $y$ and makes one parent of the other unless they are
+      already equivalent
+
+- The algorithms in pseudo code:
+[[file:Type Analysis/screenshot_2019-08-25_18-42-44.png]]
+
+- The unification algorithm uses union-find by associating a node with
+  each term (including sub-terms) in the constraint system
+	- For each term $\tau$ $\text{MakeSet}(\tau)$ is initially invoked
+	- For each constraint $\tau_1 = \tau_2$ the function
+    $\text{Unify}(\tau_1, \tau_2)$ is invoked which
+		- unifies the two terms if possible
+		- enforces the general term equality axiom by unifying sub-terms
+      recursively:
+[[file:Type Analysis/screenshot_2019-08-25_18-57-10.png]]
+
+- The unification solver only needs to process each constraint once
+	- One might interleave generating the constraint and then solving
+    them
+
+** Limitations of the Type Analysis
+- The type analysis is only approximate and therefore certain programs
+  will be unfairly rejected e.g.
+	- It is *flow-insensitive*
+	- It allows dereference of null pointers
+	- It allows escaping stack cell
+
+** Record Types
+- To extend the type analysis to also work for programs using records,
+  the type language is extended with record types:
+[[file:Type Analysis/screenshot_2019-08-25_19-08-19.png]]
+
+- The goal in the analysis is to check that field lookups are only
+  performed on records, not other types of values
+	- A first attempts is to express the type constraints for record
+    construction and field lookup as follows
+[[file:Type Analysis/screenshot_2019-08-25_19-13-21.png]]
+- The RHS of the constraint rule for the field lookup is not directly
+  expressible in the language of types
+	- A way to fix this is to require that every record type containts
+    all record fields that exist in the program
+	- Let $F = \{f_1,f_2, \dots, f_m\}$ be the set of all field names
+	- The following two constraint rules is used instead of the previous
+    ones
+[[file:Type Analysis/screenshot_2019-08-25_19-16-35.png]]
+
+* Lattice Theory
+** Lattices
+- A *partial order* is a set $S$ equipped with a binary relation
+  $\sqsubseteq$ where the following conditions are satisfied
+	- reflexivity: $\forall x \in S: x \sqsubseteq x$
+	- transitivity: $\forall x, y, z \in S: x \sqsubseteq y \land y
+    \sqsubseteq \Rightarrow x \sqsubseteq z$
+	- anti-symmetry: $\forall x,y \in S : x \sqsubseteq y \land y
+    \sqsubseteq x \Rightarrow x = y$
+
+- $x \sqsubseteq y$ means that $y$ is a safe approximation of $x$ or
+  $x$ is at least as precise as $y$
+
+- A lattice is formally a pair $(S, \sqsubseteq)$
+	- The same name is often used for its underlying set
+
+- Let $X \subseteq S$
+	- $y \in S$ is a upper bound for $X$ written $X \sqsubseteq y$ if
+    $\forall x \in X : x \sqsubseteq y$
+	- $y \in S$ is a lower bound for $X$ written $y \sqsubseteq X$ if
+    $\forall x \in X : y \sqsubseteq x$
+
+- A *least upper bound* written $\bigsqcup X$ is defined by
+\begin{equation*}
+  X \sqsubseteq \bigsqcup x \land \forall y \in S: X \sqsubseteq u \rightarrow \bigsqcup X \sqsubseteq y
+\end{equation*}
+
+- A *greatest lower bound*, written $\sqcap X$ is defined by
+\begin{equation*}
+  \sqcap X \sqsubseteq X \land \forall y \in S: y \sqsubseteq X \rightarrow y \sqcap X
+\end{equation*}
+
+- For pairs of elements the infix notation $x \sqcup y$ can be used
+  instead of $\bigsqcup \{x,y\}$ and likewise for $\sqcap$
+	- Subscript notation can also be used e.g. $\bigsqcup_{a \in A}
+    f(a)$ instead of $\bigsqcup \{f(x) \mid a \in A\}$
+
+- A *lattice* is a partial order in which $\bigsqcup X$ and $\sqcap X$
+  exists for all $X \subseteq S$
+
+- Example of partial orders that are lattices
+[[file:Lattice Theory/screenshot_2019-09-01_11-13-22.png]]
+
+- Example of partial orders that are not lattices
+[[file:Lattice Theory/screenshot_2019-09-01_11-13-48.png]]
+
+- Every lattice has a *unique largest element* denoted $\top$ and a
+  *unique smallest element* denoted $\bot$
+- The *height* of the lattice is defined to be the length of the longest
+  path from $\bot$ to $\top$
+	- For some lattices this height is infinite
+
+** Constructing Lattices
+- Every finite set $A$ defines a lattice $(2^A, \subseteq)$ where $\bot = \emptyset$, $\top = A$, $x \sqcup y = x \cup y$ and $x \sqcup y = x \cup y$
+	- This is called the *powerset lattice* for $A$
+	- e.g.
+[[file:Lattice Theory/screenshot_2019-09-01_11-21-37.png]]
+- The lattice $(2^A, \subseteq)$ has height $|A|¤
+
+- If $L_1, L_2, \dots, L_n$ are lattices, then so is the product:
+\begin{equation*}
+  L_1 \times L_2 \times \cdots \times L_n = \{(x_1, x_2, \dots, x_n) \mid x_i = L_i\} 
+\end{equation*}
+- where the lattice order $\sqsubseteq$ is defined pointwise
+\begin{equation*}
+  (x_1, x_2, \dots, x_n) \sqsubseteq (x_1^{'}, x_2^{'}, \dots, x_n^{'}) \forall i = 1,2, \dots, n : x_i \sqsubseteq x_i^{'}
+\end{equation*}
+- Products of $n$ identical lattice may be written consisely as $L^n = L \times L \times \cdots \times L$
+
+- If $L$ is a lattice, then so is $lift(L)$ which is a copy of $L$ but with a new bottom element
+	- It has $height(lift(L)) = height(L) +1$ if $L$ has finite height
+
+- If $A$ is a set, then $flat(A)$ illustrated by
+[[file:Lattice Theory/screenshot_2019-09-01_11-29-14.png]]
+- is a lattice with height $2$
+
+- If $A$ is a set and $L$ is a lattice, then a *map* can be obtained consisting of the set of functions from $A$ to $L$ ordered pointwise
+\begin{equation*}
+  A \rightarrow L = \{[a_1 \mapsto x_1, a_2 \mapsto x_2, \dots] \mid A=\{a_1, s_2, \dots\} \land x_1, x_2, \dots \in L\}
+\end{equation*}
+\begin{equation*}
+  f \sqsubseteq g \Leftrightarrow \forall a_i \in A : f(a_i) \sqsubseteq g(a_i) \text{ where } f,g \in A \rightarrow L
+\end{equation*}
+
+- If $L_1$ and $L_2$ are lattices, then a function $f:L_1 \rightarrow L_2$ is a *homomorphism* if
+\begin{equation*}
+  \forall x,y \in L_2 : f(x \sqcup y) = f(x) \sqcup f(y) \land f(x \sqcap y) = f(x) \sqcap f(y)
+\end{equation*}
+
+- A bijective homomorphism is called an isomorphism
+	- Two lattices are isomorphic if there exists an isomorphism from one to another
+
+** Equations, Monotonicity and Fixed-Points
+- A function $f: L_1 \rightarrow L_2$, where $L_1$ and $L_2$ are lattices, is *monotone* when $\forall x,y \in L_1 : x \sqsubseteq y \Rightarrow f(x) \sqsubseteq f(y)$
+	- Also called *order preserving*
+	- This definition generalises naturally to functions with multiple arguments
+
+- $x \in L$ is a fixed-point for $f$ if $f(x) = x$
+	- A least fixed-point $x$ for $f$ is a fixed point for $f$ where $x \subseteq y$ for every fixed-point $y$ for $f$
+
+- Let $L$ be a lattice, then an equation system over $L$ is of the form
+\begin{align*}
+ x_1 &= f_1(x_1, \dots, x_n) \\ 
+ x_2 &= f_2(x_1, \dots, x_n) \\ 
+  & \vdots \\
+ x_n &= f_n(x_1, \dots, x_n)
+\end{align*}
+- where $x_i$ are variables and $f_i: L^n \righarrow L$ is a collection of functions
+	- A *solution* to an equation system provides a value from $L$ for each variable such that all equations are satisfied
+	- $n$ functions can be combined into one $f: L^n \righarrow L ^n$ as such
+\begin{equation*}
+	f(x_1, \dots, x_n) = (f_1(x_1, \dots, x_n), \dots, f_n(x_1, \dots, x_n)) 
+\end{equation*} 
+- this means that the equation system looks like
+\begin{equation*}
+  x = f(x)
+\end{equation*}
+- where $x \in L^n$ 
+
+- *Fixed point theorem:* In the lattice $L$ with finite height, every monotone function $f: L \to L$ has a unique least fixed-point $fix(f)$ defined as:
+\begin{equation*}
+  fix(f) = \bigsqcup _{i \geq 0} f^i(\bot)
+\end{equation*}
+
+- A way to compute the fixed-point which looks as follows
+[[file:Lattice Theory/screenshot_2019-09-01_12-19-09.png]] 	
+- It is a naive algorithm since it does not exploit the special structures common in analysis lattices
+- The time complexity depends on
+	- The height of the lattice
+	- The cost of computing $f(x)$ and testing equality
+
+- Systems of inequalities can also be solved on the form 
+\begin{align*}
+  x_1 &\sqsupseteq f_1(x_1, \dots, x_n) \\
+  x_2 &\sqsupseteq f_2(x_1, \dots, x_n) \\
+  &\vdots \\ 
+  x_n &\sqsupseteq f_n(x_1, \dots, x_n) 
+\end{align*}
+- The system can be also be represented as follows since $x \sqsupseteq y$ is equivalent to $x= x \sqcup y$
+\begin{align*}
+  x_1 &= x_1 \sqcup f_1(x_1, \dots, x_n) \\
+  x_2 &= x_2 \sqcup f_2(x_1, \dots, x_n) \\
+  &\vdots \\ 
+  x_n &= x_n \sqcup f_n(x_1, \dots, x_n) 
+\end{align*}	
+- The same can be done for the following system
+\begin{align*}
+  x_1 &\sqsubseteq f_1(x_1, \dots, x_n) \\
+  x_2 &\sqsubseteq f_2(x_1, \dots, x_n) \\
+  &\vdots \\ 
+  x_n &\sqsubseteq f_n(x_1, \dots, x_n) 
+\end{align*}
+- which also can be represented as follows:	
+\begin{align*}
+  x_1 &= x_1 \sqcap f_1(x_1, \dots, x_n) \\
+  x_2 &= x_2 \sqcap f_2(x_1, \dots, x_n) \\
+  &\vdots \\ 
+  x_n &= x_n \sqcap f_n(x_1, \dots, x_n) 
+\end{align*}	
+
+* Dataflow Analysis with Monotone Frameworks
+** General
+- Classical dataflow analysis starts with a CFG and a lattice with
+  finite height
+	- The lattice describes abstract information which should be infered
+    for the different CFG nodes
+		- May be fixed for all programs or may be parameterized based on a
+      given program
+	- To every node $v$ a constraint variable $[[v]]$ is assigned ranging
+    over the elements of the lattice
+	- For each node a *dataflow constraint* is defined, that relates the
+    value of the variable of the node to those of other nodes
+    depending on the programming language construct it represents
+	- If all the constraints happen to be equations or inequation with
+    monotone right-hand sides then the fixed point algorithm can be
+    used
+
+- The combination of a lattice and a space of monotone functions is
+  called a *monotone framework*
+	- For a given program to be analyzed a monotone framework can be
+    instantiated by specifying the CFG and the rules for assigning
+    dataflow constraints to its nodes
+
+- An analysis is sound if all solutions to the constraints correspond
+  to correct information about the program
+	- The solutions may be more or less imprecise
+	- Computing the lease solution will give the highest degree of
+    precision possible
+
+** Fixed-Point Algorithms
+- Dataflow analysis works as follows:
+	- For a CFG with nodes $Nodes = \{v_1, v_2, \dots, v_n\}$ its is done on the lattice $L^n$ where $L$ is a lattice that models abstract states
+	- Assuming that node $v_i$ generates the dataflow equation $[[v_i]] = f_i([[v_1]], \dots, [[v_n]])$  a combine function $f:L^n \to L^n$ is constructed by defining $f(x_1, \dots, x_n) = f_1(x_1, \dots, x_n), \dots, f_n(x_1, \dots, x_n)$
+	- Applying the fixed-point algorithm gives a desired solution for $[[v_1]] , \dots [[v_n]]$
+
+- A more efficient fixed-point algorithm which exploits has the structure $L^n$ and $f$ is composed from $f_1, \dots, f_n$:
+[[file:Dataflow Analysis with Monotone Frameworks/screenshot_2019-09-01_13-19-47.png]]
+- Each iteration of the while-loop takes the same time as for the naive on but the number of iterations might be lower
+
+- A more efficient algorithm is the /chaotic-iteration algorithm/
+[[file:Dataflow Analysis with Monotone Frameworks/screenshot_2019-09-01_13-36-48.png]]
+
+- In the general case, every constraint variable $[[v_i]]$ may depend on all other variables
+- Most often an instance of $f_i$ will only read the values of a few other variables and this can be represented as a map
+\begin{equation*}
+	dep : Nodes \to 2^{Nodes}
+\end{equation*}
+- This maps each node $v$ to subsets of other nodes for which $[[v]]$ occurs in a nontrivial manner on the right side of their dataflow equations
+	- i.e. the set of nodes whose information may depend on $v$
+	- The inverse is defined as $dep^{-1}(v) = \{w \mid v \in dep(w)\}$
+	- This give rice to the *simple work-list algorithm*:
+[[file:Dataflow Analysis with Monotone Frameworks/screenshot_2019-09-01_13-45-38.png]]
+- The set $W$ is called the work-list with operations ~add~ and ~removeNext~ for adding and nondeterministically removing an item
+	- Initially contains all nodes, so each $f_i$ is applied at least one
+	- Assuming that $|dep(v)$ and $|dep^{-1}(v)|$ are bounded by a constant for all nodes $v$ the time complexity of the simple work-list algorithm can be expressed as
+\begin{equation*}
+  \mathcal O(n \cdot h \cdot k)
+\end{equation*}
+- where $n$ is the number of CFG nodes, $h$ is the height of the lattice $L$ and $k$ is the worst-case time required to compute a constraint function $f_i(x_1, \dots, x_n)$	
+
+** Types of analysis
+- *Live Variables Analysis* argues whether a variable is live a given program point
+- *Available Expression Analysis* checks whether a nontrivial expression in a program is available at a program point
+	- i.e. the current value has already been computed
+- *Very Busy Expressions Analysis* checks whether an expression will definitely be evaluated again before its value changes
+- *Reaching Definitions Analysis* finds those assignments that may have defined the current values of variables.
+	- It can be used to construct a *def-use graph* which is like a CFG excepts that edge go from definitions to possible uses
+	- Uses for dead code elimination and code motion
+- *Interval Analysis* computes for every integer variable a lower and an upper bound for its possible values
+	- Uses a lattice of infinite height
+
+** Forward. Backward, May and Must
+- Dataflow analysis can be classified in various ways
+	- A *forward* analysis is one that for each program point computes information about past behaviour
+		- e.g. sign analysis and available expression analysis
+		- The RHS of the expressions only depends on the predecessors of the CFG node
+	- A *backward* analysis is one that for each program point computes information about future behaviour
+		- e.g. live analysis and very busy expressions analysis
+		- The RHS of the expressions only depends on the successors of the CFG node
+
+- Analyses based on a powerset lattice can the distension be made between *may* and *must* analysis
+	- A *may* analysis describes information that may possible be true
+		- It is an over approximation
+	- A *must* analysis describes information that must definitely be true
+		- It is an under approximation
+[[file:Dataflow Analysis with Monotone Frameworks/screenshot_2019-09-06_08-28-13.png]] 
+
+** Transfer Functions
+- All the constraints functions are on the form
+\begin{equation*}
+  [[x]] = t_v(JOIN(v))
+\end{equation*}
+- for some function $t_v : L \to L$ where $L$ is the lattice modeling
+  abstract states and $JOIN(v) = \bigsqcup_{w \in dep^{-1}(v)}[[w]]$
+
+- The function $t_v$ is called the *transfer function* for the CFG node
+  $v$
+	- It specifies how the analysis models the statement at $v$ as an
+    abstract state transformer
+
+- A work-list algorithm is presented based on transfer functions that
+  avoids some redundancy
+	- The forward analysis of each variable $x_i$ denotes the abstract
+    state for the program point before the corresponding CFG node
+    $v_i$
+[[file:Dataflow Analysis with Monotone Frameworks/screenshot_2019-09-06_08-46-44.png]] 	
+
+** Widening and Narrowing
+- The technique called *widening* is used in flow-sensitive analysis
+  with infinite height lattices
+- Let $f: L \to L$ denote the function from the fixed-point theorem
+  and the naive fixed-point algorithm
+
+- A simple form of widening, which is often sufficient, introduces a
+  function $\omega : L \to L$ so that the sequence:
+\begin{equation*}
+	(\omega \circ f)^i(\bot) \text{ for } i = 0,1,\dots 
+\end{equation*}
+- is guaranteed to converge on a fixed point that is larger than or
+  equal to each $f^i(\bot)$
+	- To ensure that property it is sufficient that $\omega$ is monotone
+    and extensive
+	- Fixed point algorithms can easily be adapted to use widening by
+    applying $\omega$ in each iteration
+
+- $\omega$ will coarse the information sufficiently to ensure
+  termination
+	- Defined pointwise down to single intervals
+	- Operates relative to a fixed finite subset $B \subset N$ that must
+    contain $- \infty$ and $\infty$
+
+- Widening generally shoots above the target
+- If we define
+\begin{equation*}
+  fix = \bigsqcup f^i(\bot) \quad fix\omega= \bigsqcup (\omega \circ f) ^i(\bot)
+\end{equation*}
+- then $fix \sqsubseteq fix\omega$ but the following is also true
+  $fix~\subseteq~f(fix \omega)~\subseteq~fix\omega$ therefore another
+  application of $f$ may improve the result and can be iterated
+  arbitrarily many times, which is called *Narrowing*
+	- It may improve the result
+
+- Traditional widening takes a more sophisticated approx that may lead
+  to better analysis precision where it uses a binary operator
+  $\nabla$
+\begin{equation*}
+  \nabla : L \times L \to L
+\end{equation*}
+- The widening operator $\nabla$ much satisfy
+\begin{equation*}
+	\forall x,y \in L: x \sqsubseteq x \nabla y \land y \sqsubseteq x \nabla y
+\end{equation*}
+- Using this operator a safe approximation can be given of the least
+  fixed-point of $f$ by computing the following sequence
+\begin{align*}
+  x_0 &= \bot\\
+	x_{i+1} &= x_i \nabla f(x_i)
+\end{align*}
+- This sequences eventually converges for some $k$
+- The following is the variant of the naive fixed-point algorithm with (traditional) widening
+[[file:Dataflow Analysis with Monotone Frameworks/screenshot_2019-09-08_17-54-19.png]] 
+
+* Path Sensitivity
+** Introduction
+- So far if and while statements has been handled as a nondeterministic choice between the two branches
+	- It is called *path insensitive* analysis
+	- It fails to include some information that could potentially be used in a static analysis 
+
+** Assertion
+- The language is extended with the artificial statement ~assert(E)~ where $E$ is a boolean expression to exploit the available information
+	- It is only inserted places where $E$ is guaranteed to be true
+	- Conditions on the following form $X > E$ and $E > X$ are considered which is handled by the constraint rule
+\begin{equation*}
+  \text{assert}(X > E): [[v]] = JOIN(v)[X \mapsto gt(JOIN(v)(X), eval(JOIN(v),E))]
+\end{equation*}
+- where gt models the greater than operator:
+\begin{equation*}
+  gt([l_1,h_1],[L_2,h_2]) = [l_1, h_1] \sqcup [l_2, \infty]
+\end{equation*}
+
+** Branch Correlations
+- The use of ~assert~ statements at conditional branches provides a simple kind of path sensitivity called *control sensitivity*
+- A *independent attribute analyses* is where the different values of as the different values of the attributes are independent
+- A *relational* analysis is where one keeps track of the relations between different variables
+	- It can be achieved by generalizing the analysis to maintain multiple abstract states per program point
+	- It can be done by replacing the lattice $L$ by the map lattice
+\begin{equation*}
+  L^{''} = Paths \rightarrow L
+\end{equation*}
+- where /Paths/ is a finite set of /path contexts/
+
+* Interprocedural Analysis
+** Interprocedural Control Flow Graphs
+- *Intraprocedural analysis* is analyzing the body of a single function
+- *Interprocedural analysis* is analyzing the whole program with
+  function calls
+- The subset of the TIP language containing function is used but
+  pointers and functions are ignored as values
+- It is assumed that all function calls are performed in connection
+  with assignments: $X=f(E_1, \dots, E_n);$
+- Each function call statement are represented using two nodes
+	- A *call node* representing the connection from the caller to the
+    entry of $f$
+	- An *after-call node* where execution resumes after returning from
+    the exit of $f$
+[[file:Interprocedural Analysis/screenshot_2019-09-12_15-20-29.png]]
+
+- Each $\text{return } E;$ statement are represented as an assignment
+  using a special variable named ~result~
+[[file:Interprocedural Analysis/screenshot_2019-09-12_15-21-40.png]]
+
+- CFGs can be constructed such that there is always a unique entry
+  node and a unique exit node for each function
+	- The caller and callee are glued together as follows:
+[[file:Interprocedural Analysis/screenshot_2019-09-12_15-24-40.png]]
+- The connection between the call node and its after-call node is
+  represented by a special edge, which is needed for propagating
+  abstract values for local variables of the caller
+
+** Context Sensitivity
+- When calling a function multiple times it can mess up the result
+	- This is due to data flowing along *interprocedurally invalid paths*
+- A simple solution to calling a function multiple times is to clone
+  the function
+	- It can also be achieved by inlinening the function
+	- It can be achieved using context-sensitive analysis on the for
+\begin{equation*}
+  (Contexts \rightarrow lift(States))^n
+\end{equation*}
+- The bottom element of $lift(States)$, is denoted ~unreachable~, is
+  used for call context that are unreachable from the program entry
+
+** Context Sensitivity with Call Strings
+- Let $Calls$ be the set of call nodes in the CFG
+- The *call string* approach to context sensitivity defines
+\begin{equation*}
+  Contexts = Calls ^{\leq k}
+\end{equation*}
+- where $k$ is a positive integer
+	- Using this one can obtain a similar effect as function cloning or
+    inlining without changing the CFG
+	- The idea is that a tuple $(c_1, c_2, \dots, c_m) \in Calls ^{\leq
+    k}$ identifies the topmost $m$ call sites on the call stack
+	- If $(e_1, \dots, e_n) \in (Contexts \rightarrow States)^n$ is a
+    lattice element then $e(c_1, c_2, \dots, c_m)$ provides an
+    abstract state that approximate runtime states that can appear at
+    the ith CFG node
+		- This is assuming that the the node was called from $c_i$ in each
+      case
+
+** Context Sensitivity with a functional approach
+- In the *functional approach* it distinguishes calls based on abstract states at the calls
+- It uses
+\begin{equation*}
+  Context = States
+\end{equation*}
+- The analysis lattice becomes
+\begin{equation*}
+  (States \rightarrow lift(States))^n 
+\end{equation*}	
+
+- A lattice element for a CFG node $v$ is a map $m: States \rightarrow list(States)$
+	- Such that $m(s)$ approximates the possible states at $v$ given that the current function containing $v$ was entered in a state that matches $s$
+	- $m(s) = \text{unreachable}$ means that there is no execution of the program where the function is entered in a state that matches $s$ and $v$ reached
+
+* Control Flow Analysis
+** Definition
+- If functions are introduced as values i.e. higher-order functions or
+  object with methods, then the control flow and data flow suddenly
+  become intertwined
+	- It is no longer trivial to see which code is being called
+	- The task of *control flow analysis* is to conservatively approximate
+    the interprocedural control flow (call graph) for such programs
+
+** Closure Analysis for the $\lambda$ calculus
+- Control flow analysis in its purest form is best illustrated by
+  $\lambda$ calculus
+\begin{align*}
+	E &\to \lambda X.E \\
+	& \mid \quad X \\
+	& \mid \quad E E
+\end{align*} 
+
+- To construct a CFG for a term in this calculus every expression $E$
+  needs to be approximated to the set of *closures* to which it may
+  evaluated
+	- It can be modeled by a symbol of the form $\lambda X$ that
+    identifies a concrete $\lambda$ abstraction
+	- The problem is called *closure analysis*
+	- The lattice used is the powerset of closures occurring in the given term and ordered by subset inclusion
+	- For every AST node $v$ a constraint variable $[[v]]$ is used to denote
+    the set of resulting closures
+
+** The Cubic Algorithm		
+- Given a finite set of *tokens* $\{t_1,\dots,t_k\}$ and a finite set of
+  variables' $x_1,\dots,x_n$ whose values are set of tokens the task
+  is to read a collection of constraints on the form $t \in x$ or $t
+  \in x \Rightarrow y \subseteq$ and produce a minimal solution
+	- Each variable is mapped to a node in a DAG
+	- Each node has an associated bit vector $\in \{0,1\}^k$
+		- Initially all 0's
+	- Each bit has an associated list of pairs of variables, which is
+    used to model conditional constraints
+	- The edges in the DAG reflect inclusion constraints.
+	- Constraints are added one at a time
+	- The bit vectors will at all times directly represent the minimal
+    solution of the constraints seen so far
+	- A constraint of the form $t \in x$ is handled by
+		a) Looking up the node associated with $x$ and settings the
+       corresponding bit to $1$
+		b) If its list of pairs was not empty then an edge between the
+       nodes corresponding to $y$ and $z$ is added for every pair
+       $(y,z)$
+	- A constraint of the form $t \in x \Rightarrow y \subseteq z$ is
+    handled by first testing if the bit corresponding to $t$ in the
+    node corresponding to $x$ has value $1$
+		- If so then an edge between the nodes corresponding to $y$ and
+      $z$ are added
+		- Otherwise the pair $(y, z)$ is added to the list for that bit
+	- If an added edge creates a cycle the corresponding nodes can be
+    merged into one node
+
+- The running time of the algorithm is $O(n^3)$
+
+* Pointer Analysis
+** Allocation-Site Abstraction
+- *Allocation-site abstraction* is a common choice for representing the
+  set of possible memory cells that the pointers may point to, which
+  is to introduce
+	- An abstraction cell $X$ for program variable $X$
+	- An abstraction cell $\mathtt{alloc}-i$ for where $i$ is a unique
+    index for each occurrence of an $\mathtt{alloc}$ operation
+	- Each abstract cell represents the set of cells at runtime that are
+    allocated to the same source location
+	- $Cells$ is used to denote the set of abstract cells for the given
+    program
+	- $Locs$ is used to denote the set of abstract location of the cells
+    which is written as $\& c \in Locs$ for every $c \in Cells$
+	
+** Andersen's Algorithm
+- It is an approach to points-to analysis
+- For each cell $c$ constraint variable $[[c]]$ is introduced ranging over
+  sets of locations
+- The analysis assumes that the program has been normalized so that every pointer operation is one of these six kinds
+	- $X = \mathtt{alloc}~P$ where $P$ is $\mathtt{null}$ or an integer constant
+	- $X_1 = \& X_2$
+	- $X_1 = X_2$
+	- $X_1 = * X_2$
+	- $*X_1 = X_2$
+	- $X = \mathtt{null}$
+
+- The following constraints are generated for each of these pointer operations
+[[file:Pointer Analysis/screenshot_2019-09-27_12-20-00.png]]
+
+** Steensgaard's Algorithm
+- It is an approach to points-to analysis
+- It is a coarsers analysis which can be expressed using term unification
+- A term variable $[[c]]$ is used for every cell $c$
+- A term constructor $\& t$ is used to represent a pointer to $t$
+[[file:Pointer Analysis/screenshot_2019-09-27_13-33-50.png]]
+- Each $\alpha$ denotes a fresh term variable
+- Term constructors satisfy the general term equality axiom:
+\begin{equation*}
+  \& \alpha_1 = \& \alpha_2 \Rightarrow \alpha_1 = \alpha_2
+\end{equation*}
+- The resulting points to function is defined as:
+\begin{equation*}
+  \mathtt{pt}(p) = \left\{t \in Cells \mid [[p]] = & [[t]]\right\}
+\end{equation*}
+	
+** Interprocedural Points-To Analysis
+- CFG and points-to analysis may depend on each other and therefore
+  one should perform the two simultaneously
+- All function calls should be normalized to the form
+\begin{equation*}
+  X = X'(X_1, \dots, X_n) \end{equation*}
+- i.e. all involved expressions are variables and all return
+  expression are assumed to be just variables
+- Andersen's algorithm are very similar to cfg analysis and therefore
+  it can be extended with the appropriate constraints
+- A reference to a constant function $f$ generates the constraint
+\begin{equation*}
+ f \in [[f]] \end{equation*}
+- The computed function call generates the constraint
+[[file:Pointer Analysis/screenshot_2019-09-27_13-47-08.png]]
+- for every occurrence of a function with $n$ parameters
+[[file:Pointer Analysis/screenshot_2019-09-27_13-47-39.png]]
+
+** Null Pointer Analysis
+- Used to ensure the when dereferencing a pointer that it is not a null pointer
+- The lattice used called $Null$ is 
+[[file:Pointer Analysis/screenshot_2019-09-27_13-57-13.png]]
+- Where the bottom element $\mathtt{NN}$ means definitely not $\mathtt{null}$
+- The top element $\top$ represents that values may be $\mathtt{null}$
+- The following map lattice is formed that represents abstract states:
+\begin{equation*}
+  States = Cells \to Null \end{equation*}
+
+- For every CFG node $v$ a constraint variable $[[v]]$ is introduced
+  denoting an element from the map lattice
+	- It describes the state immediately after the node
+
+- For all nodes that does not have a pointer there is the following
+  constraint
+[[file:Pointer Analysis/screenshot_2019-09-27_14-01-09.png]]
+
+- The constraint for heap load operations
+[[file:Pointer Analysis/screenshot_2019-09-27_14-01-58.png]]
+- Other constraint for simple operations
+[[file:Pointer Analysis/screenshot_2019-09-27_14-02-47.png]]
+- The constraint for heap store operations
+[[file:Pointer Analysis/screenshot_2019-09-27_14-04-56.png]]
+- This is called a *weak update*
+	- In a *strong update* the new abstract value overwrites the existing
+    one
+
+** Flow-Sensitive Points-to Analysis
+- It can e.g. be used to discover interesting heap structures
+- A lattice of *point-to graphs* is used
+	- It is directed graphs in which the nodes are the abstract cells of
+    for the given graph and the edges correspond to possible pointers
+	- They are ordered by inclusion of their sets to edges
+	- $\bot$ is the graph without edges and $\top$ is the fully connected graph
+	- i.e. the lattice for abstract states is
+\begin{equation*}
+	States = 2^{Cells \times Cells} \end{equation*}
+
+- For every CFG node $v$ a constraint variable $[[v]]$ is introduced
+  denoting a point-to graph that describes all possible stores at that
+  program point
+	- Constraints:
+[[file:Pointer Analysis/screenshot_2019-09-27_15-02-36.png]]
+- where
+[[file:Pointer Analysis/screenshot_2019-09-27_15-03-28.png]]
+
+- The analysis also computes a flow sensitive points-to map that for
+  each program point $v$ is defined by
+\begin{equation*}
+  pt(p) = \{t \mid (p,t) \in [[v]]\} 
+\end{equation*}
+	
+** Escape Analysis
+- It is used to track whether a pointer to a variable in a scope escapes that scope
+- It can be easily done using the generated point-to graph from the Flow-Sensitive Points-to Analysis
+
+* Abstract Interpretation
+** A Collecting Semantics for TIP
+- A concrete state is a partial map from program variables to
+  integers:
+\begin{equation*}
+  \mathtt{ConcreteStates} = \mathtt{Vars} \hookrightarrow \mathbb Z
+\end{equation*}
+- For every CFG node $v$ there is constraint variable that ranges over
+  sets of concrete states:
+\begin{equation*}
+  \{[[v]]\} \subseteq \mathtt{ConcreteStates} \end{equation*}
+- $\{[[v]]\}$ should denote the set of concrete states that are possible
+  at the program point immediately after the instruction
+	- It is called a *collecting semantics* since is collects states that
+    are possible states
+
+- The function $\mathtt{ceval}: \mathtt{ConcreteStates} \times E \to
+  2^{\mathbb Z}$ gives the semantics of evaluating an expression $E$
+  relative to a concrete state $\rho \in \mathtt{ConcreteStates}$
+	- It results in a set of possible integer values
+[[file:Abstract Interpretation/screenshot_2019-10-03_14-17-32.png]]
+- Evaluation of the other binary operators are defined similary
+- $ceval$ is overloaded such that it also works on sets of concrete
+  states:
+\begin{align*}
+  ceval: 2^{ConcreteStates} \times E &\to 2^{\mathbb Z} \\ ceval(R,E)
+  = \bigcup_{\rho \in R} ceval (\rho, E) \end{align*}
+- The function $\mathtt{csucc}: \mathtt{ConcreteStates} \times
+  \mathtt{Nodes} \to 2^{\mahtt{Nodes}}$ gives the set of possible
+  successors of a CFG node relative to a concrete state
+	- It is also overloaded to work on sets of concrete states
+
+- For a CFG node $v$, $CJOIN(v)$ denotes the set of states at the
+  program point immediately /before/
+[[file:Abstract Interpretation/screenshot_2019-10-03_14-45-53.png]]
+
+- The semantics of a node $v$ that represents an assignment state
+  $X=E$ can be expressed as the following constraint rule:
+[[file:Abstract Interpretation/screenshot_2019-10-03_14-58-01.png]]
+
+- For at variable declaration the following rule is used:
+[[file:Abstract Interpretation/screenshot_2019-10-03_15-02-44.png]]
+	
+- The inital state has the following constraint
+[[file:Abstract Interpretation/screenshot_2019-10-03_15-04-36.png]]
+
+- For all other kinds of nodes, there is this trivial constraint rule:
+[[file:Abstract Interpretation/screenshot_2019-10-03_15-21-05.png]]
+	
+- A program with $n$ CFG nodes, $v_1, dots, v_n$ is represented by $n$ equations:
+[[file:Abstract Interpretation/screenshot_2019-10-03_15-23-25.png]]
+
+- A function $f: L_1 \to L_2$ where $L_1$ and $L_2$ is *continuous* if
+  $f(\bigsqcup A) = \bigsqcup_{a \in A} f(a)$ for every $A \subseteq
+  L$
+	- If $f$ is continuous it is also monotone
+	- For finite lattices continuity coincides with distributively
+
+** Abstract and Concretization
+- The following is an abstraction function from the abstract
+  interpretation to sign analysis
+[[file:Abstract Interpretation/screenshot_2019-10-04_09-13-58.png]]
+[[file:Abstract Interpretation/screenshot_2019-10-04_09-12-53.png]]
+
+- The following is an concretization function from the sign analysis
+  sign analysis to abstract interpretation
+[[file:Abstract Interpretation/screenshot_2019-10-04_09-14-36.png]]
+: 
+- If $L_1$ and $L_2$ are lattices $\alpha: L_1 \to L_2$ is an
+  abstraction function and $\gamma: L_2 \to L_1$ is a concretization
+  function, then $\alpha$ and $\gamma$ usually have the following
+  properties
+	- $\gamma \circ \alpha$ is extensive i.e. $x \sqsubseteq
+    \gamma(\alpha(x))$ for all $x \in L_1$
+	- $\alpha \circ \gamma$ is reductive i.e. $\alpha(\gamma(y))
+    \sqsubseteq y$ for all $y \in L_2$
+- If $\alpha$ and $\gamma$ satisfies these two properties they are
+  called a *Galois connection*
+
+** Soundness
+- Let $\alpha: L_1 \to L_2$ be an abstraction function where $L_1$ is
+  the lattice for a collecting semantics and $L_2$ is the lattice for
+  an analysis. Then an analysis is *sound* with respect to the semantics
+  and the abstraction function if for every program $P$
+\begin{equation*}
+  \alpha(x) \sqsubseteq y \end{equation*}
+- where $x$ is the least solution to the semantic constraints for $P$
+  and $y$ is the least solution to the analysis constraints for $P$
+- Soundness can dually be defined using the concretization function
+[[file:Abstract Interpretation/screenshot_2019-10-05_12-53-57.png]]
+
+- The general recipe for specifying and proving soundness of an
+  analysis consists of the following steps:
+	1) Specify the analysis and check for monotonicity of the constraint
+     functions
+	2) Specify the collecting semantics and check for monotonicity of
+     the semantic constraint functions
+		 - It must capture the desired aspect of concrete execution
+	3) Establish the connection between the semantic lattice and the
+     analysis lattice
+	4) Show that each constituent of the analysis constraints is safely
+     approximating the corresponding constituent of the semantics
+     constraints for all programs
+	5) The soundness then follows from the soundness theorem
+	
+** Optimality
+- It is said that $a f$ is an optimal approximation of $cf$ if
+\begin{equation*}
+  af = \alpha \circ cf \circ \gamma \end{equation*}
+
+- If $af$ is an optimal approximation of $cf$ for every program $P$
+  then it is said that *the analysis is optimal with respect to the
+  analysis lattice*
+
+** Trace Semantics
+- It is used to provide information about how one state at a program
+  point is related to states at other program points
+
+- A *trace* is a finite sequence of pairs of program points and states:
+\begin{equation*}
+  Traces = (Nodes \times ConcreteStates)^* \end{equation*}
+
+- The semantics of a single CFG node is defined as functions from
+  concrete states to concrete states
+- For assignment nodes, $ct_ v$ can be defined as follows:
+\begin{equation*}
+  ct_{X=E}(\rho) = \rho[X \mapsto ceval(\rho,E)] \end{equation*}
+- The semantics variable declaration nodes can be defined similarly
+	- All other nodes do not change the state:
+\begin{equation*}
+  ct_v(\rho) = \rho \end{equation*}
+
+- The trace semantics of a program $P$ is a set of finite traces
+	- It is written as $\langle [p] \rangle \in 2^{Traces}$
+	- It is defined as the set of finite traces that start at the
+    program entry point and in each step proceed according to the CFG
+	- It is defined as the least solution to the following two
+    constraints
+[[file:Abstract Interpretation/screenshot_2019-10-05_13-40-31.png]]
+
+- The relation between the reachable states collecting semantics and
+  the trace semantics can be expressed as a Galois connection
+[[file:Abstract Interpretation/screenshot_2019-10-05_13-42-16.png]]
+
+* Separation logic for sequencial programs
+- Hoare triples are basic predicates about programs
+- The points-to predicate $x \hookrightarrow v$ is the basic propertion about resources
+- These construct satisfy the following type rules:
+\begin{equation*}
+\frac{\Gamma \vdash P: \text { Prop } \quad \Gamma \vdash e: E x p
+\quad \Gamma \vdash \Phi: V a l \rightarrow \text { Prop }}{\Gamma
+\vdash \{P\} e\{\Phi\}: \text { Prop }} \quad \frac{\Gamma \vdash
+\ell: \text { Val } \quad \Gamma \vdash v: \text { Val }}{\Gamma
+\vdash \ell \hookrightarrow v: \text { Prop }} \end{equation*}
+
+- The intuitive reading of the Hoare triple $\{P\} e\{\Phi\}$ is that
+	- If the program $e$ is run in a heap $h$ satifying $P$, then the computation does not get struck
+	- If it terrminates with a value $v$ and a heap $h'$ then $h'$ satisfies $\Phi(v)$
+	- $\Phi$ has two purposes
+		- It describes the value $v$
+		- It describes the resources after the execution of the program
+
+- The essential properties of the points-to predicate is that they are nt duuplicable i.e.
+\begin{equation*}
+	\ell \hookrightarrow v * \ell \hookrightarrow v^{\prime} \vdash
+\text { False } \end{equation*}
+- and that it is a partial function in the sense that
+\begin{equation*}
+	\ell \hookrightarrow v \wedge \ell \hookrightarrow v^{\prime} \vdash
+v=_{v a l} v^{\prime} \end{equation*}
+
+- The following basic axioms for Hoare triples are the following
+[[file:Seperation logic for sequencial
+programs/screenshot_2019-10-27_16-28-30.png]]
+- They are split into three groups
+	1) *The structural rules:* They deal with transforming pre- and postconditions but do not change the program
+	2) *Rules for basic constructs of the language:* For each elimination form and basic heap operation of the language there is a rule stating how the primitive operation transform pre- and postconditions
+	3) The third group is two more structural rules which allow us to move persistent propositions
+		 - These propositions do not depend on any resources in and out of preconditionsThese propositions do not depend on any resources in and out of preconditions
+		 - In postconditions $y.Q$ is used to mean $\lambda v. Q$
+
+- The frame rule
+\begin{equation*}
+	\frac{S \vdash\{P\} e\{v . Q\}}{S \vdash\{P * R\} e\{v . Q * R\}}
+\end{equation*}
+- expresses if an expression $e$ satisfies a Hoare triple, then it will preserve any resources described by a "frame" $R$ disjoint from the resources described by the precondition $P$
+
+- The following rule
+\begin{equation*}
+	\overline{S \vdash\{\text { False }\} e\{v . Q\}} \end{equation*}
+- is trivially sound since there are no resources satisfying False
+
+- The value and evaluation context rules:
+[[file:Seperation logic for sequencial
+programs/screenshot_2019-10-27_16-56-04.png]]
+
+- The ~HT-RET~ rule is simple
+	- The computation conststing of a value does not compute further since it does not require any resources and the return value is just the value itself
+
+- The rule ~HT-BIND~ is used to transform the verification of a big program $E[e]$ to the verification of induvidual steps for which there is basic axoims for Hoare triples 
+
+- *Persistent propositions* is propositions which do not result on any exclusive resources
+	- The essential properties of persistents propositions are the ~HT-EQ~ and ~HT-HT~
+	- The following axiom holds for any *persistent propositions* $P$ and any proposition $Q$
+\begin{equation*}
+	P \wedge Q \vdash P * Q \quad \text { if } P \text { is
+persistent. } \end{equation*}
+
+- Intuitively, if $P$ is persistent, then it does not depend on any exclusive resources
+- The following entailment always holds
+\begin{equation*}
+P * Q+P \vdash Q \end{equation*}
+
+- The rule of consequence:
+[[file:Seperation logic for sequencial
+programs/screenshot_2019-10-27_17-41-07.png]]
+- It states that we can strengthen the precondition and weaken the poscondition
+	- The context must be persistent
+	- This rules is often used and it is often used implicitly
+
+- *Elimination of disjunction and existential quantification* The rules
+[[file:Seperation logic for sequencial
+programs/screenshot_2019-10-27_17-51-43.png]]
+- They allow us to make use of disjunction and existential quantification in the precondition
+
+- *Rules for basic constructs of the language* The first rule appearing in the ~HT-OP~ internalising the operational semantics of binary operations
+
+- The following is the rule for reading a memory location:
+[[file:Seperation logic for sequencial
+programs/screenshot_2019-10-27_17-57-06.png]]
+- To read a resource one needs the precondition that it exists i.e. that it contains $\ell \hookrightarrow u$
+
+- Allocation does not need any precondition
+[[file:Seperation logic for sequencial
+programs/screenshot_2019-10-27_18-07-41.png]]
+
+- Writing to a location $\ell$ requires resources
+[[file:Seperation logic for sequencial
+programs/screenshot_2019-10-27_18-08-35.png]]
+- $\ell \hookrightarrow -$ is shorthand for $\exists u. \ell \hookrightarrow u$
+
+- The following is the recursion rule
+[[file:Seperation logic for sequencial
+programs/screenshot_2019-10-27_18-22-34.png]]
+- It states that to prove that the recursive function application satisfies some specification it is suffices to prove that the body of recursive function satisfies under the assumption that the recursive calls satisfy it
+	- The variable $v$ is the programming language value to which the function is applied
+	- The variable $y$ is the logical variable which is typically connected to the programming language value $v$ in the precondition $P$
+
+* Ghost state
+- *Definition 7.8* A *commutative semigroup* is a set $\mathcal M$ together with a function $(\cdot): \mathcal M \times \mathcal M \to \mathcal M$ called the *operation* such that the operation is *associative* and *commutative*
+	- A commutative semigroup is called a *commutative monoid* if there exists an element $\epsilon$ (called the unit) which is the neutral element for the operation $(\cdot)$ i.e. for all $m \in \mathcal M$ the property $m \cdot \epsilon = \epsilon \cdot m = m$ hold
+	- The set $\mathcal M$ is called the *carrier* of the semigroup
+	- Every semigroup can be made a preorder by definition the extension order $a \preccurlyeq b$ as
+\begin{equation}
+  a \preccurlyeq b \Leftrightarrow \exists c, b=a \cdot c
+\end{equation}
+
+- Certain kinds of commutative semigroups and monoid serve as good abstract models of resources
+	- Resources can be composed using the operation
+	- The unit of the monoid represents the empty resource which in many instances exist
+	- A subset $\mathcal V$ can be used to express valid element which express that certain resources cannot be combined together
+
+- *Definition 7.10* A *resource algebra* is a commutative semigroups together with a subset $\mathcal V \subseteq \mathcal M$ of elements called *valid* and a partial function $|\cdot|:\mathcal M \to \mathcal M$, called the *core*
+	- The set of valid elements is required to have the closure property
+\begin{equation}
+	a \cdot b \in \mathcal{V} \Rightarrow a \in \mathcal{V}
+\end{equation}
+- i.e. if $x$ is valid then every sub-part of $x$ i also valid
+	- The core is required to have the following properties
+\begin{equation}
+	\begin{aligned}
+		|a| \text { defined } & \Rightarrow|a| \cdot a=a \\
+	  |a| \text { defined } &\Rightarrow\|a\|=|a| \\ 
+		a \preccurlyeq b \wedge|a| \text { defined } &\Rightarrow|b| \text
+{ defined } \wedge|a| \preccurlyeq|b| \end{aligned} \end{equation}
+- A resource algebra is *unital* if $\mathcal M$ is a commutative monoid with unit $\epsilon$ and the following properties hold
+\begin{equation}
+\varepsilon \in \mathcal{V} \quad|\varepsilon|=\varepsilon
+\end{equation}
+- In particular $|\epsilon|$ is defined
+
+- The core of the resource algebra is meant to be a function, which for each element captures the "duplicable part" of an element
+	- Sometimes such a duplicable part does not exist and therefore the core is allowed to be a partial functions
+
+- *Definition 7.23 (Frame preserving update).* For any resource algebra $\mathcal M$ with the set of valid elements $\mathcal V$ a relation is defined, the *frame preserving update* $a \leadsto B$ where $a \in \mathcal M$ and $B \subseteq \mathcal V$ is a non-empty subset of valid elements.
+	- It states that any element compatible with $a$ is compatible with some element $B$ i.e.
+\[ a \leadsto B \Longleftrightarrow \forall x \in \mathcal{M}, a \cdot
+x \in \mathcal{V} \Rightarrow \exists b \in B, b \cdot x \in
+\mathcal{V} \]
+- If $B$ is the singleton set $\{b\}$ then $a \leadsto b$ is written for $a \leadsto \{b\}$
+* Exam
+** Verification
+- Question 6
+	- Separation logic: predicate logic
+
+- Exam plan:
+	- Explaining the problem on high level
+	- Give some definition and give example
+		- Or show important rules
+	- Relating to other stuff
+		- The most interesting
+
+- Questions
+	- Why is separation logic important?
+	- What is the evaluation context?
+	- What are the non deterministic parts of the programming language?
+	- How would you represent a hash table in the logic
+	- How would you represent a tree in the logic?

@@ -1,0 +1,854 @@
+* Header
+#+LaTeX_HEADER: \renewcommand{\null}{\text{null}}
+#+LaTeX_HEADER: \usepackage{mathtools}
+#+LaTeX_HEADER: \DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+#+LaTeX_HEADER: \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+* Probabilistic Analysis and Randomized Quicksort
+** Worst-case, average-case, and randomized algorithms
+- $I$ is an input and $T(I)$ is running time on input $I$
+\begin{align*}
+	T_\text{worstcase}(n) &= \max_{\text{inputs } I \text{ of size } n} T(I) \\
+	T_\text{averagecase}(n) &= \stackrel{\text{avg}}{\text{inputs } I \text{ of size } n} T(I)
+\end{align*}	
+
+- *Quicksort:* Given array of some length $n$
+	1. Pick an element $p$ of the array as the pivot (or halt if the array has size $0$ or $1$) 
+	2. Split the array into sub-arrays LESS, EQUAL, and GREATER by comparing each element to the pivot
+		 - LESS has all elements less than $p$
+		 - EQUAL has all element equal to $p$
+		 - GREATER has all elements greater than $p$
+	3. recursively sort LESS and GREATER
+
+- *Basic-Quicksort:* Run the Quicksort algorithm as given above, always choosing the leftmost element in the array as the pivot
+	- Worst-case running time is $\Theta(n^2)$
+	- The average-case running time is $O(n \log n)$
+
+- *Randomized-Quicksort:* Run the Quicksort algorithm as given above, each time picking a random element in the array as the pivot
+	- For any given array input array $I$ of $n$ elements, the expected time of this algorithm $E[T(I)]$ is $O(n \log n)$
+
+** The Basics of Probabilistic Analysis
+- Any probabilistic settings is defined by a *sample space* $S$ and a *probability measure* $p$
+	- The points of the sample space are called *elementary events*
+
+- In a discrete probability distribution the probability measure is a function $p(e)$ over elementary events $e$ such that $p(e) \geq 0$ for all $e \in S$ and $\sum_{e \in S} p(e) = 1$
+	- Also denoted $\Pr(e)$
+
+- An *event* is a subset of the sample space
+
+- A *random variable* is a function from elementary events to integers or reals
+
+- A property of a random variable often considered is its *expectation*. For a discrete random variable $X$ over sample space $S$, the expected value of $X$ is:
+\begin{equation*}
+	\mathbf{E}[X]=\sum_{e \in S} \operatorname{Pr}(e) X(e)
+\end{equation*}
+
+- One often groups together the elementary events according to the different values of the random variable and rewrites the definition like this
+\[
+	\mathbf{E}[X] = \sum_a \Pr(X = a) a
+\]
+
+- For any partition of the probability space into disjoint events $A_1, A_2, \dots$ the expectation of the random variable $X$ can be rewritten as
+\begin{equation}
+	\mathbf{E}[X]=\sum_{i} \sum_{e \in A_{i}} \operatorname{Pr}(e) X(e)=\sum_{i} \operatorname{Pr}\left(A_{i}\right) \mathbf{E}\left[X | A_{i}\right]
+\end{equation}
+- where $\mathbf{E}\left[X | A_{i}\right]$ is the expected value of $X$ given $A_{i},$ defined to be $\frac{1}{P r\left(A_{i}\right)} \sum_{e \in A_{i}} \operatorname{Pr}(e) X(e)$
+
+- An important fact about expected values is *Linearity of Expectation*: for any two random variables $X$ and $Y$
+\[
+	E[X+Y] = E[X] + E[Y]
+\]
+
+- *Theorem 3.1 (Linearity of Expectation)* For any two random variables $X$ and $Y$, $\mathbf{E}[X+Y]=$ $\mathbf{E}[X]+\mathbf{E}[Y]$
+
+** Analysis of Randomized Quicksort
+*** Method 1
+- It is assumed that no two elements in the array are equal
+- *Theorem 3.2* The expected number of comparisons made by randomized quicksort on an array of size $n$ is at most $2n \ln n$
+
+- In terms of the number of comparisons it makes, Randomized Quicksort is equivalent to randomily shuffling the input and then handing it off to Basic Quicksort
+	- i.e. it has also been proven that Basic Quicksort has $O(n \log n)$ average-case running time
+	
+*** Method 2
+- *Theorem 3.3* For Randomized Quicksort, the expected number of comparisons is at most $2n \ln n$
+
+* Basic Probabilistic Inequalities
+- *The Dictionary Problem.*
+	- We receive a set $S$ of $n$ keys $x_1, \dots, x_n$ from a universe $[U] = \{0, \dots, U-1\}$.
+	- The goal is to store $S$ in a data structure such that, given a query element $x \in [U]$ we can quickly determine whether $x \in S$
+	
+- *Hashing with Chaining.* This data structure solves the dictionary problem as follows
+	- Construct an array $A$ with $m$ entries, denoted $A[0], \dots, A[m-1]$
+	- Each array entry stores an initially empty linked list
+		- The list stored at entry $i$ is denoted $List(A[i])$
+	- Pick a random hash function $[U] \to [m]$
+	- It is assumed that $h$ is truly random and can be evaluated in constant time i.e.
+		1. For any set of distinct elements $\{x_1, \dots, x_k\} \subseteq [U]$ and any set of values $v_1, \dots, v_k \in [m]$
+			 - $Pr_h[h(x_1) = v_1 \land \cdots \land h(x_k) = v_k] = 1/m^k$
+			 - Each value $h(x_i)$ is uniform random and independent of $h(x_1), \dots, h(x_{i-1}), h(x_{x+1}), \dots, h(x_k)$
+		2. Given an element $x \in [U]$ one can compute $h(x)$ in $O(1)$ time
+	- After having chosen $h$ elements $x_1, \dots, x_n$ of $S$ is processed one at a time, for the element $x_i$
+		a) Compute $h(x_i)$
+		b) Append $x_i$ to the list $List(A[h(x_i)])$
+	- To answer whether an element $x$ is in $S$
+		a) Compute $h(x)$
+		b) Scan through the list $List(A[h(x)])$ and check if it is there
+
+- *Lemma 1* (Linearity of Expectation). Let $X_1, \dots, X_n$ be real valued discrete random variables and let $X = \sum_i X_i$ be the random variable giving their sum. Then $\mathbb E[\sum_i X_i] = \mathbb E[X] = \sum_i \mathbb E[X_i]$
+	- It does not need the random variables to be independent
+
+- *Lemma 2* (Markov's Inquality). Let $X$ be a real valued non-negative discrete random variable. Then for any $t > 1$. we have $\text{Pr}[X > t \mathbb E [X]] < 1/t$
+	- It requires the random variable to take non-negative values
+
+- *Lemma 3* (Chernoff Bound). Let $X_1, \dots, X_n$ be independent random variables taking values in $\{0,1\}$. Let $X$ denote their sum. Then for any $0 < \delta < 1$, there exists a constant $c_1 > 0$ such that
+\[
+	\text{Pr}[X > (1 + \delta) \mathbb E[X]] > e^{-c_1 \dleta^2 \mathbb E[X]}
+\]	
+- For any $\delta \geq1$, there exists a constant $c_2 > 0$ such that
+\[	
+	\text{Pr}[X > (1+ \delta) \mathbb E[X]] < e^{-c_2 \delta \mathbb E[X] \ln(\delta)}
+\]
+
+- *Lemma 4* (Union Bound). Let $E_1, \dots, E_n$ be events (not necessarily independent). Then
+\[
+	\operatorname{Pr}\left[\bigcup_{i} E_{i}\right] \leq \sum_{i} \operatorname{Pr}\left[E_{i}\right]
+\]
+
+* Cuckoo Hashing
+** Introduction
+- It is assumed the following for implementing the dictionary
+	- All items to be stored have the same size, and two items can be compared in constant time
+	- We have access to hash function $h_1$ and $h_2$ such that
+		- The probability that $h_i(x)$ is equal to a particular value in $\{1,\dots, r\}$ is $1/r$
+		- The function values are independent of each other
+		- The hash values can be computed in constant time
+	- There is a fixed upper bound $n$ on the number of items in the set
+
+** Hashing with Chaining
+- The main idea in hashing based dictionaries is to let the hash functions decide where to store each item
+	- An item $x$ will be stored at position $h_1(x)$ in an array of size $r \geq n$
+
+- For each value $a \in \{1,\dots, r\}$ there is some set $S_a$ of items having the value $a$ when evaluated using $h_1$
+	- A pointer is used from position $a$ to a data structure holding the set $S_a$
+	- This data structure is called a *bucket* and is represented using a linked list
+	- The following must hold for these buckets
+		1. For any two distinct items $x$ and $y$ the probability that $x$ hashed to the bucket of $y$ is $O(1/r)$
+		2. The time for an operation on an item $x$ is bounded by some constant times the number of items stored in the bucket of $x$
+
+** Cuckoo Hashing
+- A *perfect hash function* is a hash functions that has no collisions for elements in the set
+- Instead of requiring that $x$ should be stored at position $h_1(x)$ there are two alternatives position $h_1(x)$ and position $h_2(x)$
+
+- When inserting a new element $x$ there might be no space at both position $h_1(x)$ and position $h_2(x)$, this is resolved as follows
+	- Throw out the current occupant $y$ of position $h_1(x)$ to make room
+	- If the alternative position for $y$ is vacant then there is no problem
+		- Otherwise $y$ repeats the behavior of $x$ and throws out the occupant
+	- This is continued until the procedure finds a vacant position or has taken too long
+		- It is has taken too long new hash functions are chosen and the whole data structure is rebuilt
+
+- $a \leftrightarrow b$ means that the contents of $a$ and $b$ are swapped
+[[file:Cuckoo Hashing/screenshot_2020-02-09_09-17-59.png]]
+
+- *Lemma 1* For any positions $i$ and $j$, and any $c > 1$, if $r \geq 2cn$ then the probability that in the undirected cuckoo graph there exists a path from $i$ to $j$ of length $\ell \geq 1$, which is a shortest path from $i$ to $j$ is at most $c^{-\ell}/r$
+
+** Simple Tabulation Hashing
+ - The scheme views a key $x$ as a vector of $c$ characters $x_1, \dots, x_c$
+ - For each character position a totally random table $T_i4 is initialized and then we use the hash function
+ \[
+	 h(x) = T_1[x_1] \oplus \cdot \oplus T_c[x_c]
+ \]
+
+ - If the keys are drawn from a universe of size $u$ and hash values are machine words then the space required is $O(cu^{1/c})$ words
+
+ - A family $\mathcal H = \{h : [u] \to [m]\}$ of hash functions is $k$ independent if for any $x_1, \dots, x_k \in [u]$ the hash code $h(x_1), \dots, h(x_k)$ are independent random variables and the hash code of any fixed $x$ is uniformly distributed in $[m]$
+
+- *Theorem 2.* Any set of n keys can be placed in two table of size $m=(1+\varepsilon)$ by cuckoo hashing and simple tabulation with probability 1 $-O\left(n^{-1 / 3}\right)$. There exist sets on which the failure probability is $\Omega\left(n^{-1 / 3}\right)$
+
+* High Speed Hashing for Integers and Strings
+** Hash functions
+- A *truly random hash function* $h : U \to [m]$ assigns an independent uniformly random variable $h(x)$ to each key in $x$
+	- $|U| \log_2(m)$ bits are needed to store such a hash function
+
+- *Definition* A hash function $h : U \to [m]$ is a random variable in the class of all functions $U \to [m]$
+	- It consists of a random variable $h(x)$ for each $x \in U$
+
+- The three things important for a hash function
+	- *Space* The size of the random seed necessary to calculate $h(x)$ give $x$
+	- *Speed* The time it takes to calculate $h(x)$ given $x$
+	- *Properties of the random variable* 
+
+** Universal hashing
+*** Definition
+- A random hash function $h : U \to [m]$ should be generated
+	- From a key universe $U$ to a set of hash values $[m] = \{0, \dots, m-1\}$
+	- $h$ thought of as a random variable following some distribution over functions $U \to [m]$
+
+- $h$ is universal if for any given distinct keys $x, y \in U$ when $h$ is picked at random then the following must hold
+\[
+	\Pr_h[h(x) = h(y)] \leq 1/m
+\]
+
+- $h$ is called $c$ universal if for $c= O(1)$
+\[
+	\Pr_h[h(x) = h(y)] \leq c/m
+\]
+
+- An important application of these is *hash tables with chaining*	
+
+*** Multiply-mod-prime
+- One may assume that $m < u$ and that $m > 1$
+- The classical hash function is based on a prime number $p \geq u$
+	- Pick uniformly at random $a in [p]_+ = \{1, \dots, p-1\}$ and $b \in [p] = \{0, \dots, p-1\}$
+	- Define $h_{a,b} : [u] \to [m]$ by
+\[
+	h_{a,b}(x) = ((ax + b) \text{ mod } p) \text{ mod } m
+\]
+
+- $h_{a,b}(x)$ is a universal hash function
+
+*** Multiply-shift
+- Multiply-shift addresses hashing from $w$ bit integers to $\ell$ bit integers
+- One picks uniformly at random an odd $w$ bit integer $a$ and compute $h_a : [2^w] \to [2^\ell]$ as 
+\[
+	h_a(x) = \lfloor (ax \text{ mod } 2^w) / (2^{w-\ell}) \rfloor
+\]
+- It is much faster faster than multiply-mod-prime
+- Multiply-shift is 2 universal
+
+** Strong universality
+*** Definition
+- For $h : [u] \to [m]$ pair-wise events on the following form are considered
+	- Given two distinct keys $x,y \in [u]$ and two possible non-distinct hash values $q,r \in [m]$ we have $h(x)$ and $h(y) = r$
+	- A random hash function $h : [u] \to [m]$ is *strongly universal* if the probability of every pair-wise event is $1/m^2$
+
+- *Observation* An equivalent definition of strong universality is that each key is hashed uniformly into $[m]$ and that very two distinct keys are hashed independently
+
+- Strong universality is also called *2-independence*
+
+- *Definition* A random hash function $h : U \to [m]$ is strongly $c$ universal if
+	1. $h$ is $c$ uniform, meaning for every $x \in U$ and for every hash value $q \in [m]$ that $\Pr[h(x) = q] \leq c/m$
+	2. Every pair of distinct keys hash independently
+
+*** Applications
+- An important application of strongly universal hashing is *coordinated sampling*
+	- Based on small samples one can reason about the similarity of huge sets
+
+- Sampling from a single set $A \subseteq U$ can be done using a strongly universal hash function $h : U \to [m]$ and a threshold $t \in \{0, \dots, m\}$
+	- One sample $x$ if $h(x) < t$ which happens with probability $t / m$ for any $x$
+	- Let $S_{h,t}(A) = \{x \in A \mid h(x) < t\}$ denote the resulting sample form $A$
+	- By linearity of expectation $E\left[\left|S_{h, t}(A)\right|\right]=|A| \cdot t / m$ and therefore one can estimate $|A|$ as $\left|S_{h, t}(A)\right| \cdot m / t$
+
+- If for two different sets $B$ and $C$ one have found the samples $S_{h,t}(B)$ and $S_{h,t}(C)$
+	- One can based on these compute the sample of the union and the union of the samples $S_{h, t}(B \cup C)= S_{h, t}(B) \cup S_{h, t}(C)$ and likewise for the intersection
+	- The size of the union and the intersection can be estimated by multiplying the corresponding sample sizes by $m/t$
+
+- *Lemma* Let $X= |S_{h,t}(A)|$ and $\m = E[|X|] = |A| \cdot t/m$. Then $\Var(X) \leq \mu$ and for every $q >0$
+\[
+	\Pr[|X - \mu| \geq q \sqrt(\mu)] \leq 1/q^2
+\]
+
+*** Multiply-mod-prime
+- For some prime $p$ uniformly at random pick $(a,b) \in [p]^2$ and define $h_{a,b} : [p] \to [p]$ by
+\[
+	h_{a, b}(x)=(a x+b) \bmod p
+\] 
+
+*** Multiply-shift
+- For any bit-string $z$ and integers $j > i \geq 0$, $z[i,j) = z[i,j-1]$ denotes the number represented by bits $i, \dots, j-1$ so
+\[
+	z[i,j) = \lfloor (x \bmod 2^{j}/2^i)
+\]
+	
+- To get strongly universal hashing $[2^w] \to [2^\ell]$
+	- Pick any $\bar w \geq 2+ \ell +1$
+	- For any pair $(a,b) \in [\bar w]^2$ define $h_{a,b} : [2^w] \to [2^\ell]$ by
+\[
+	h_{a, b}(x)=(a x+b)[\bar{w}-\ell, \bar{w})
+\]
+
+- *Fact* Consider two positive integers $\alpha$ and $m$ that are relatively prime. If $X$ is uniform in $[m]$, then $(aX) \bmod m$ is also uniformly distributed in $[m]$
+
+- *Theorem* When $a,b \in [2^{\bar w}]$ are uniform and independent, the multiply-shift scheme is strongly universal
+
+- Lemma 3.5 Let $\bar{w} \geq w+\ell-1$. Consider a random function $g: U \rightarrow\left[2^{\bar{w}}\right]$ with the property that there for any distinct $x, y \in U$ exists a positive $s<w$, determined by $x$ and $y$ (and not by $g$), such that $(g(y)-g(x))[0, s)=0$ while $(g(y)-g(x))[s, \bar{w})$ is uniformly distributed in $\left[2^{\bar{w}-s}\right] .$ For buniform in $\left[2^{\bar{w}}\right]$ and independent of $g$, define $h_{g, b}: U \rightarrow\left[2^{\ell}\right] b y$
+$$
+h_{g, b}(x)=(g(x)+b)[\bar{w}-\ell, \bar{w})
+$$
+- Then $h_{g, b}(x)$ is strongly universal.
+
+** Beyond strong uiversality
+- A hash function $H: U \to [m]$ is $k$ independent if for any distinct keys $x_1, \dots, x_k \in [u]$, the hash values $H(x_1), \dots, H(x_k)$ are independent random variables, which each are uniformly distributed in $[m]$
+
+- For prime $p$ one can implement a $k$ independent $H:[p] \to [p]$ using $k$ random coefficients $a_0, \dots, a_{k-1} \in [p]$ defining
+\[
+	H(x) = \sum_{i=1}^{k-1} a_ix^i \bmod p
+\]
+
+* Streaming Algorithms: Frequent Items
+** Introduction
+- In the streaming settings
+	- We have a data stream $x_1, \dots, x_n$ with $x_i \in [m]$
+	- The available memory is $O(log^c n)$
+
+- Algorithms for finding frequent items in a stream
+
+** Deterministic Algorithm
+- The following algorithm estimates item frequencies $f_j$ within an additive error of $n/k$ using $O(k \log n)$ memory
+	1. Maintain set $S$ of $k$ counters, initialize to $0$
+	2. For each element $x_i$ in stream
+		 a) If $x_i \in S$ increment the counter for $x_i$
+		 b) If $x_i \notin S$ add $x_i$ to $S$ if space is available else decrement all counters in $S$
+
+- An item in $S$ whose count falls to $0$ can be removed
+- The space requirement for storing $k$ counters is $k \log $n$
+- The update time per item is $O(k)$
+- The algorithm estimates the count of an item as the value of its counter or zero if it has no counter
+
+- *Claim 1* The frequency estimate $n_j$ produced by the algorithm satisfies $f_j - n/k \leq n_j \leq f_j$
+
+** Count min sketch
+- The turnstile model allows both addition and deletions of items in the stream
+	- The stream consists of pairs $(i,c_i)$ where $i \in [m]$ is an item and $c_i$ is the number of items to be added or deleted
+	- The count of an item can not be negative at any stage
+	- The frequency of an item $j$ is $f_j = \sum c_j$:
+
+- The following algorithm estimates frequencies of all items up to an additive error of $\epsilon |f|_1$ with probability $1 - \delta$
+	- The $\ell_1$ norm $|f|_1$ is the number of items present in the data set
+
+- The two parameters $k$ and $t$ in the algorithm are chosen to be $(2/\epsilon, \log(1/\delta))$
+	1. Maintain $t$ arrays $A[i]$ each having $k$ counters, hash function $h_i : U \to [k]$ drawn from a 2-wise independent family $\mathcal H$ is associated to array $A[i]$
+	2. For element $(j, c_j)$ in the stream update counters as follows: $A\left[i, h_{i}(j)\right] \leftarrow A\left[i, h_{i}(j)\right]+c_{j} \quad \forall i \in[t]$
+	3. The frequency estimate for item $j$ is $\min_{i \in [t]} A[i, h(j)]$
+
+- The output estimate is always more than the true value of $f_j$ as the count of all items in the stream is non negative
+
+** Count Sketch
+- This sketch algorithm has an error in terms of the $\ell_2$ norm $|f|_ 2 = \sqrt{\sum_j f_j^2}$
+- The relation between the $\ell_1$ and $\ell_2$ norms is $\frac{1}{\frac n} |f|_1 \leq |f| \leq |f|_1$, the $\ell_2$ norm is less than the $\ell_1$ norm this means that the guarantee is better than that for the previous one
+	1. Maintain $t$ arrays $A[i]$ each having $k$ counters, hash functions $g_i: U \to \{-1,1\}$ and $h_i : U \to [k]$ drawn uniformly at random from a 2-wise independent family associated to array $A[i]$
+	2. For element $(j,c_j)$ in the stream update the counters as follows: $A\left[i, h_{i}(j)\right] \leftarrow A\left[i, h_{i}(j)\right]+g_{i}(j) c_{j} \quad \forall i \in[t]$
+	3. The frequency estimate for item $j$ is the median over the $t$ arrays of $g_i(x_j)A_[i,h(j)]$
+
+* Johnson-Lindenstrauss Dimensionality Reduction
+** Simple JL Lemma
+- *The Johnson-Lindenstrauss Lemma* For any $0<\epsilon < \frac12$ and any integer $m$, then for integer
+\[
+	k = O(\frac{1}{\epsilon^2} \lg m)
+\]
+- large enough and any $m$ points $x_1, \dots, x_m \subset \mathbb R^d$	there exists a linear map (matrix) $L: \matbb R^d \to \mathbb R^k$ such that for any $1 \leq i$, $j \leq m$
+\[
+	(1-\epsilon) \| x_i - x_j \|^2_2 \leq \|Lx_i - Lx_j \|^2_2 \leq (1+\epsilon)\|x_i - x_j\| ^2_ 2
+\]
+- The linear transformation $L$ is simply multiplication by a matrix whose entries are sampled independently from a standard Gaussian
+
+- *Lemma 1.* Fix any vector unit vector. For any $0 < \epsilon$, $\delta < \frac12$. For $k = O(\epsilon^{-2} \log \frac1\delta)$ large enough let $L = \frac{1}{\sqrt k} A$ by a random variable, where $A$ is a $k \times d$ random matrix whose entries are independent zero mean Gaussians $(\sim \mathcal N(0,1))$ Then:
+\[
+	\text{Pr}_{L}\left(\|L x\|^{2}-1 |>\varepsilon\right) \leq \delta
+\]
+
+- *Fact 1.* For any constants $a,b$ if $X \sim \mathcal N(0,1)$, and $Y \sim \mathcal N(0,1)$ then $aX + bY \sim \mathcal{N}(0, a^2 \sigma^2_x + b^2 \sigma^2_y)$
+- *Definition 1.* If $Z_1, \dots, Z_k$ are independent, standard normal random variables $(Z_i \sim \mathcal N(0,1)$), then the sum of their squares
+\[
+	Q = \sum_{i=1}^k Z_i^2
+\]
+- is distributed according to the chi-squared distribution with $k$ degrees of freedom denoted as $Q \sum \chi_k^2$
+- *Lemma 2* Let $Y \sim \chi_k^2$. Then
+\[
+	\text{Pr}_{Y}\left(\left|\frac{Y}{k}-1\right| \geq x\right) \leq e^{-\frac{3}{16} k x^{2}}, x \in\left[0, \frac{1}{2}\right)
+\]
+
+- *Lemma 3.* Given any unit vector $x \in \mathbb R^d$. Let $A$ be the random variable matrix with each $A_{i,j} \sim \mathcal N(0,1)$ independently of the other entries. Then the random variable that is the squared norm of Ax is $\chi_{k,d}$ distributed i.e.
+\[
+	\|A x\|^{2} \sim \chi_{k}^{2}
+\]   	
+
+** Sparse Embeddings
+- An approach to speed up JL is to use an embedding matrix $A$ that is *sparse*
+	- A sparse matrix is a matrix with few non-zeroes
+	- If one can use an embedding matrix $A$ where each column has only $t$ non-zeroes, then the embedding time improves to $O(dt)$
+
+- The sparsity of a vector $x$ is denoted $\| x \|_0$ which equals the number of non-zeroes in $x$
+	- The embedding time of classic JL is $O(m \| x \|_0)$ with a matrix having $t-sparse columns, it is $O(t \|x\|_0)$
+
+- The following constructions preserves with high probability all pairwise distances for a set of $n$ points
+	- For each column of the matrix $A \in \mathbb R^{m \times d}$ pick a uniform random set of $t = O(\epsilon^{-1} \lg n)$ rows an assign the corresponding entries either $-1$ or $+1$ uniformly at random and independently
+	- Embed $x$ as $t^{-1/2} A x$
+	- The embedding time compared to standard JL went from $O(\| x \|_0 \epsilon^{-2} \lg n)$ to $O(\| x \|_0 \epsilon^{-1} \lg n)$, that is an $\epsilon^{-1}$ improvement
+	- The target dimensionality $m$ remains optimal $O(\epsilon^{-2} \lg n)$ 
+
+** Feature Hashing
+- The ratio between the largest coordinate $\|x\|_\infty$ and $\|x\|_2$ is small
+- In feature hashing $A$ have exactly one non-zero per column, chosen at a uniform random row and wqith a value that is uniform among $-1$ and $+1$
+	- It is really the construction of Kane and Nelson with $t=1$
+	- Feature hashing has the fastest possible embedding time of just $O(\|x\|_0)$
+
+- Feature hashing into the optimal $m = O(\epsilon^{-2} \lg n)$ preserve all distances within $(1 \pm \epsilon)$ exactly when
+\[
+	\frac{\|x\|_{\infty}}{\|x\|_{2}}=O\left(\varepsilon^{-1 / 2} \cdot \min \left\{\frac{\lg (1 / \varepsilon)}{\lg n}, \sqrt{\frac{1}{\lg n}}\right\}\right)
+\]
+- If one embeds into $m \geq \epsilon^{-2} \lg n$ dimensions, then distances are preserved when
+\[
+	\frac{\|x\|_{\infty}}{\|x\|_{2}}=O\left(\varepsilon^{-1 / 2} \cdot \min \left\{\frac{\lg (\varepsilon m / \lg n)}{\lg n}, \sqrt{\frac{\lg \left(\varepsilon^{2} m / \lg n\right)}{\lg n}}\right\}\right)
+\]
+
+** Fast Johnson-Lindenstrauss Transform
+- Instead of using sparse matrices for embeddings, another approach is to use matrices for which there are efficient algorithms to compute the product $Ax$
+
+- The observation is that if the data vectors have only small coordinates i.e. the ratio $\| x \|_{\infty} / \| x \|_2$ is small, then one can use very sparse matrices for the embedding
+	- The main idea is to first multiply $x$ with a matrix which ensures that coordinates becomes small and then use a sparse matrix afterwards
+
+* Near-Optimal Hashing Algorithms for Approximate Nearest Neighbor in High Dimensions
+** Introduction
+- The *nearest neighbor* problem: Given a collection of $n$ points, build a data structure which given any query point, reports the data point that is closest to the query
+	- A interesting and well-studied instance is where the data points live in a $d$ dimensional space under some distance function
+
+- There are several efficient algorithms for when the dimension $d$ is low
+	- e.g. $kd$ trees
+- The current solutions suffer from either space of query time that is exponential in $d$
+	- Many uses approximations to overcome this problems where for some $c > 1$ called the *approximation factor* the query is at most $c$ times  the distance from the query to its nearest points
+
+** Geometric Normed Spaces
+- $P$ is used to denote the set of data points
+	- It has cardinality $n$
+	- The points belong to a $d$ dimensional space $\mathbb R^d$
+	- $p_i$ is used to denote the ith coordinate of $p$ for $i=1, \dots, d$
+
+- For any two points $p$ and $q$, the distance between them is defined using the $\ell_s$ norm for a parameter $s> 0$
+\[
+	\|p-q \|_s = \left(\sum_{i=1}^d | p_i - q_i |^s \right)^{1/s}
+\]
+
+- The *hamming distance* is the number of positions on which the points $p$ and $q$ differ
+
+** Problem Definition
+- The nearest neighbor problem is an *optimization* problem since the goal is to find a point which minimizes a certain objective function
+	- The algorithms that are presented solve the decision version of the problem
+
+- A point $p$ is a $R$ *near neighbor* of a point $q$ if the distance between $p$ and $q$ is at most $R$
+	- The algorithm either returns one of the $R$ near neighbors or concludes that no such point exists for some parameter $R$
+
+- *Definition (Randomized c-approximate $R$ near neighbor)*:
+	- Given a set $P$ of points in a $d$ dimension space $\mathbb R^d$ and parameters $R > 0$, $\delta > 0$
+	- Constructs a data structure such that given any query point $q$, if there exists an $R$ near neighbor of $q$ in $P$ it reports some $cR$ near neighbor of $q$ in $P$ with probability $1- \delta$
+
+- The probability of success can be amplified by building and querying several instances of the data structure
+
+- *Definition (Randomized $R$ near neighbor reporting)*:
+	- Given a set $P$ of points in a $d$ dimensional space $\mathbb R^d$ and parameters $R > 0$ $\delta > 0$
+	- Constructs a data structure that, given any *query* point $q$, reports each $R$ near neighbor of $q$ in $P$ with probability $1-\delta$
+
+** Locality-Sensitive Hashing
+- *Definition (Locality-sensitive hashing)*. A family $\mathcal H$ is called $(R, cR, P_1, P_2)$ sensitive if for any two points $p,q \in \mathbb R^d$
+	- if $\|p-q \| \leq R$ then $\Pr[h(q) = h(p)] \geq P__1$ 
+	- if $\|p-q \| \geq cR$ then $\Pr[h(q) = h(p)] \leq P_2$
+
+- For a (LSH) family to be useful, it has to satisfy $P_1 > P_2$
+
+** Algorithm
+[[file:Near-Optimal Hashing Algorithms for Approximate Nearest Neighbor in High Dimensions/screenshot_2020-03-22_10-21-06.png]]	
+
+- An LSH family $\mathcal H$ can be used to design an efficient algorithm for approximate near neighbor search
+	- One can typically not use $\mathcal H$ as is since the gap between the probability $P_1$ and $P_2$ could be quite small
+	- An amplification process is needed to get the desired probabilities of collision
+
+- Given a family $\mathcal H$ of hash function with parameters $(R, cR, P_1, P_2)$ the gap is amplified by concatenating several functions
+	- For parameters $k$ and $L$ choose $L$ functions $g_j(q) = (h_{1,j}(q), \dots, h_{k,j}(q))$, where $h_{t,j}$ ($1 \leq t \leq k$, $1 \leq j \leq L$) are chosen independently and uniformly at random from $\mathcal H$
+	- These are the functions used to hash the data points
+
+- The data structure is constructed by placing each point $p$ from the input set into a bucket $g_j(p)$ for $j=1,\dots,L$
+	- One only retain the nonempty buckets by resorting to hashing of the values $g_j(p)$
+	- The data structure uses only $O(nL)$ memory cells
+
+- To process a query $q$
+	- One scans through the buckets $g_1(q), \dots, g_L(q)$
+	- Retrieve the points stored in them
+	- Compute their distances to the query point and report any points the is a valid answer to the query
+
+- There are two scanning strategies possible for computing the distances
+	1. Interrupt the search after finding the first $L'$ points for some parameter $L'$
+		 - Solves the $(c,R)$ near neighbor problem
+		 - This with $L' = 3L$ yields a solution to the *randomized c-approximate $R$ near neighbor problem* with parameters $R$ and $\delta$ for some constant failure probability $\delta < 1$
+		 - To obtain this guarantee it suffices to set $L$ to $\Theta(n^\rho)$ where $\rho = \frac{\ln 1/P_1}{\ln 1/P_2}$
+		 - The algorithm runs in time proportional to $n^\rho$ which is sublinear in $n$ if $P_1 > P_2$
+	2. Continue the search until all points from all buckets are retrieved
+		 - Solves the $(c,R)$ near neighbor reporting problem
+		 - No additional parameter is required
+		 - Can be used to solve the *randomized $R$ near neighbor reporting problem*
+		 - The failure probability $\delta$ depends on the choice of the parameters $k$ and $L$
+		 - The query time also depends on the choice of parameters $k$ and $L$
+			 - Could be as high as $\Theta(n)$ in the worst case
+			 - For many natural data sets a proper choice of parameters results in a sublinear query time
+
+** Analysis
+- Let $p$ be any $R$ neighbor of $q$ and consider any parameter $k$
+	- For any function $g_i$ the probability that $g_i(p) = g_i(q)$ is at least $P_1^k$
+	- The probability that $g_i(p) = g_i(q)$ for some $i=1,\dots,L$ is at least $1-(1- P_1^k)^L$
+	- If $L=\log_{1-P_1^k} \delta$ so that $(1-P_1^k)^L \leq \delta$, then any $R$ neighbor of $q$ is returned by the algorithm with probability at least $1-\delta$
+
+- Larger values of $k$ lead to a large gap between the probabilities of collision for close points and far points i.e. the probabilities $P_1^k$ and $P_2^k$
+	- The benefit of this amplification is that the hash functions are more selective
+	- If $k$ is large then $P_1^k$ is small and there $L$ must be sufficiently large to ensure that an $R$ near neighbor collides with the query point at least once
+
+* Nearest Neighbor Search
+** Algorithm
+- Assume the availability of a family of hash functions $\mathcal H$ that is $(R, cR, P_1, P_2)$ sensitive for dist.
+	- It is assumed that the functions in $\mathcal H$ maps from $\mathbb R^d$ to bit strings of some fixed length $w$
+
+- The preprocessing of the point set $P$ is as follows if $\delta = 1/2$
+[[file:Nearest Neighbor Search/screenshot_2020-03-22_11-34-45.png]]
+
+- If it takes $O(d)$ time to compute $\text{dist}(p,q)$ and $t$ time to evaluate simple hash functions $h \in \mathcal H$, the worst case query time is $O(L(d + tk))$
+- The total space usage is $O(nd + Ln)$ where 
+	- $O(nd)$ comes from storing the input
+	- $O(Ln)$ comes from storing the pointers in the hash tables $H_i$
+
+- To obtain a data structure when correctness must be $1-\delta$ for arbitrary $\delta$ make $\lg(1/\delta)$ copies of the above data structure
+	- On a query $q$ query all $\lg(1/\delta)$ copies
+	- If one of the succeds in finding a $cR$ near neighbor then the query is answered correctly
+	- The final query time becomes $O(L(d+t k) \lg (1 / \delta))$ and the final space usage becomes $O(n d+L n \lg (1 / \delta))$
+
+** Other Distance Measures
+- $\ell_1$ distance or Manhattan distance: For two points $p,q \in \mathbb R^d$, $\text{dist}_{\ell_1}(p,q) = \sum_{i=1}^d | p_i - q_i |$
+- Given the radius $R$ and approximation factor $c$ one can design a sensitive family of hash functions as follows: For a radius $w$ to be determined consider the (infinite) family
+\[
+	\mathcal{H}=\left\{h_{\left(o_{1}, \ldots, o_{d}\right)}(x)=\left(\left\lfloor\frac{x_{1}-o_{1}}{w}\right\rfloor, \cdots,\left\lfloor\frac{x_{d}-o_{d}}{w}\right\rfloor\right) | o_{1}, \ldots, o_{d} \in[0, w)\right\}
+\]
+- This family $\mathcal H$ is $\left(R, c R, e^{-(R / w)(1+2 R / w)}, e^{-c R / w}\right)$ sensitive
+	
+** Set Similarity Search
+- The input consists of $n$ sets $S_1, \dots, S_n$, all subsets of a universe $U$
+- A classic measure of set similarity is the *Jaccard coefficient*, which for two sets $A$ and $B$ is defined as
+\[
+	J(A,B) = \frac{|A \cap B|}{|A \cup B|}
+\]
+- The Jaccard coefficient lies between 0 and 1
+	- $J(A,B) = 1$ when $A$ and $B$ are identical
+	- $J(A,B) = 0$ when $A$ and $B$ are disjoint
+
+- Nearest neighbor queries on sets should be supported i.e. given a set $C$ find the set $S_i$ in the data that is most similar to $C$
+
+- One can define the following distance measure using the Jaccard coefficient
+\[
+	\text{dist}_J(A,B) 1- J(A,B)
+\]
+
+- A family of hash functions $\mathcal H \subseteq U \to \mathbb R$ is min-wise independent if for all $x \in U, S \subset U$ with $x \notin S$ it holds that
+\[
+	\text{Pr}_{h \sim H}\left[h(x)<\min _{y \in S} h(y)\right]=\frac{1}{|S|+1}
+\]
+- Which means that in any set, each element has exactly the same probability of receiving the smallest hash value
+	- It is assumed that any $h \in \mathcal H$ returns distinct values for all $x \in U$
+
+- If one have a min-wise independent family of hash functions $\mathcal H$ and define from it a new family of hash functions $\mathcal G_{\mathcal H} \subset 2^U \to U$ as follows:
+\[
+	\mathcal{G}_{\mathcal{H}}=\left\{g_{h}(A)=\underset{x \in A}{\operatorname{argmin}} h(x) | h \in \mathcal{H}\right\}
+\]
+- It maps sets $A \subseteq U$ to hash values in $U$
+	- It family $\mathcal G_{\mathcal H}$ has one function $g_h$ for each function $h \in \mathcal H$
+	- $\mathcal G_{\mathcal H}$ is $(R,cR, 1-R, 1-cR)$ sensitive with respect to the distance measure $\text{dist}_J$
+
+** Constructing Min-Wise Independent Families
+- Min-Wise Independent Families are impossible to construct using a small random seed
+- One can find efficient families that are only approximately min-wise independent
+	- This suffices to get reasonable nearest neighbor search structures
+
+- A family of hash functions $\mathcal H$ is $\epsilon$ approximate min-wise independent, if for any $x \in U$ and any set $S \subset U$ with $x \notin S$ one has that
+\[
+	\text{Pr}_{h \sim \mathcal{H}}\left[h(x)<\min _{y \in S} h(y)\right] \in \frac{1 \pm \varepsilon}{|S|+1}
+\]
+
+- Any $O(\lg(1/\epsilon))$ wise independent family of hash functions is also $\epsilon$ approximate min-wise independent
+
+- A classical example of a $k$-wise independent family of hash functions is the following for any prime $p > U$:
+\[
+	\mathcal{H}=\left\{h_{a_{k-1}, \ldots, a_{0}}(x)=\sum_{i=0}^{k-1} a_{i} x^{i} \bmod p | a_{0}, \ldots, a_{k-1} \in [p] \right\}
+\]
+
+- The simple tabulation hash function is $\epsilon$ approximate min-wise independent with $\epsilon = O(\lg^2 n/n^{1/c})$ where $c$ is the number of tables used for the hash function
+	- $c$ is the number of tables used for the hash function
+	- $n$ is the cardinality of the set $S$
+
+** $\ell_2$ distance
+- The $\ell_2$ distance / Euclidian distance is given by $\text{dist}_{\ell_2}(p,q) = \sqrt{\sum_{i=1}^d(p_i - q_i)^2}$
+
+- Let $w$ be a parameter to be fixed and consider the following (infinite) family of hash functions:
+\[
+	\mathcal{H}=\left\{h_{o, u}(x)=\left\lfloor\frac{\langle x, u\rangle-o}{w}\right\rfloor | o \in[0, w), u \in \mathbb{R}^{d}\right\}
+\]
+- To draw a hash function $h_{o,u}$ from $\mathcal H$ one picks the offset $o$ uniformly in $[0,w)$ and the vector $u$ such that each coordinate is independently $\mathcal N(0,1)$ distributed
+* Randomized Rounding in Approximation Algorithms
+** A $\frac78$ Approximation Algorithm for MAX 3SAT
+- The input for MAX 3SAT are $n$ Boolean variables $x_1, \dots, x_n$ and $m$ clauses
+	- Each clause is the disjunction of 3 literals where a literal is a variable of its negation
+	- The goal is to output a truth assignment that satisfies the maximum-possible number of clauses
+	- It is an NP-hard problem
+
+- *Theorem* The expected number of clauses satisfied by a random trust assignment, chosen uniformly at random from all $2^n$ truth assignment is $\frac78$ m
+	- Therefore an algorithm that chooses a random assignment is a $\frac78$ approximation in expectation since the optimal solution cannot satisfy more than $m$ clauses
+
+- *Corollary* For every 3SAT formula, there exists a truth assignment satisfying at least $87.5 \%$ of the clauses
+
+** Randomized Rounding
+- In the *edge-disjoint paths* problems
+	- The input is a graph $G=(V,E)$ directed or undirected and source-sink pairs $(s_1, t_1), \dots, (s_k,t_k)$
+	- The goal is to determine whether or not there is an $s_i-t_i$ path $P_i$ for each $i$ such that no edge appears in more than one of the $P_i$'s
+	- The problem is NP-hard
+
+- The linear programming rounding approach to approximation algorithms:
+	1. Solve a LP relaxation of the problem
+		 - For an NP hard problem the optimal solution is expected to be fractional
+	2. "Round" the resulting fractional solution to a feasible (integral) solution, hopefully without degrading the objective function value by too much
+
+- In *Randomized* LP rounded the idea is to interpret the fractional values to an LP solution as specifying a probability distribution and then to round variables to integers randomly according to this distribution
+	- Used in the edge-disjoint paths problems
+
+- The rounding set yields path $P_1, \dots, P_k$ and this will in general not be disjoint
+	- The goal is to probe that they are approximately disjoint in some sense
+
+- *Theorem* Assume that the LP relaxation is feasible. Then with high probability, the randomized rounding algorithm outputs a collection of path such that no edge is used more than
+\[
+	\frac{3 \ln m}{\ln \ln m}
+\]
+- of the paths, where $m$ is the number of edges	
+
+** A Linear Programming Relaxation of Set Cover
+- Set Cover 
+	- We are given a finite set $U$ and a collection $S_1, \dots, S_n$ of subsets of $U$
+	- The goal is to find the fewest sets whose union in $U$ i.e. the smallest $I \subseteq \{1,\dots, n\}$ such that $\bigcup_{i \in I} S_i = U$
+
+- The set cover problem as an Integer Linear Programming problem: Given an input $(U, S_1, \dots, S_n)$ of the set cover problem
+	- Introduce a variable $x_i$ for every set $S_i$ with the meaning that $x_i = 1$ when $S_i$ is selected and $x_i = 0$ otherwise
+\begin{alignat*}{3}
+  &\text{minimize} && \sum_{i=1}^n x_i && \\
+  &\text{subject to} && \sum_{i:v \in S_i} x_i \geq 1 \quad && \forall v \in U \\
+                   & && x_i \leq 1 && \forall i \in \{1,\dots, n\} \\
+                   & && x_i \in \mathbb N && \forall i \in \{1,\dots, n\} \\
+\end{alignat*}
+- Which have the corresponding linear programming relaxation
+\begin{alignat*}{3}
+  &\text{minimize} && \sum_{i=1}^n x_i && \\
+  &\text{subject to} && \sum_{i:v \in S_i} x_i \geq 1 \quad && \forall v \in U \\
+                   & && x_i \leq 1 && \forall i \in \{1,\dots, n\} \\
+                   & && x_i \geq 0 && \forall i \in \{1,\dots, n\} \\
+\end{alignat*}
+
+- In the *weighted* version of set cover
+	- One are given the set $U$, the collection of set $S_1, \dots, S_n$ and also a weight $w_i$ for every set
+	- The goal is to find a collection of sets with has the minimal total weight and whose union is $U$
+	- The LP relaxation version of the weighted set cover problem
+\begin{alignat*}{3}
+  &\text{minimize} && \sum_{i=1}^n w_ix_i && \\
+  &\text{subject to} && \sum_{i:v \in S_i} x_i \geq 1 \quad && \forall v \in U \\
+                   & && x_i \leq 1 && \forall i \in \{1,\dots, n\} \\
+                   & && x_i \geq 0 && \forall i \in \{1,\dots, n\} \\
+\end{alignat*}
+
+- If the linear programming relaxation is solved the one cannot just round each fractional value to the nearest to an integer because then we are no longer guaranteed that this is a set cover
+
+- The most natural approach after rounding the $x_i^*$ to the nearest integer is to think of each $x_i^*$ as a probability
+	- The solution $\mathbf{x}^*$ can be thought of as describing a probability over ways of choosing some of the subsets $S_1, \dots, S_n$ in which $S_1$ is chosen with probability $x_1^*$, $S_2$ with probability $x_2^*$ and so on
+
+- Algorithm RandomPick
+	- Input: values $(x_1, \dots, x_n)$ feasible for the LP relaxation of the weighted set cover problem
+	- $I := \emptyset$
+	- for $i=1$ to $n$
+		- with probability $x_i$, assign $I := I \cup \{i\}$ o.w. do nothing
+	- return $I$
+
+- Using the Algorithm RandomPick the expected cost of the sets that one picks is $\sum_i w_i x_i^*$ which is the same as the cost of the $\mathbf{x^*}$ in the linear programming problem
+
+- Every element has a reasonably good probability of being covered
+	- *Lemma 1* Consider a sequence of $k$ independent experiments, in which the $i$'th experiment has probability $p_i$ of being successful, and suppose that $p_i + \dots + p_k \geq ¡$. Then there is a probability $\geq 1-1/e$ that at least one experiment is successful
+
+- The randomized rounding process will be as follows: repeat the procedure RandomPick until all the elements have been covered
+
+- Algorithm RandomizedRound
+	1. Input: $x_1, \dots, x_n$ feasible for the LP relaxation of the weighted set cover problem
+	2. $I:= \emptyset$
+	3. while there are elements $u$ such that $u \notin \bigcup_{i \in I} S_i$
+		 - for $i := 1$ to $n$
+			 - with probability $x_i$, assign $I:= I \cup \{i\}$ otherwise do nothing
+	4. return $I$
+
+- *Fact 2* There is a probability at most $e^{-100}$ that the while loop is executed for more than $\ln |U| + 100$ times. In general, there is a probability at most $e^{-k}$ that the while loop is executed for more than $\ln|U| + k$ times.
+
+- *Fact 3* Fix any positive integer parameter $t$ and any feasible solution $(x_1, \dots, x_n)$ for the LP relaxation of the weighted set cover problem. Then the expected size of $I$ in Algorithm RandomizedRound on input $(x_1, \dots, x_n)$ after $t$ (or at the end of the algorithm if it ends in fewer than $t$ iterations) is at most
+\[
+	t \cdot \sum_{i=1}^n w_i x_i
+\]
+
+- Fact 4 Given an optimal solution $(x_1^*, \dots, x_n^*)$ to the LP relaxation of weighted set cover, algorithm RandomizedRound outputs, with probability $\geq .45$, a feasible solution to the set cover problem that contains at most $(2\ln |U| + 6)\cdot opt$ sets.
+
+
+- The Algorithm RandomizedRound can be analyzed as follows
+
+* Invertible Bloom Lookup Tables
+** Introduction
+- The Bloom filter data structure is a well-known way of probabilistically supporting dynamic set membership queries 
+	- It trades off query accuracy for space efficiency by using a binary array $T$ and random hash functions $h_1, \dots, h_k$ to represent a set $S$ by assigning $T[h_i(x)] = 1$ for each $x \in S$
+	- To check if $x \in S$ one can check that $T[h_i(x)] = 1$ for $1 \leq i \leq k$ with some change of a false positive
+
+** A Simple Version of the Invertible Bloom Lookup Table
+*** Introduction
+- The IBLT data structure $\mathcal B$ is a randomized data structure storing a set of key-value pairs
+	- It is designed with respect to a threshold number of key $t$
+	- A structure is success for an operation with high probability is under the assumption that the actual number of key in the structure $n$ is less that or equal to $t$
+	- It is assumed:
+		- That keys and values fit in a single word of memory
+		- Each such word can be viewed as an integer, character string, floating-point number, etc.
+		- w.l.o.g. keys and values are viewed as positive integers
+	- When one takes sums of keys and/or values it must be considered whether word-value overflow occurs when trying to store these sums in a memory word
+		- In most situations with suitable sized memory words overflow may never be a consideration
+		- We work in a system that supports graceful overflow i.e. $(x+y) - y = x$ even if the first sum results in an overflow
+		- In many settings XORs can be used in place of sums in our alogirthms
+
+*** Operations Supported
+- The structure supports the following operations
+	- $\textsc{insert}(x,y)$: insert the key-value pair, $(x,y)$, into $\mathcal B$
+		- This operation always succeeds, assuming that all keys are distinct
+	- $\textsc{delete}(x,y)$: delete the key-value pair, $(x,y)$, into $\mathcal B$
+		- This operation always succeeds, provided $(x,y) \in \mathcal B$
+	- $\textsc{get}(x)$: return the value $y$ such that there s a key-value pair $(x,y)$ in $\mathcal B$
+		- If $y = \null$ is returned then $(x,y) \notin \mathcal B$ for any value of $y$
+		- With low (but constant) probability this operation may fail, returning a "not found" error condition, in this case there may or may not be a key-value pair $(x,y)$ in $\mathcla B$
+	- $\textsc{listEntries}()$: list all the key-value pairs being stored in $\mathcal B$
+		- With low (inverse polynomial in $t$) probability, this operation may return a partial list along with an "list-incomplete" error condition
+
+- When IBLT $\mathcal B$ is first created, it initializes a lookup table $T$ of $m$ cells
+	- Each of the cells in $T$ stores a constant number of fields, each of which corresponds to a single memory word
+	- An important feature of the data structure is that at times the number of key-value pairs in $\mathcal B$ can be much larger than $m$
+		- But the space used for $\mathcal B$ remains $O(m)$ words
+
+*** Data Structure Architecture
+- An IBLT uses a set of $k$ random hash function $h_1, h_2, \dots, h_k$ to determine where key-value pairs are stored
+	- Each key-value pair $(x,y)$ is placed into cells $T[h_1(x)], T[h_2(x)], \dots, T[h_t(x)]$
+	- It is assumed that the hashes yield distinct locations
+		- It can be accomplished by splitting the $m$ cells into $k$ subtables each of size $m/k$ and having each hash function choose one cell from each subtable
+		- This does not affect the asymptotic behavior of the analysis
+	- Each cell contains three field:
+		- A $\text{count}$ field, which counts the number of entries that have been mapped to this cell
+		- A $\text{keySum}$ field, which is the sum of all the keys that have been mapped to this cell
+		- A $\text{valueSum}$ field, which is the sum of all the values that have been mapped to this cell
+	- Given these field, which are initially $0$, the update operations are as follows
+		- $\textsc{insert}(x,y)$:
+			- *for* each (distinct) $h_i(x)$, for $i=1, \dots, k$ *do**
+				- add $1$ to $T[h_i(x)]$.count
+				- add $x$ to $T[h_i(x)]$.keySum
+				- add $y$ to $T[h_i(x)]$.valueSum
+
+		- $\textsc{delete}(x,y)$:
+			- *for* each (distinct) $h_i(x)$, for $i=1, \dots, k$ *do**
+				- subtract $1$ to $T[h_i(x)]$.count
+				- subtract $x$ to $T[h_i(x)]$.keySum
+				- subtract $y$ to $T[h_i(x)]$.valueSum
+
+*** Data Lookups
+- The $\textsc{get}$ operation is done as follows:
+[[file:Invertible Bloom Lookup Tables/screenshot_2020-04-26_11-24-37.png]]
+
+- For a key $x$ that is in $\mathcal B$ the probability $p_0$ that each of its hash locations contains no other item is
+\[
+	p_0 = \left(1-\frac{k}{m}\right)^{(n-1)} \approx e^{-kn/m}
+\]
+
+- The probability that a $\textsc{get}$ for a key that is in $\mathcal B$ returns "not found" is therefore approximately
+\[
+	(1- p_0)^k \approx \left(1- e^{-kn/n} \right)^k	
+\]
+
+- The probability that a $\textsc{get}$ for a key that is not in $\mathcal B$ returns "not found" instead of null is 
+\[
+	\left(1- e^{-kn/m} - \frac{kn}m e^{-kn/m} \right)^k
+\]
+	
+*** Listing Set Entries
+- The following method for listing the content of $\mathcal B$ is in a destructive fashion (if one wants a non-destructive method, one should first create a copy of $\mathcal B$ as backup)
+[[file:Invertible Bloom Lookup Tables/screenshot_2020-04-26_11-43-39.png]]
+
+- It is fairly straightforward to implement this method in $O(m)$ time
+- If at the end of the while-loop all the entries in $T$ are empty, then we say that the method *succeeded* and we can confirm that the output list is the entire set of entries in $\mathcal B$
+- If the method there are some cells in $T$ with non-zero counts, then the method only outputs a partial list of the key-value pairs in $\mathcal B$
+
+- *Theorem:* As long as $m$ is chosen so that $m > (c_k + \epsilon)t$ for some $\epsilon > 0$, $\textsc{listEntries}$ fails with probability $O(t^{-k+2})$ whenever $n \leq t$
+
+** Adding Fault Tolerance to an Invertible Bloom Lookup Table
+*** Introduction
+- For cases where there can be deletions for key-value pairs that are not already in $\mathcal B$ or values can be inserted for keys that are already in $\mathcal B$ some fault tolerance is required
+
+*** Extraneous Deletions
+- It is assumed that a key-value pair might be deleted without a corresponding insertion
+- It is still assumed that each key is associated with a single value and is not inserted or deleted multiple times at any instant
+
+- This causes problems for both the $\textsc{get}$ and $\textsc{listEntries}$ routines
+	- e.g. it is possible for a cell to have an associated count of $1$ even if more than one key has hashed to it
+
+- To help deal with the issue there are added to the IBLT structure
+	- It is assumed that each key $x$ has an additional hash value given by a hash function $G_1(x)$
+		- It is assumed to take on uniform random values in a range $[1, R]$
+	- It is required each cell has the following additional field
+		- A $\text{hashkeySum}$ field which is the sum of the hash values, $G_1(x)$ for all the key that have been mapped to this cell
+	- The $\text{hashkeySum}$ field must be of sufficiently many bits and the hash function must be sufficiently random to make collisions sufficiently unlikely
+
+- The insertion and deletion operation must change accordingly
+	- $G_1(x)$ must be added to each $T[h_i(x)].\text{hashkeySum}$ on an insertion and subtract $G_1(x)$ during a deletion
+- The $\text{hashkeySum}$ field can serve as an extra check
+	- e.g to check when a cell has a count of $1$ that it corresponds to a cell without extraneous deletion one check $G_1(x)$ field against the $\text{hashkeySum}$ field
+	- This fails with probability at most $1/R$ (negligible in $R$)
+
+- For the $\textsc{get}$ operations
+	- If the count field is $0$ and the $\text{keySum}$ and $\text{hashkeySum}$ are also $0$ one should assume that the cell is in fact empty and return null
+	- If the count field is $1$ and the $\text{keySum}$ and $\text{hashkeySum}$ match $x$ and $G_1(x)$ respectively, then one should assume the cell has the right key and return its value
+	- If the count field is $-1$ and after negating $\text{keySum}$ and $\text{hashkeySum}$ the values match $x$ and $G_1(x)$ respectively one should assume the cell has the right key except that it has been deleted instead of inserted
+		- The value is returned although one could also flag it as an extraneous deletion
+	- One can no longer return null if the count field is $1$ but the $\text{keySum}$ field does not match $x$
+		- It could e.g. be that an additional key inserted and an additional key extraneously deleted from that cell
+		- It would case the field to not match even if $x$ was hashed to that cell
+		- This reduces the probability of returning null for a key not in $\mathcal{B}$ to $\left(1- e^{-kn/m})^k$
+		- To return null at least one cell with zero key-value pairs from $\mathcal{B}$ hashing to it
+
+- For the $\textsc{listEntries}$ operation the $\textsc{hashkeySum}$ field to check when a cell has a count of $1$ that it corresponds to a cell without extraneous deletions
+	- An error in this check will cause the entire listing operation to fail so the probability of an error in this check should be made quite low
+	- If a cell contains a count of $-1$ the $\text{count}$, $\text{keySum}$ and $\text{hashKeySum}$ is negated and the values is checked and if the check passes the key is added to the other associated cells
+
+*** Multiple Values
+- It is assumed that a key can be inserted multiple times with different values, or inserted and deleted with different values
+- If a key is inserted multiple times with different values not only can that key not be recovered, but every cell associated with that key will not be useful for listing key since it cannot have the count of $1$ even if all the other values are recovered
+	- The same is true if a key is inserted and deleted with different values
+
+- An additional check for the sum of the values at a cell is introduced, using a hash function $G_2(y)$ for all the values that have been mapped to this cell
+	- A $\text{hashvalueSum}$ field, which is the sum of the hash values $G_2(y)$ for all the values that have been mapped to this cell
+
+- One can check that the hash of the $\text{keySum}$ and $\text{valueSum}$ take on the appropriate values when the $\text{count}$ field of a cell is $1$ (or $-1$) in order to see if listing the key-value pair is appropriate
+
+- The goal of $\textsc{listEntries}$ is modified to return all key-value pairs for all valid keys with high probability
+	- i.e. all keys with a single associated value at that time
+	- If the invalid keys make up a constant fraction of the $n$ key it is possible under the construction with linear space
+
+- *Theorem:* Suppose there are $n^{1-\beta}$ invalid keys. Let $k = \ceil{1/\beta} + 4$. Then if $m > (c_k + \epsilon)n$ for some $\epsilon > 0$, $\textsc{listEntries}$ succeeds with high probability
+
+*** Extensions to Duplicates
+- Using the same approach as for extraneous deletion the IBLT can handle the setting where the same key-value pair is inserted multiple time
+
+- The additional $\text{hashkeySum}$ and $\text{valueSum}$ fields is used
+
+- When the $\text{count}$ field is $j$ for the cell one takes $\text{keySum}$, $\text{hashkeySum}$ and $\text{valueSum}$ fields and divide them by $j$ to obtain the proposed key, value, and the corresponding hash
+	- If the key hash matches, one can assume that the right key as been found and return the lookup value or list the key-value pair accordingly depending on the operation
+	- If it is possible to have the same key appear with multiple values as above then one must also make use of the $\text{hashvalueSum}$ fields, dividing it by $j$ and using to check that the value is correct as well
+	- For the listing operation, the IBLT delete $j$ copies of the key-value pair from the other cells
+
+- A potential issue with duplicate key-value pairs is in the case of word-value overflow for the memory locations containing the sum
+	- In practice this may limit the number of duplicates that can be tolerated
+	- For small numbers of duplicates and suitably sized memory fields, overflow will be a rare occurence
+
+** Space-Saving for an Invertible Bloom Lookup Table
+- IBLT often have a great deal of wasted space corresponding to zero entries that can be compressed or fixed-length space required for fields like the $\text{count}$ field that can be made variable-length depending on the value
+	- The wasted space can be compressed away using techniques for keeping compresses forms of arrays, including those for storing arrays of variable-length strings
+
+- A simpler, standard approach (saving less space) is to use quotienting
+	- The hash value for a key determines a bucket and an addition quotient value can be stored
+	- It can be used with the IBLT to reduce the space used for storing e.g. the $\text{keySum}$ or the $\text{hashkeySum}$ values
+
+- In settings without multiple copies of the same key-value pair XORs can be used in place of sums to save space
+
+- If one is willing to give up lookup accuracy then less space is needed to maintain successful listing
+

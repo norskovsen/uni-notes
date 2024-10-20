@@ -1,0 +1,1541 @@
+* Generelt
+- *Instruktor:* Jonas Svendsen
+- *Kontor:* 1530-315 på A3-gangen
+- *Mail:* svendsen@qgm.au.dk
+- *Tid:* 13-15
+- *Afleveringsfrist:* Mandag kl. 13.15
+	
+* Numbers
+** The natural numbers and integers
+- For $X, Y \in \mathbb Z$, $X \leq Y$ holds if $Y-X \in \mathbb N$ and $X < Y$ if $X \neq Y$ and $X \geq Y$
+	- An element $s \in S \subseteq \mathbb Z$ is the *first element* in $S$ if $s \leq x$ for all $x \in S$
+- Every non-empty subset of $\mathbb N$ has a first element
+	- The set of natural numbers is well ordered
+
+** Division with remained
+- *Theorem 1.2.1* Let $d \in \mathbb Z$, where $d >0$. For every $x \in \mathbb Z$ there is a unique remainder $r \in \mathbb N$ such that 
+\begin{equation*}
+  x = qd +r
+\end{equation*}
+where $q \in \mathbb Z$ and $0 \leq r < d$	
+
+- *Definition 1.2.2* If $a = bc$ where $a,b,c \in \mathbb Z$. Then $c$ is a divisor of $a$ and it is written as $c \mid a$
+- *Definition 1.2.3* If $x,d \in \mathbb Z$ where $d>0$, then $[x]_d$ denotes the unique remainder in Theorem 1.2.1. The notation $[x]$ is used when it is clear which $d$ is used
+
+** Congruences
+- *Definition 1.3.1* Let $a,b,c \in \mathbb Z$. Then $a$ and $b$ are called *congruent modulo* $c$ if $c$ divides $b-a$. It is denoted
+\begin{equation*}
+  a \equiv b (\text{mod } c)
+\end{equation*}	
+
+- *Proposition 1.3.2* Let $c \in \mathbb Z$, where $c > 0$. Then
+	a) $a \equiv [a]_c (\text{mod } c)$
+	b) $a \equiv b (\text{mod } c)$ if and only if $[a]_c = [b]_c$
+for all $a,b \in \mathbb Z$
+
+- *Proposition 1.3.4* Suppose that $x_1 \equiv x_2 (\text{mod } d)$ and $y_1 \equiv y_2 (\text{mod } d)$. Then
+	a) $x_1 + y_1 \equiv x_2 + y_2 (\text{mod } d)$
+	b) $x_1y_1 \equiv x_2y_2 (\text{mod } d)$
+for $x_1, x_2, y_1, y_2, d \in \mathbb Z$
+
+- The following follows for Prop. 1.3.4 and 1.3.2 
+\begin{equation*}
+  [xy] = [[x][y]]
+\end{equation*}
+
+- The repeated squaring algorithm uses a lookup table to efficiently compute remainders of huge powers and the following:
+\begin{equation*}
+	[2^{2^n}] = [\bigg(a^{2^{n-1}}\bigg)] = [[a^{2^{n-1}}][a^{2^{n-1}}]]
+\end{equation*} 
+for $a,n \in \mathbb Z$ where $n \geq 0$ where $a,b,c \in \mathbb Z$ with $b,c \geq 0$	
+
+** Greatest common divisor
+- Let
+\begin{equation*}
+  \text{div}(n) = \{d \in \mathbb N \mid d \mid n \}
+\end{equation*}
+denote the set of natural divisors in $n \in \mathbf Z$	
+- $\text{div}(0) = \mathbb N$ and $\text{div}(n) = \text{div}(-n)$ for every $n \in \mathbf Z$
+
+- *Lemma 1.4.2 (Euclid)* Let $m,n \in \mathbb Z$. There exists a unique natural number $d \in \mathbb N$ such that
+\begin{equation*}
+	\text{div}(m) \cap \text{div}(n) = \text{div}(d)  
+\end{equation*}
+
+- *Definition 1.4.3* The unique number $d \in \mathbb N$ satisfying $\text{div}(d) = \text{div}(m) \cap \text{div}(n)$ is called the *greates common divisor*.
+	- It is denoted $\text{gcd}(m,n)$
+
+** The Euclidean Algorithm
+- *Proposition 1.5.1* Let $m,n \in \mathbb Z$. Then
+	a) $\gcd(m,0) = m$ if $m \in \mathbb N$
+	b) $\gcd(m,n) = \gcd(m-qn,n)$ for every $q \in \mathbb Z$
+
+- *Definition 1.5.4* The Euclidean algorithm where $\lambda$ and $\mu$ is computed in each step is called the *extended Euclidean algorithm*
+
+- *Lemma 1.5.7* Let $m,n \in \mathbb Z$. Then there are integers $\lambda, \mu \in \mathbb Z$ such that
+\begin{equation*}
+  \lambda m + \mu n = \gcd(m,n)
+\end{equation*}
+
+- *Definition 1.5.8* Two integers $a,b \in \mathbb Z$ are called *relatively prime* if 
+\begin{equation*}
+  \gcd(a,b) = 1
+\end{equation*}
+
+- *Remark 1.5.9* If there there are $\lambda,\mu \in \mathbb Z$ such that $\lambda a + \mu b = 1$ then $a$ and $b$ are relatively prime
+
+- *Corollary 1.5.10* Suppose that $a \mid bc$, where $a,b,c \in \mathbb Z$ and $a$ and $b$ are relatively prime. The $a \mid c$
+
+- *Corollary 1.5.11* Let $a,b,c \in \mathbb Z$
+	a) If $a$ and $b$ are relatively prime, $a \mid c$ and $b \mid c$ then $ab \mid c$
+	b) If $a$ are $b$ are relatively prime and $a$ and $c$ are relatively prime then $a$ and $bc$ are relatively prime
+
+** The Chinese remainder theorem
+- *Definition 1.6.1* Define
+\begin{equation*}
+  \mathbfb Z /N = \{X \in \mathbb N \mid 0 \leq X < N\}
+\end{equation*} 
+for $N \in \mathbb N$. If $N = n_1 \cdots n_t \neq 0$ is the product of $n_1, \dots, n_t \in \mathbb N$ we let
+\begin{equation*}
+  r: \mathbb Z/N \rightarrow \mathbb Z/n_1 \times \cdots \times Z /n_t
+\end{equation*}
+be the map given by $r(X) = ([X]_{n_1}, \dots,[X]_{n_t})$. $r$ is called the remainder map
+
+- *Lemma 1.6.3* Suppose that $N = n_1 \cdots n_t$, where $n_1, \dots, n_t \in \mathbb N \backslash \{0\}$ and $\gcd(n_i,n_j) = 1$ if $i \neq j$. Then the remainder map
+\begin{equation*}
+  r: \mathbb Z/N \rightarrow \mathbb Z/n_1 \times \cdots \times Z /n_t
+\end{equation*}
+is *bijective*	
+
+- *Theorem 1.6.4 (Chinese remainder theorem)* Suppose that $N = n_1 \cdots n_t$, where $n_1, \dots, n_t \in \mathbb Z \backslash \{0\}$ and $\gcd(n_i,n_j) = 1$ for $i \neq j$. Consider the system
+\begin{align*}
+  X &\equiv a_1 (\text{mod } n_1), \\
+  & \vdots \\
+  X &\equiv a_2 (\text{mod } n_2), \\
+  X &\equiv a_t (\text{mod } n_t), \\
+\end{align*} 
+- of congruences for $a_1, \dots a_t \in \mathbb Z$. Then
+	a) The system has a solution for $X \in \mathbb Z$
+	b) If $X,Y \in \mathbb Z$ are solutions of the system then $X \equiv Y (\text{mod } N)$. If $X$ is a solution of (1.3) and $Y \equiv X (\text{mod } N)$ then $Y$ is a solution of the system
+
+** Euler's theorem
+- Let 
+\begin{equation*}
+	(\mathbb Z / N)^* = \{X \in \mathbb Z / N \mid gcd(X,N) = 1\} 
+\end{equation*}	
+- for $N \in \mathcal N$ and define the function $\phi(N) = |(\mathcal Z / N)^*|$ which is the Euler $\phi$ function
+	- It counts the numbers relatively prime or smaller than a given natural number
+
+- *Proposition 1.7.1* Let $m$ and $n$ be relatively prime natural numbers. Then
+\begin{equation*}
+  \phi(m \cdot n)= \phi (m) \phi (n)
+\end{equation*}
+	
+- *Theorem 1.7.2 (Euler)* Let $a,n \in \mathbb Z$ be relatively prime integers, where $n \in \mathbb N$. Then
+\begin{equation*}
+  a^{\phi(n)} \equiv 1 (\text{mod } n)
+\end{equation*} 
+
+** Prime numbers
+- A prime number of the form $M_n = 2^n -1$ is called a Mersenne prime number
+
+- *Lemma 1.8.1* Every non-zero natural number $n$ is a product of prime numbers
+
+- *Theorem 1.8.2 (Euclid)* There are infinitely many prime numbers
+
+- A twin prime is a prime number $p$ such that $p+2$ or $p-2$ is a prime number
+
+- *Lemma 1.8.3* Let $p$ be a prime number and suppose that $p \mid ab$, where $a,b \in \mathbb Z$. Then $p \mid a$ or $p \mid b$
+	- It extends to products with more than two factors if $p$ is a prime number and $p \mid a_1a_2 \cdots a_n$ then $p \mid a_1$ or $p \mid a_2$ or $\dots$ or $p \mid a_n$
+
+** Unique factorization
+- *Theorem 1.8.5* Every non-zero natural number $n$ can be factored niquely into a product of prime numbers
+\begin{equation*}
+  n = p_1 \cdots p_r 
+\end{equation*}
+	
+- *Remark 1.8.6* Suppose that $n > 1$ is a natural number with the prime factorization
+\begin{equation*}
+  n = p_1^{e_1} \cdots p_r^{e_r}
+\end{equation*}
+where $e_1, \dots, e_r \geq 0$. Then Theorem 1.8.5 shows
+\begin{equation*}
+  \text{div}(n) = \{p_1^{k_1}, \cdots p_r^{k_r} \mid 0 \leq k_1 \leq f_1, \dots, 0 \leq k_r \leq f_r\}
+\end{equation*}
+and $\text{div}(m) \cap \text{div}(n)$ is 
+[[file:Numbers/screenshot_2019-09-05_14-15-02.png]]	
+- This means that
+\begin{equation*}
+  \text{gcd}(m,n) = p_1^{\min(e_1, f_1)} \cdot p_r^{\min(e_r,f_r)}
+\end{equation*}
+- This also means that the smallest natural number having both $m$ and $n$ as divisors must be
+\begin{equation*}
+  \text{lcm}(m,n) = p_1^{\max(e_1, f_1)} \cdot p_r^{\max(e_r,f_r)}
+\end{equation*}
+- This is called the *least common multiple* of $m$ and $n$
+
+** How to compute $\phi(n)$
+- To compute $\phi(n)$ for a general number
+\begin{equation*}
+  n = p_1 \cdots p_r 
+\end{equation*}
+- the following method can be used
+[[file:Numbers/screenshot_2019-09-05_14-21-18.png]] 
+	
+** RSA explained
+- *Proposition 1.9.1* Let $X$ be any integer and $k \in \mathbb N$ a natural number. Then
+\begin{equation*}
+  X^{k(p-1)(q-1)+1} \equiv X (\text{mod } N)
+\end{equation*}
+
+- The public exponent $e$ is chosen to be relative prime to $\phi(N) = (p-1)(q-1)$, then the secret exponent $d$ is computed as following using Lemma 1.5.7
+\begin{equation*}
+  \lamda (p-1)(q-1) + \mu e = 1
+\end{equation*}
+$k = -\lamda$ and $d=\mu$ 
+	
+- *Corollary 1.9.2 (Fermat's little theorem)* Let $p$ be a prime number and $a$ and integer with $\gcd(a,p) =1$. Then 
+\begin{equation*}
+  a^{p-1} \equiv 1 (\text{mod } p)
+\end{equation*}
+
+- *Definition 1.9.3* Let $N$ be a composite natural number and $a$ an integer. Then $N$ is called a *psudoprime* relative to the base $a$ if $a^{N-1} \equiv 1 (\text{mod } N)$
+
+- *Lemma 1.9.4* Let $p$ be a prime number and $x \in \mathbb Z$. If $x^2 \equiv 1 (\text{mod } p) then $x \equiv \pm 1 (\text{mod } p)$
+
+- *Definition 1.9.5* An odd composite number $N$ is called a *strong pseudoprime* relative to the base $a$ if either $a$ if either $a^q \equiv 1 (\text{mod } N)$ or there exists $i=0,\dots,k-1$ such that
+\begin{equation*}
+  a^{2^iq} \equiv -1 (\text{mod } N)
+\end{equation*}
+- where $N-1 = 2^k q$ and $2 \nmid q$
+
+- *Proposition 1.9.6* Let $p$ be an odd prime number and suppose that 
+\begin{equation*}
+  p-1 = 2^kq
+\end{equation*}
+where $2 \nmid q$. If $a \in \mathbb Z$ and $\gcd(a,p) = 1$ then either $a^q \equiv (\text{mod } p)$ or there exists $i=0,\dots, k-1$ such that
+\begin{equation*}
+  a^{2^iq} \equiv -1 (\text{mod } p)
+\end{equation*}	
+
+- *Theorem 1.9.7 (Rabin)* Suppose that $N>4$ is an odd composite integer and let $B$ be the number of bases $a$ where $(1 < a < N)$ such that $N$ is pseudoprime relative to $a$. Then 
+\begin{equation*}
+  B < \phi(N)/4 \leq (N-1) /4
+\end{equation*} 	
+
+** Algorithms for prime factorization
+*** Pollard's $\rho$ algorithms
+[[file:Numbers/screenshot_2019-09-05_15-03-20.png]]
+
+*** Pollard's $(\rho - 1)$ algorithm 
+- If $a$ is an integer and $p \nmid a$ then given $m$ that is a natural number such that $p-1 \mid m$ then
+\begin{equation*}
+  a^m \equib 1 (\text{mod } p)
+\end{equation*}
+	- The idea behind pollard's ($p-1$) algorithm is using this and trying with a bigger different $a$ if not the case
+
+** Quadratic residues
+- Definition *1.11.1*	Let $p$ be a prime number. If $p \nmid a$ then $a$ is called a *quadratic residue modulo* $p$ if it is congruent to a square modulo $p$ i.e.
+\begin{equation*}
+  \exists x \in \mathbb Z: a \equiv x^2 (\text{mod } p)
+\end{equation*}
+- If this is not the case $a$	is called a *quadratic non-residue modulo* $p$.
+	- If $p \mid a$ then $a$ is considered neither a quadratic residue nor a quadratic non-residue. This definition is contained in the Legendre symbol
+\begin{equation*}
+  \bigg(\frac{a}{p}\bigg) = 
+  \begin{cases}
+    \mbox{$0$} & \mbox{if $p \mid a$} \\
+    \mbox{$1$} & \mbox{\text{if $a$ is a quadratic residue modulo } p} \\
+    \mbox{$-1$} & \mbox{\text{if $a$ is not a quadratic residue modulo } p}
+  \end{cases}
+\end{equation*} 
+
+- The following must hold for the Legendre symbol
+\begin{equation*}
+  \bigg(\frac{a}{p}\bigg) = \bigg(\frac{a+kp}{p}\bigg)
+\end{equation*}
+where $k \in \mathbb Z$
+
+- *Proposition 1.11.3* Let $p$ denote an odd prime. Half the numbers $1,2,3,\dots, p-1$ are quadratic residues; the other half are quadratic non-residues modulo $p$
+
+- *Theorem 1.11.4 (Euler)* Let $p$ be an odd prime and let $a$ be an integer not divisible by $p$. Then 
+\begin{equation*}
+	\bigg(\frac{a}{p}\bigg) \equiv a^{(p-1)/2} (\text{mod } p)
+\end{equation*}	
+
+- *Corollary 1.11.5* Let $p$ be an odd prime. Then the Legendre symbol satisfies
+\begin{equation*}
+  \bigg(\frac{ab}p \bigg) = \bigg(\frac{a}{p}\bigg) \bigg(\frac{b}{p}\bigg)
+\end{equation*}	
+
+- *Proposition 1.11.6* Let $p$ be an odd prime. Then $-1$ is a quadratic residue modulo modulo $p$ f $p \equiv 1 (\text{mod } 4)$ and a quadratic non-residue if $p \equiv 3(\text{mod } 4)$
+
+- Let $\mu (a)$ denote the number of elements from the list
+\begin{equation*}
+  a, 2a, 3a, \dots, \frac{p-1}{2}a
+\end{equation*}
+congruent to a negative number in $S$ where
+\begin{equation*}
+  S = \bigg\{-\frac{p-1}{2}, -\frac{p-3}{2}, \dots, -2,-1,1,2, \dots, \frac{p-3}{2}, \frac{p-1}{2}\bigg\}
+\end{equation*}
+	
+- *Remark 1.11.9* Notice that $\mu(a)$ is also the number of elements in
+\begin{equation*}
+  \{[a], [a2], \dots, [a(p-1)/2]\} \cap \{(p+1)/2, \dots, p-1\}
+\end{equation*}
+
+- *Lemma 1.11.10 (Gauss)* 
+\begin{equation*}
+  \bigg(\frac{a}{p}\bigg) = (-1)^{\mu(a)} 
+\end{equation*}	
+
+- *Corollary 1.11.11* Let $p$ be an odd prime. Then $2$ is a quadratic residue modulo $p$ if $p\equiv 1,7 (\text{mod } 8)$ and a quadratic non-residue if $p \equiv 3,5 (\text{mod } 8)$
+
+* Groups
+** Definition
+*** Introduction	
+- A *composition* on a set $G$ is a map $\circ : G \times G \rightaroow G$. The composition $\circ(g,h)$ is often written $g \circ h$ or $gh$
+
+- *Definition 2.1.1* A pair $(G, \circ)$ consisting of a set $G$ and a composition $\circ: G \times G \rightarrow G$ is called a *group* if it satisfies the following three properties
+	a) The composition is *associative*: $s_1 \circ (s_2 \circ s_3) = (s_1 \circ s_2) \circ s_3$ for every $s_1, s_2, s_3 \in G$
+	b) There is a *neutral* element $e \in G$ such that $e \circ s = s$ and $s \circ e = s$ for every $s \in G$
+	c) For every $s \in G$ there is an inverse element $t \in G$ such that $s \circ t = e$ and $t \circ s = e$. 
+- A group $G$ is called *abelian* if $x \circ y = y \circ x$ for every $x,y \in G$
+- The number of elements $|G|$ in $G$ is called the *order* of $g$
+
+*** Groups and congruences
+- $a + n \mathbb Z = \{a + nx \mid x \in \mathbb Z\}$, where $a,n \in \mathbb Z$
+- *Proposition 2.1.2* Let $a,b,c \in \mathbb Z$. Then $a + c \mathbb Z = b + c \mathbb Z$ if and only if $a \equiv b (\text{mod } c)$.
+	- Also $(a + c \mathbb Z) \cup (b + c \mathbb Z) = \emptyset$ if and only if $a \nequiv b (\text{mod } c)$
+
+- $[x]$ denote the subset for $x+c \mathbb Z$
+	- This means that $[x] = [[x]_c]$
+	- The finite subsets of the form $[x]$ are given by $\mathbb Z /c\mathbb Z$
+	- Addition can be defined as follows $[x] + [y] = [x+y]$
+	- $(\mathbb Z /c\mathbb Z, +)$ denotes an abelian group
+
+*** The composition table
+- *Definition 2.1.4* When dealing with a finite group $(\{e, g_1, \dots, g_r\}, \circ)$, the composition $\circ$ is often displayed in a *composition table*:
+[[file:Groups/screenshot_2019-09-09_20-26-01.png]]
+	
+*** Uniqueness of neutral and inverse elements
+- There can only be one neutral elements in a group $G$
+- To every $g \in G$ there can only be one inverse element $h$
+
+- *Definition 2.1.7* Let $g \in G$ be an element of a group. Then let $g^{-1} \in G$ denote the unique inverse element of $g$
+	- $(ab)^{-1} = b^{-1}a^{-1}$
+
+** Subgroups and costs
+*** Definition
+- *Definition 2.2.1* A subgroup of a group $G$ is a non empty subset $H \subseteq H$ such that the composition of $G$ makes $H$ into a group. This means that $H$ is a subgroup of $G$ if and only if
+	a) $e \in H$
+	b) $x^{-1} \in H$ for every $x \in H$
+	c) $xy \in H$ for every $x,y \in H$
+
+*** Subgroups of $\mathbb Z$
+- *Proposition 2.2.3* Let $H$ be a subgroup of $(\mathbb Z, +)$. Then 
+\begin{equation*}
+  H = d \mathbb Z = \{dn \mid n \in \mathbb Z\} = \{\dots, -2d, -d, 0, d,2d, \dots\}$
+\end{equation*}
+	
+*** Cosets
+- Let $H$ be a subgroup of $G$ and $g \in G$. Then the subset
+\begin{equation*}
+  gH = \{gh \mid h \in H\} \subseteq H
+\end{equation*}
+is called a *left coset* of $H$. Similary the subset 
+\begin{equation*}
+  Hg = \{hg \mid h \in H\} \subseteq H
+\end{equation*}
+- is the right coset of $H$.
+	- The set of left cosets of $H$ is denoted $G/H$
+	- The set of right cosets of $H$ is denoted $H \backslash G$
+	
+- If $H$ is a subgroup of $G$ and $g_1 H = g_2 H$ then $g_1$ and $g_2$ are not necessarily equal
+
+- *Lemma 2.2.6* Let $H$ be a subgroup of a group $G$ and let $x,y \in G$. Then
+	a) $x \in xX$
+	b) $x H = y H \Leftrightarrow x^{-1} y \in H$
+	c) If $xH \neq yH$ then $x H \sap y H = \emptyset$
+	d) The map $\phi:H \to xH$ given by $\phi(h) = xh$ is bijective
+
+- *Corollary 2.2.7* Let $H$ be a subgroup of $G$. Then 
+\begin{equation*}
+  G = \bigcup_{g \in G} g H
+\end{equation*}
+- and if $g_1 H \neq g_2H$ then $g_1 \cap g_2H = \emptyset$
+
+- *Theorem 2.2.8 (Lagrange)* If $H \subseteq G$ is a subgroup of a finite group $G$ then
+\begin{equation*}
+	|G| = |G/H| |H| 
+\end{equation*}
+- The order of a subgroup divides the order of the group
+
+- *Definition 2.2.9* The number of costs $|G/H|$ is called the *index* of $H$ in $G$ and is denoted $[G:H]$
+
+** Normal subgroups
+- Let $H$ be a subgroup of a group $G$
+
+- Define 
+\begin{equation*}
+  XY = \{xy \mid x \in X, y \in Y\}
+\end{equation*}
+- for arbitrary subsets $X, Y \subseteq G$.
+	- It is a composition on the set of subsets of $G$
+	- It is associative since the composition in $G$ is associative
+
+- *Proposition 2.3.1* Let $H$ be a subgroup of a group $G$. If $g H = Hg$ for every $g \in G$ then
+\begin{equation*}
+  (xH)(yH) = (xy)H
+\end{equation*}
+- for every $x,y \in G$
+
+- *Definition 2.3.2* A subgroup $N$ of a group $G$ is called normal if
+\begin{equation*}
+  g N g^{-1} = \{gng^{-1} \mid n \in N\} = N
+\end{equation*}
+- for every $g \in G$
+	- A normal subgroup $N$ of $G$ satisfies $gN = Ng$ for every $g \in G$
+
+- *Corollary 2.3.3* Let $N$ be a normal subgroup of the group $G$. Then the composition of subsets makes $G/N$ into a group and
+\begin{equation*}
+  (g_1 N)(g_2N) = (g_1g_2)N
+\end{equation*}
+- for $g_1 N, g_2N \in G/N$
+
+- *Definition 2.3.4* Let $N$ be a normal subgroup of $G$. The group $G/N$ is called a *quotient group*
+
+- *Lemma 2.3.6* Let $H$ and $K$, where $H$ is normal, be subgroups of a group $G$. Then $HK$ is a subgroup of $G$
+
+- Let 
+\begin{equation*}
+  (\mathbb Z/n \mathbb Z)^* = \{[a] \in \mathbb Z /n\mathbb Z \mid \text{gcd}(a,n)=1\}
+\end{equation*}
+- for $n \in \mathbb N$
+	- It has order $\phi(n)$ for $n > 0$
+	
+** Group homomorphisms
+- *Definition 2.4.1* Let $G$ and $K$ be groups. A map $f: G \to K$ is called a *group homomorphism* is $f(xy) = f(x)f(y)$ for every $x,y \in G$
+
+- *Definition 2.4.5* The *kernel* of a group homomorphism $f:G \to K$ is 
+\begin{equation*}
+  \text{Ker} \ f = \{g \in G \mid f(g) = e\}
+\end{equation*}
+- The *image* of $f$ is $f(G) = \{f(g) \mid g \in G\} \subseteq K$
+
+- A bijective group homomorphism is called a *group isomorphism*
+	- A group isomorphism $f: G \to K$ is denoted $f: G \stackrel{\sim}{\to} K$
+	- $G \cong K$ is written to denote that $G$ and $K$ are *isomorphic*
+
+- *Proposition 2.4.9* Let $f: G \to K$ be a group homomorphism
+	a) The image $f(G) \subseteq K$ is subgroup of $K$
+	b) The kernel $\text{Ker} \ f \subseteq G$ is a normal subgroup of $G$
+	c) $f$ is injective if and only if $\text{Ker}(f) = \{e\}$
+	
+** The isomorphism theorem
+- *Theorem 2.5.1* Let $G$ and $K$ be groups and $f: G \to K$ a group homomorphism with kernel $N = \text{Ker}(f)$. Then 
+\begin{equation*}
+  \tilde f: G/N \to f(G)
+\end{equation*}
+- given by $\tilde f(gN) = f(g)$ is a well defined map and a group isomorphism
+	
+** Order of a group element
+- In a group $G$ an element $g \in G$ can be composed with itself an arbitrary number of times $g, gg, (gg)g \dots$
+	- Define $g^0 = e$ and $g^n = g^{n-1} g$ for $n > 0$ 
+	- $g^n = (g^{-1})^{-n}$ for $n < 0$ and every $g \in G$
+	- This results in a well defined $f_g : \mathbb Z \to G$ given by $f_g(n) = g^n$
+
+- *Proposition 2.6.1* Let $G$ be a group and $g \in G$. The map
+\begin{equation*}
+  f_g : \mathbb Z \to G 
+\end{equation*}
+- given by $f_g(n) = g^n$ is a group homomorphism from $(\mathbb Z, +)$ to $G$	
+	- The image $f_g (\mathbb Z) = \{g^n \mid n \in \mathbb Z\}$ is denoted $\langle g \rangle$
+	- The number of element in $\langle g \rangle$ is called the *order* of $g$ and is denoted $\text{ord}(g)$
+	- The order of $g$ is the smallest positive power of $g$ giving the neutral element
+		- If no such $g$ exists then $g$ have infinite order
+
+- *Proposition 2.6.3* Let $G$ be a finite group and let $g \in G$
+	a) The order $\text{ord}(g)$ of $g$ divides $|G|$
+	b) $g^{|G|} = e$
+	c) If $g^n = e$ for some $n > 0$ then $\text{ord}(g) \mid n$
+
+** Cyclic groups
+- *Definition 2.7.1* A *cyclic group* is a group $G$ containing an element $g$ such that $G = \langle g \rangle$.
+	- The element $g$ is called a *generator* of $G$
+	- It is said that $G$ is *generated* by $g$
+
+- A cyclic group is isomorphic to $\mathbb Z / n \mathbb Z$ for some $n \in \mathbb N$
+
+- *Proposition 2.7.2* A group $G$ of prime order $|G| = p$ is isomorphic to the cyclic group $\mathbb Z / p\mathbb Z$
+
+- *Proposition 2.7.4* Let $G$ be a cyclic group
+	a) Every subgroup of $G$ is cyclic
+	b) Suppose that $G$ is finite and that $d$ is a divisor in $|G|$. Then $G$ contains a unique subgroup $H$ of order $d$
+	c) The are $\phi(d)$ elements of order $d$ in $G$. These are the generators of $H$
+
+- *Corollary 2.7.6* Let $N$ be a positive integer. Then
+\begin{equation*}
+  \sum_{d \mid N} \phi(d) = N
+\end{equation*}
+- where the sum is over $d \in \text{div}(N)$	
+
+** Groups and numbers
+*** Product groups
+- If $G_1,G_2, \dots G_n$ are groups then the product
+\begin{equation*}
+  G= G_1 \times G_2 \times \cdots \times G_n = \{(g_1, g_2, \dots, g_n) \mid g_1 \in G_1, g_2 \in G_2, \dots, g_n \in G_n\}
+\end{equation*}
+- has the natural composition
+\begin{equation*}
+  (g_1, g_2, \dots, g_n)(h_1, h_2, \dots, h_n) = (g_1h_1, g_2h_2, \dots, g_nh_n)
+\end{equation*}	
+- This composition is associative
+- The neutral element is $(e,e,\dots,e)$
+- The inverse of a group element $g=(g_1,\dots,g_n)$ is $g^{-1}=(g_1^{-1},\dots,g_n^{-1})$
+- $G$ is a group called the *product group* of $G_1, \dots, G_n$
+- If $H$ is a group and have group homomorphisms $\phi_i : H \to G_i, i = 1, \dots, n$, then 
+\begin{equation*}
+  \phi(g) = (\phi_1(g), \dots, \phi_n(g))
+\end{equation*}
+- is a group homomorphism from $H$ to $G$
+
+- *Lemma 2.8.1* Let $M,N$ be normal subgroups of a group $G$ with $M \cap N = \{e\}$. Then $MN$ is a subgroup of $G$ and 
+\begin{align*}
+  \pi : M \times N &\to MN \\
+  						x, y &\mapsto xy 
+\end{align*}
+- is an isomorphism
+
+*** The Chinese remainder theorem
+- *Proposition 2.8.2* Let $n_1, \dots n_r \in \mathbb Z$ be pairwise relative prime integers and let $N = n_1 \cdots n_r$. If $\phi_i$ denotes the canonical group homomorphism $\pi_{n_i \mathbb Z}: \mathbb Z \to \mathbb Z/n_i \mathbb Z$ then the map
+\begin{equation*}
+  \tilde \phi: \mathbb Z /N \mathbb Z \to \mathbb Z/n_1 \mathbb Z \times \cdots \times \mathbb Z/n_r \mathbb Z
+\end{equation*}
+- given by $\phi(x + N \mathbb Z) = (\phi_1(x), \ðots, \phi_r(x))$ is a group isomorphism	
+
+** Symmetric and alternating groups
+*** General
+- $M_n = \{1,2,\dots,n\}$ with $n$ elements
+	- $S_n$ consists of the bijective maps from $M_n$ to itself
+
+- *Definition 2.9.1* Suppose that $\sigma \in S_n$. Then the following is defined 
+\begin{equation*}
+  M_\phi = \{x \in M_n \mid \sigma(x) \neq x\}
+\end{equation*}
+- Permutations $\sigma, \tau \in S_n$ are called disjoint if $M_\sigma \cap M_\tau = \emptyset$	
+
+- *Proposition 2.9.2* Let $\phi, \tau \in S_n$ be disjoint permutations in $S_n$. Then
+\begin{equation*}
+  \sigma \tau = \tau \sigma
+\end{equation*}
+
+*** Cycles
+- Given $k$ different elements $X_1, x_2, \dots, x_k$ of $M_n$. A permutation $\sigma \in S_n$ given by 
+\begin{equation*}
+  \sigma(x_1) = x_2, \quad  \sigma(x_2) = x_3, \quad, \dots, \sigma(x_{k-1}) = x_k, \quad \sigma(x_k) = x_1
+\end{equation*} 
+- and $\sigma (x) = x$ if $x \notin \{x_1, \dots, x_k\}$ is called a k-cycle. It is denoted
+\begin{equation*}
+  \sigma = (x_1,x_2, \dots, x_k)
+\end{equation*}	
+- to indicate that $x_2 = \sigma(x_1), \dots, x_1 = \sigma(x_k)$.
+- $M_\sigma = \{x_1, x_2, \dots,x_k\}$ and the order of a $k$ cycle in $S_n$ is $k$
+- A 1-cycle is the identity map
+- A 2-cycle is called a *transposition* and is there its own inverse in S_n
+	- A transposition of the form $s_i = (i~i+1)$ where $i=1, \dots, n-1$ is called a *simple transposition*
+- Every permutation can be expressed as a product of disjoint cycles
+
+- *Proposition 2.9.5* Let $\sigma \in S_n$ be written as a product of disjoint cycles $\sigma_1 \dots \sigma_r$. Then the order of $\sigma$ is the least common multiple of the cycles $\sigma, \dots, \sigma_r$
+
+- *Proposition 2.9.6* Every permutation $\sigma \in S_n$ is a product of unique disjoint cycles
+
+- *Lemma 2.9.8* Suppose that $\theta = (i_1,i_2, \dots, i_k)$ is a $k$ cycle and $\sigma$ permutation in $S_n$. Then 
+\begin{equation*}
+	\sigma(i_1i_2 \dots i_k) \sigma^{-1} = (\sigma(i_1)\sigma(i_2)\dots \sigma(i_k))  
+\end{equation*} 
+
+- *Definition 2.9.10* Let $\sigma \in S_n$ be a permutation. A pair of indices, where $1 \leq 1 < j \leq n$, is called an inversion of $\sigma$ if $\sigma(i) > \sigma(j)$. Let
+\begin{equation*}
+  I_\sigma = \{(i,j) \mid 1 \leq i < j \leq n \text{ and } \sigma(i) > \sigma(j)\}
+\end{equation*}
+- denote the set of inversions and let $n(\sigma) = |I_\sigma|$ be the number of inversions of $\sigma$
+
+- *Proposition 2.9.12* The permutation $\sigma \in S_n$ is the identity map if and only if $n(\sigma) = 0$. If $\sigma$ is not the identity map then there exists $i=1,\dots,n-1$ such that $\sigma(i) > \sigma(i+1)$
+
+- *Lemma 2.9.13* Let $s_i \in S_n$ be a simple transposition and $\sigma \in S_n$. Then
+\begin{equation*}
+  n(\sigma s_i) = 
+  \begin{cases} 
+    n(\sigma) + 1 & \text{if } \sigma(i) < \sigma(i+1) \\
+    n(\sigma) - 1 & \text{if } \sigma(i) > \sigma(i+1) 
+  \end{cases}
+\end{equation*}
+
+- *Proposition 2.9.14* Let $\sigma \in S_n$. Then	
+	a) $\sigma$ is a product of $n(\sigma)$ simple transpositions
+	b) $n(\sigma)$ is the minimal number of simple transpositions needed in writing $\sigma$ as a product of simple transpositions
+
+*** The alternating group
+- *Definition 2.9.15* The sign of a permutation $\sigma \in S_n$ is
+\begin{equation*}
+  \text{sgn}(\sigma) = (-1)^{n(\sigma)}
+\end{equation*}	
+- A permutation with a positive sign is called even
+- A permutation with a negative sign is called odd
+
+- *Proposition 2.9.16* The sign
+\begin{equation*}
+  \text{sgn}: S_n \to \{\pm 1\}
+\end{equation*}
+- of a permutation is a group homomorphism, where the composition in $\{\pm 1\}$ is multiplication
+
+- The set of even permutations in $S_n$ is denoted $A_n$ and called the alternating group
+	- It is a normal subgroup of $S_n$
+
+- The following is a group isomorphism
+\begin{equation*}
+  S_n / A_n \tilde \to \{\pm 1\}
+\end{equation*}
+
+- *Proposition 2.9.17* Let $n \geq 2$. A transposition $\tau = (i,j) \in S_n$ is an odd permutation. The sign of an $r$ cycle $\sigma=(x_1x_2 \dots x_r) \in S_n$ is $(-1)^{r-1}$
+
+*** Simple groups 
+- A group $N$ is called *simple* if $\{e\}$ and $N$ are the only normal subgroups of $N$
+	- One can prove that any finite group $G$ has a decreasing sequence of subgroups:
+\begin{equation*}
+  G = G_0 \supseteq G_1 \supseteq G_2 \supseteq \cdots \supseteq G_{n-1} \supseteq G_n = \{e\}
+\end{equation*}
+- Such that $G_{i+1}$ is a normal subgroup of $G_i$ and the quotient group $G_i/G_{i+1}$ is a simple finite group
+
+- *Lemma 2.9.18* Every permutation in $A_n$ is a product of $3$ cycles if $n \geq 3$
+
+- *Theorem 2.9.19* The alternating group $A_$ is simple for $n \geq 5$
+
+** Actions of groups
+*** General
+- *Definition 2.10.1* Let $G$ be a group and $S$ a set. $G$ acts (from the left) on $S$ if there is a map
+\begin{equation*}
+  \alpha : G \times S \to S
+\end{equation*}
+- denoted $\alpha(g,s) = g \cdot s$, such that
+	a) $e \cdot s = s$ for every $s \in S$
+	b) $(g \cdot h) \cdot s = g \cdot (h \cdot s)$ for every $g,h \in G$ and every $s \in S$
+
+- *Definition 2.10.2* Let $\alpha : G \times S \to S$ be an action of $G$ on $S$, $X \subseteq S$ and $s \in S$.
+	- Then $G \cdot s = Gs = \{g \in G\}$ is called the *orbit* of $s$
+	- The set of orbits $\{Gs \mid s \in S \}$ is denoted $S/G$
+	- Let $g \times X = gX = \{gx \mid x \in X\}$, where $g \in G$. Then 
+\begin{equation*}
+ G_X = \{g \in G \mid gX = X\} 
+\end{equation*}
+- is called the stabilizer of $X$.
+	- If $X = \{x\}$ then $G_X = G_x$
+	- A fixed point for the action is an element $s \in S$ such that $gs = s$ for every $g \in G$
+	- The set of fixed points is denoted $S^G$
+
+- *Proposition 2.10.5* 	Let $\alpha: G \times S \to S$ be an action
+	a) Let $X \subset S$, then $G_X$ is a subgroup of $G$
+	b) The set $S$ is the union of $G$ orbits $S = \cup_{s \in S} G_s$, where $Gs \neq Gt$ implies $Gs \cap Gt = \emptyset$ if $s,t \in S$
+	c) Let $x \in S$. Then 
+\begin{equation*}
+  \tilde f G/G_x \to Gx$
+\end{equation*}
+- given by $\tilde f(gG_x) = gx$ is a well defined and bijective map between the left costs of $G_x$ and the orbit $Gx$
+
+- *Corollary 2.10.7*  Let $G \times S \to S$ be an action, where $S$ is a finite set. Then
+\begin{equation*}
+	|S| = |S^G| + \sum_x |G/G_x|
+\end{equation*}
+- where the summation is denote by picking out an element $x$ from each orbits with more than one element
+
+- *Lemma 2.10.8 (Burnside)* Let $G \times S \to S$ be an action where $G$ is a finite group and $S$ a finite set. Then
+\begin{equation*}
+  |S / G| = \frac{\sum_{g \in G}|S^g|}{|G|}
+\end{equation*}
+- where	$S^g = \{x \in S \mid gx = x\}$
+
+*** Conjugacy classes
+- The map $\alpha : G \times G \to G$ given by $\alpha(g,h) = ghg^{-1}$ is an action on $G$ and is called *conjugation*
+- The orbit
+\begin{equation*}
+  G \cdot h = G(h) = \{ghg^{-1} \mid g \in G\}
+\end{equation*}
+- is called the *conjugacy class*	containing $h$
+- The stabilizer $G_h$ is denoted $Z(h)$ and is called the *centralizer* of $h$
+	- Notice that
+\begin{equation*}
+  Z(h) = \{g \in G \mid gh = hg\}
+\end{equation*}
+- The set of fixed points 
+\begin{equation*}
+  G^G = Z(G) = \{g \in G mid gx = xg \text{ for every } x \in G\}
+\end{equation*}
+- is denoted $Z(G)$ and is called the *center* of $G$
+	- It is an abelian normal subgroup of $G$
+
+- The stabilizer of a subgroup $H \subseteq G$
+\begin{equation*}
+  G_H = N_G(H) = \{ g \in G \mid gHg^{-1} \}
+\end{equation*}
+- is denoted $N_G(H)$ and called the *normalizer* of $H$ in $G$
+	- $H$ is a normal subgroup if and only if $N_G(H) = G$
+	- If $G$ is finite then Corollary 2.10.7 can be written as
+\begin{equation*}
+  |G| = |Z(G)| + \sum_{h \in G} |G / Z(h)|
+\end{equation*}
+- where the last summation is done by picking out one element $h$ from each conjugacy class with more than one element	
+	
+*** Conjugacy classes in the symmetric group
+- The conjugacy class $C(\sigma)$ consists of permutations with the same cycle type as $\sigma$
+
+- *Remark 2.10.12* Counting the number of conjugacy classes in $S_n$ translates into the problem of counting increasing sequences $1 \leq i_1 \leq i_2 \leq \cdots \leq i_r \leq n$ such that $i_1 + \cdots + i_r = n$.
+
+*** Groups of order $p^r$
+- A finite group $p^r$, where $p$ is a prime number and $r \in \mathbb Z$, is called a $p$ group
+
+- *Proposition 2.10.13* Let $G$ be a non-trivial $p$ group acting a finite set $S$. Then $|S| \equiv |S^G| (\text{mod } p )$
+
+- *Corollary 2.10.14* Let $G$ be a non-trivial $p$ group of $p^r$. Then 
+\begin{equation*}
+  |G| \equiv |Z(G)| (\text{mod } p)
+\end{equation*}
+- and $|Z(G)| > 1$	
+
+- *Corollary 2.10.15* Let $p$ be a prime number. A group $G$ of order $|G| = p^2$ is abelian 
+
+*** The Sylow theorems
+- *Definition 2.10.16* Let $G$ be a finite group and $p$ a prime number and suppose that $|G| = p^rm$, where $p \nmid m$. A Sylow $p$ subgroup is a subgroup $H \subseteq G$ of order $p^r$
+
+- *Theorem 2.10.17 (First Sylow theorem)* Let $G$ be a finite group and $p$ a prime number, and suppose that $|G| = p^rm$ where $p \nmid m$. Then $G$ contains a Sylow $p$ subgroup
+
+- *Theorem 2.10.18 (Second Sylow theorem)* Let $G$ be a finite group and $P,Q$ two Sylow $p$ subgroups. Then there exists $g \in G$ such that 
+\begin{equation*}
+  gPg^{-1} = Q
+\end{equation*}
+- Furthermore, any subgroup $H$ is contained in a Sylow $p$ subgroup
+
+- *Theorem 2.10.19 (Third Sylow theorem)* Let $G$ denote a finite group of order $p^rm$, where $p \nmid m$. Let $\text{Syl}_p(G)$ denote the set of Sylow p-subgroups. Then
+	a) $|\text{Syl}_p(G)|$ divides $m$
+	a) $|\text{Syl}_p(G)| \equiv 1 (\text{mod } p)$
+
+* Rings
+** Definition
+*** General
+- A *ring* is an abelian group $(R,+)$ with an additional composition $\cdot : R \times R \to R$ called multiplication. Multiplication satisfies the following for every $x,y,z \in R$:
+	a) $(x \cdot y) \cdot z=x \cdot(y \cdot z)$
+	b) there exists an element $1 \in R$ such that $1 \cdot x=x \cdot 1=x$
+	c) $x \cdot(y+z)=x \cdot y+x \cdot z$ and $(y+z) \cdot x=y \cdot x+z \cdot x$
+ 	
+- *Definition 3.1.1* The most important definitions concerning a ring $R$:
+	a) A subset $S \subseteq R$ of a ring $R$ is called a subring if $S$ is a subgroup of $(R,+)$ $1 \in S$ and $x y \in S$ if $x, y \in S$.
+	b) An element $x \in R \backslash\{0\}$ is called a zero divisor if there exists $y \in R \backslash\{0\}$ such that $x y=0$ or $y x=0$.
+	c) An element $x \in R$ is called a unit if there exists $y \in R$ such that $x y= y x=1$
+		 - $y$ is denoted $x^{-1}$ and called the inverse of $x$
+		 - The set of units in $R$ is denoted $R^{*}$.
+	d) $R$ is called commutative if $x y=y x$ for every $x, y \in R$
+
+- The multiplication makes $R$ into a group
+
+- The group of units in a commutivative ring $R$ is an abelian group
+
+- A rings $R$ with $R^* = R \backslash \{0\}$ is called a field
+	- If $K \subseteq L$ are fields and $K$ is a subring of $L$ then
+		- $K$ is called a subfield of $L$
+		- $L$ is called an extension field of $K$
+
+- A *domain* is a ring $R \neq \{0\}$ with no zero divisors
+
+- *Proposition 3.1.3* Let $R$ be a domain and a $x, y \in R$. If a $\neq 0$ and a $x=a y$ then $x=y$
+	
+- *Proposition 3.1.4* Let $F$ be a field. Then $F$ is a domain.
+
+*** Ideals
+- An *ideal* in a ring $R$ is a subgroup $I$ of $(R,+)$ such that $\lambda x \in I$ for every $\lambda \in R$ and $x \in I$
+
+- Let $r_1, \dots, r_n \in R$ then the subset
+[[file:Rings/screenshot_2019-10-28_18-59-03.png]]	
+- is an ideal in $R$
+	- If $I$ is an ideal in $R$ and there exist $r_1, \dots, r_n \in R$ such that $I = \langle r_1, \dots, r_n \rangle$
+
+- *Remark 3.1.6* Ideals can also be generated by infinitely many elements. Let $M$ be any subset of $R$. The ideal generated by $M$ is 
+[[file:Rings/screenshot_2019-10-28_19-01-47.png]]
+
+- *Remark 3.1.7* Let $I$ and $J$ be ideal in a ring $R$
+	a) Then $I \cap J$ and $I + J = \{i+j \mid i \in I, j \in J\}$ also ideals in $R$
+	b) The product $IJ$ of $I$ and $J$ is defined to be the ideal generated by $\{ij \mid i \in I, j \in J\}$
+
+- *Remark 3.1.8* An ideal in a field $F$ is either $\langle 0 \rangle$ of $F$ it self
+
+- An ideal $I$ in $R$ that is generated by one element is called a *principal ideal*
+- *Definition 3.1.9* A domain in which every ideal is a principal ideal is called a *principal ideal domain*
+
+- *Proposition 3.1.10* The ring $\mathbb Z$ is a principal ideal domain
+
+- *Theorem 3.1.11* The ring of Gaussian integers $\mathbb Z[i]$ is a principal ideal domain
+	
+** Quotient rings
+*** Definition
+- Let $I$ be an ideal in a ring $R$
+	- $I$ is a subgroup of the abelian group $(R,+)$ and the set of left costs of $I$ with respect to $+$ is an abelian group
+
+- $R/I$ for an ideal $I$ and a ring $R$ can be made into a ring the following way by defining addition and multiplication as follows:
+	a) $[x] + [y] = [x+y]$ for every $[x], [y] \in R/I$
+	b) $[x][y] = [xy]$ for every $[x], [y] \in R/I$
+
+*** Quotient rings of $\mathbb Z$
+- *Proposition 3.2.2* Suppose that $d$ is a positive integer. Then the group of units $(\mathbb Z/d \mathbb Z)^*$ is an abelian group with $\phi(d)$ elements
+
+- *Proposition 3.2.3* Let $n \in \mathbb N$. Then $\mathbb Z/n\mathbb Z$ is a field if and only if $n$ is a prime number. If $n$ is a composite number then $\mathbb Z /n \mathbb Z$ is not domain
+
+- *Definition 3.2.5* The field $\mathbb Z/p \mathbb Z$ is denoted $\mathbb F_p$ where $p$ is a prime number
+
+*** Prime ideal
+- An prime ideal is and ideal satisfying
+\begin{equation*}
+	I \neq R \text{ and } xy \in I \text{ implies } x \in I \text{ or } y \in I 
+\end{equation*}
+
+- *Proposition 3.2.6* An ideal $I \subseteq R$ is a prime ideal if and only if $R/I$ is a domain
+	
+*** Maximal ideal
+- $I$ is a *maximal ideal* for a ring $R$ if it satisfy the following property
+\begin{equation}
+ \text{if } I \subsetneq  \text{ then} J = R
+\end{equation}
+- where $J$ is an ideal of $R$
+
+- *Proposition 3.2.7* An ideal $I \subseteq R$ is a maximal ideal if and only if $R/I$ is a field.
+
+- *Remark 3.2.8* A maximal ideal is a prime ideal
+	
+** Ring homomorphisms
+*** General
+- A map $f : R \to S$ between two rings $R$ and $S$ is called a *ring homomorhism* if
+	- It is a group homomorphism from $(R,+)$ to $(S, +)$
+	- $f(xy) = f(x)f(y)$ for every $x,y \in R$
+	- $f(1) = 1$
+
+- A bijective ring homemorphism is called a *ring isomorphism*
+	- If $R$ and $S$ are rings there exists a ring isomorphism $f:R \to S$ it is said that $R$ and $S$ are isomorphic
+	- It is denoted $R \cong S$
+
+- *Proposition 3.3.2* Let $R$ to $S$ be rings and $f: R \to S$ a ring homomorphism with kernel $K = \text{Ker}(f)$. Then
+\begin{equation}
+	\tilde{f}: R / K \rightarrow f(R)
+\end{equation}
+- given by $\tilde{f}(r+K)=f(r)$ is a well defined map and a ring isomorphism
+
+*** The unique ring homomorphism from $\mathbb Z$
+- *Lemma 3.3.3* For every ring $R$, there is a unique ring homomorphism $f: \mathbb Z \to R$
+- *Remark 3.3.4* Let $f : \mathbb Z \to R$ denote the unique ring homomorphism for a given ring $R$. For $n \geq 0$, one think of $f(n)$ as
+\begin{equation}
+	f(n)=1+1+\cdots+1
+\end{equation}
+- A sum of $n$ copies of $1 \in R$
+
+- Let $R$ be a ring $\text{ord}(1)$ denote the order of $1$ in $(R,+)$
+	- If $\text{ord}(1)$ is finite $R$ is said to have finite characteristic $\text{ord}(1)$
+	- The characteristic of $R$ is $n_1$, where $n_1 \in \mathbb N$ and $n_1 \mathbb Z = \text{Ker} f_1$
+	- The characteristic of $R$ is denoted $\text{char} \ R$
+
+- *Lemma 3.3.5* Let $R$ be a ring. Then there is an injective ring homomorphism
+\begin{equation*}
+	\mathbb{Z} / n \mathbb{Z} \rightarrow R
+\end{equation*}
+- where $n = \text{char } R$
+
+- *Remark 3.3.6* In the situation of Lemma 3.3.5 we say that $\mathbb{Z} / n \mathbb{Z}$ is contained in $R$ since it is isomorphic to a subring in $R$
+
+- *Proposition 3.3.7* Let R be a domain. Then char R is either zero or a prime number. If $R$ is finite then $R$ is a field and char $R$ is a prime number.
+	
+*** Freshman's Dream
+- Lemma 3.3.8 Let $R$ be a ring and $a$, $b$ two elements in $R$. Then
+\begin{equation*}
+	(a+b)^{n}=a^{n}+\left(\begin{array}{c}{n} \\ {1}\end{array}\right) a^{n-1} b+\cdots+\left(\begin{array}{c}{n} \\ {n-1}\end{array}\right) a b^{n-1}+b^{n}
+\end{equation*}	
+- for $n \in \mathbb{N}$.
+
+- *Theorem 3.3.9 (Freshman's Dream)* Let $R$ be a ring of prime characteristic $p$. Then
+$$
+(x+y)^{p^{r}}=x^{p^{r}}+y^{p^{r}}
+$$
+- for every $x, y \in R$ and $r \in \mathbb{N}$.
+
+- *Remark 3.3.10* Notice that if $R$ is a ring of prime characteristic $p$ then Theorem 3.3.9 shows that the map $F: R \rightarrow R$ given by $F(x)=x^{p}$ is a ring homomorphism. It is called the Frobenius map after G. Frobenius 
+	
+** Fields of fractions
+- If $R$ is domain then there is a very natural field $Q$ and an injective ring homomorphism $R \to Q$
+	- $Q$ is the "smallest" field containing $R$
+	- The field $Q$ consists of fraction with a numerator in $R$ and a denominator in $R \backslash \{0\}$
+	- Let $M=R \times(R \backslash\{0\})$ and define $Q=M / \sim$ where $(a, s) \sim(b, t)$ if and only if $a t=b s$
+	- The following are well defined operations 
+\begin{equation}
+	\frac{a b}{s t}=\frac{a b}{s t}, \quad \frac{a}{s}+\frac{b}{t}=\frac{a t+b s}{s t}
+\end{equation}
+- These make $Q$ into a ring where
+\begin{equation}
+	0=\frac{0}{a} \quad \text { and } \quad 1=\frac{a}{a}
+\end{equation}
+
+- The field $Q$ is called the *field of fractions* of $R$
+
+- *Proposition 3.4.1* Let R be a domain with field of fractions $Q$, let $L$ be a field and let $\varphi: R \rightarrow L$ be an injective ring homomorphism. Then there exists a unique injective ring homomorphism $\bar{\varphi}: Q \rightarrow L$ such that $\bar{\varphi} \circ i=\varphi$.
+
+- *Corollary 3.4.2* Let R be a domain contained in the field $L$. The smallest subfield in $L$ containing $R$ is
+$$
+K=\left\{a s^{-1} | a \in R, s \in R \backslash\{0\}\right\}
+$$
+- The field of fractions of $R$ is isomorphic to $K$.
+
+** Unique factorization
+*** Divisibility and greatest common divisor
+- Suppose that $x,y \in R$
+	- If $x = ry$ for some $y \in R$ we say that $y$ is a divisor of $x$ denoted $y \mid x$
+	- $y \mid x$ if and only if $\langle x \rangle \subseteq \langle y \rangle$
+	- If $x= uy$ where $u \in R^*$ then $\langle x \rangle = \langle y \rangle$
+	- If $\langle x\rangle=\langle y\rangle$ then $x=r y$ and $y=s x$ for some $r,s \in R$
+	- $\langle x\rangle=\langle y\rangle$ implies that there exists $u \in R^{*}$ such that $x=u y$
+		- In this case $x$ and $y$ are called associated elements of $R$.
+
+- An element $d \in R$ is a greatest common divisor of $a, b \in R$ if $d$ is a common divisor of $a$ and $b$ and every common divisor of $a$ and $b$ divides $d$.
+
+- Let $R$ be a principal ideal domain.
+	- For every $a, b \in R$ there exists $d \in R$ such that $\langle a, b\rangle=\{x a+y b \mid x, y \in R\}=\langle d\rangle$
+		- Where $d$ is the greates common divisor of $a$ and $b$
+
+*** Irreducible elements
+- An element $r \in R \backslash R^*$ is called *irreducible* if $r=ab$ for $a,b \in R$ implies that either $a$ or $b$ is unit
+	- i.e. if $r$ is an irreducible element and $u$ is a unit then $ur$ is also an irreducible element
+	- A non-zero element $x \in R \backslash R^*$ is said to have a have a factorization into irreducible elements if there exist irreducible elements $p_{1}, \ldots, p_{r} \in R$ such that
+$$
+x=p_{1} \cdots p_{r}
+$$
+- $x$ is said to have unique factorization into irreducible elements if for any other irreducible factorization
+$$
+x=q_{1} \cdots q_{s}
+$$
+- every $p_{i}$ for $i=1, \ldots, r$ divides $q_{j}$ for some $j=1, \ldots, s$
+
+- A domain $R$ such that every non-zero element in $R \backslash R^{*}$ has unique factorization into irreducible elements is called a *unique factorization domain*.
+	
+*** Prime elements
+- A non-zero element $p \in R \backslash R^{*}$ is called a prime element if $p \mid x y$ for $x, y \in R$ implies that $p | x$ or $p | y$.
+- *Proposition 3.5.2* A prime element is irreducible.
+- *Proposition 3.5.3* Let R be a ring for which every non-zero element $x \in R \backslash$ $R^{*}$ has a factorization into irreducible elements. Every irreducible element is a prime element in $R$ if and only if $R$ is a unique factorization domain.
+
+- *Lemma 3.5.5* Let $R$ be a principal ideal domain and $r$ a non-zero element. Then $r$ has an irreducible factorization.
+
+- *Proposition 3.5.6* Suppose that $R$ is a principal ideal domain that is not a field. An ideal $\langle x \rangle \subseteq R$ is a maximal ideal if and only if $x$ is an irreducible element in $R$.
+
+- *Theorem 3.5.7* A principal ideal domain $R$ is a unique factorization domain  
+
+*** Euclidean domains
+- A domain $R$ is called Euclidean if there exists a Euclidean function $N: R \backslash \{0\} \rightarrow \mathbb{N}$
+	- It satisfies that for every $x \in R$, $d \in R \backslash\{0\}$ there exist $q, r \in R$ such that
+$$
+x=q d+r
+$$
+- where either $r=0$ or $N(r)<N(d)$
+
+- *Proposition 3.5.9* A Euclidean domain $R$ is a principal ideal domain
+
+- A greatest common divisor of two elements in a Euclidean domain $R$ can be found using the Euclidean algorithm as follows:
+	- Let $N: R \backslash \{0\} \to \mathbb N$ be a Euclidean function
+	- Suppose that $a,b \in R$
+	- A greatest common divisor is a generator for the ideal $\langle a, b \rangle$
+	- If either $a$ or $b$ is zero we are done
+	- If $N(a) \geq N(b)$. Then there exists $q \in R$ such that that $N(a) \geq N(b)$ $r=0$ or $N(r)<N(b)$
+	- Then $\langle a, b\rangle=\langle b, r\rangle$ since $r=a-q b \in\langle a, b\rangle$  $a=q b+r \in\langle b, r\rangle$.
+	- Continue the procedure with $a=b$ and $b=r$ until one of $a$ and $b$ is zero
+	
+*** Fermat's two square theorem
+- *Proposition 3.5.11* Let $\pi = a + bi \in \mathbb Z[i]$ be a Gaussian integer with $N(\pi) = p$, where $p$ is a prime number. Then $\pi$ is a prime element in $\mathbb Z[i]$
+
+- *Lemma 3.5.12 (Lagrange)* Let p be a prime number. If $p \equiv 1(\text{mod } 4)$ then the congruence
+$$
+x^{2} \equiv-1(\bmod p)
+$$
+- can be solved by $x=(2 n) !$ where $p=4 n+1$
+
+- *Corollary 3.5.14* A prime number $p \equiv 1(\text{mod } 4)$ is not a prime element in $\mathbb{Z}[i]$
+
+- *Theorem 3.5.15 (Fermat)* A prime number $p \equiv 1(\text{mod } 4)$ is a sum of two uniquely determined squares.
+
+* Polynomials
+** General
+- The set of functions $f: \mathbb R \to \mathbb R$ is a ring
+	- The sum of two functions $f$ and $g$ is $(f+g)(x) = f(x) + g(x)$
+	- The product of two functions $f$ and $g$ is $(fg)(x) = f(x)g(x)$
+	- The subset $\left\{a_{0}+a_{1} x+\cdots+a_{n} x^{n} | a_{i} \in \mathbb{R}\right\}$ of polynomials is a subring of this ring with the following addition
+\begin{equation*}
+	\begin{array}{l}{\left(a_{0}+a_{1} x+a_{2} x^{2}+\cdots\right)+\left(b_{0}+b_{1} x+b_{2} x^{2}+\cdots\right)} \\ {\quad=\left(a_{0}+b_{0}\right)+\left(a_{1}+b_{1}\right) x+\left(a_{2}+b_{2}\right) x^{2}+\cdots}\end{array}
+\end{equation*}
+- and the multiplication
+	\begin{array}{l}{\left(a_{0}+a_{1} x+a_{2} x^{2}+\cdots\right)\left(b_{0}+b_{1} x+b_{2} x^{2}+\cdots\right)} \\ {\quad=\left(a_{0} b_{0}\right)+\left(a_{1} b_{0}+a_{0} b_{1}\right) x+\left(a_{2} b_{0}+a_{1} b_{1}+a_{0} b_{2}\right) x^{2}+\cdots}\end{array}
+
+** Polynomial rings
+- Let $R$ be a ring and $R[\mathbb{N}]$ the set of functions $f: \mathbb{N} \rightarrow R$ such that $f(n)=0$ for $n \gg 0$. Given $f, g \in R[\mathbb{N}]$
+	- Define their sum as $(f+g)(n)=f(n)+g(n)$
+	- Define
+$$
+(f g)(n)=\sum_{i+j=n} f(i) g(j)
+$$
+- where $i, j \in \mathbb{N}$
+
+- Let $X^i \in R[\mathbb N]$ denote the function
+$$
+X^{i}(n)=\left\{\begin{array}{ll}{1} & {\text { if } n=i} \\ {0} & {\text { if } n \neq i}\end{array}\right.
+$$
+- $X^i X^j = X^{i+j}$ where $i,h \in \mathbb N$
+- $a \in R$ is viewed as the function 
+\begin{equation*}
+	a(n)=\left\{\begin{array}{ll}{a} & {\text { if } n=0} \\ {0} & {\text { if } n>0}\end{array}\right. 
+\end{equation*}
+- in $R[\mathbb N]$
+
+- An element $f \in \mathbb R[\mathbb N]$ can be written as
+\begin{equation*}
+	f=a_{0}+a_{1} X+\cdots+a_{n} X^{n} 
+\end{equation*}
+- where $a_i = f(i)$ and $f(i) = 0$ if $i > n$
+	- $1 = X^0$ is the neutral element for the multiplication
+	- The neutral element for $+$ is $0 \in R$
+	- $fg = gf$ and $f(g+h)=f g+f h$ for $f, g, h \in R[\mathbb{N}]$
+
+- *Definition 4.1.1* Define the polynomial ring $R[X]$ in one variable over the ring $R$ as $R[\mathbb{N}]$. Where $X$ denotes the function $X^{1} \in R[\mathbb{N}]$. A term is a polynomial of the form $a X^{m}$ where $a \in R \backslash\{0\}$. A polynomial $f \in R[X]$ can be written
+$$
+	a_{0}+a_{1} X+a_{2} X^{2}+\cdots+a_{n} X^{n}
+$$
+- where $a_0, \ldots, a_n \in R$ are called the coefficients of $f$
+	- If $a_n \neq 0$ then $\text{deg}(f) = n$ and call $a_n$ the leading coefficient of $f$
+	- In this case $\text{deg}(f)$ is called the *degree* of $f$ and $a_\text{deg}(f)X^{\text{def} (f)}$ is the leading term
+	- A non-zero polynomial is called *monic* if its leading coefficient is $1$
+
+- *Remark 4.1.2* The degree of a polynomial is a function deg: $R[X] \backslash\{0\} \rightarrow \mathbb N$. It is an extremely useful invariant of a polynomial. The degree of the zero polynomial is not defined.
+
+- *Remark 4.1.3* Two polynomials $f=a_{m} X^{m}+\cdots+a_{1} X+a_{0}$ and $g=$
+$b_{n} X^{n}+\cdots+b_{1} X+b_{0}$ in $R[X]$ are the same if and only if $a_{0}=b_{0}, a_{1}=b_{1}, \ldots$ 
+
+** Division of polynomials
+- *Proposition 4.2.2* Let $f, g \in R[X] \backslash\{0\}$ If the leading coefficient of $f$ or $g$ is not a zero divisor then
+$$
+\text{deg}(f g)=\text{deg}(f)+\text{deg}(g)
+$$
+
+- *Proposition 4.2.3* Let R be a domain. Then $R[X]^{*}=R^{*}$
+
+- *Proposition 4.2.4* Let $d$ be a non-zero polynomial in $R[X]$ Assume that the leading coefficient of $d$ is not a zero divisor in $R$. Given $f \in R[X]$, there exist polynomials $q, r \in R[X]$ such that
+$$
+f=q d+r
+$$
+- and either $r=0$ or none of the terms in $r$ is divisible by the leading term of $d$.
+
+- *Corollary 4.2.5* Let $d$ be a non-zero polynomial in $R[X]$. Assume that the leading coefficient of $d$ is invertible in $R$. Given $f \in R[X]$, there exist unique polynomials $q, r \in R[X]$ such that
+$$
+f=q d+r
+$$
+- and either $r=0$ or $deg(r) <\operatorname{deg}(d)$.
+
+- *Definition 4.2.7* The polynomial $r$ in Corollary 4.2.5 is called the remainder of $f$ divided by $d$
+
+** Roots of polynomials
+*** Definition
+- The map $j: R \rightarrow R[X]$ given by
+\begin{equation*}
+  j(r)=r+0 X+0 X^{2}+\cdots
+\end{equation*}
+- is an injective ring homomorphism
+	- The image $j(R)$ is identified with $R$
+	- $R$ is a subring of $R[X]$ in this way
+
+- *Proposition 4.3.1* Let $f=a_n X^n + \dots + a_1 X + a_0 \in R[x]$ and $\alpha \in R$. The map $\varphi_\alpha : R[X] \to R$ given by
+\begin{equation}
+	\varphi_{\alpha}(f)=f(\alpha)=a_{n} \alpha^{n}+\cdots+a_{1} \alpha+a_{0}
+\end{equation}
+- is a ring homomorphism
+
+- Let $f \in R[X]$ be a polynomial
+	- The element $\alpha \in R$ is called a *root* of $f$ if $f(\alpha) = \varphi_\alpha(f) = 0$
+	- Let $V(f)=\{\alpha \in R | f(\alpha)=0\}$ denote the set of roots of $f \in R[X]$
+
+- *Corollary 4.3.2* Let $f \in R[X]$. Then $\alpha \in R$ is a root of $f$ if and only if $X- \alpha$ divides $f$
+
+- A *monic polynomial* is a polynomial where the leading coefficient is $1$
+
+- If a monic polynomial $q$ divides a non-zero polynomial $f$ then
+	- $f=qr$ for a unique $r$
+	- $deg(f) = deg(q) + deg(r)$ i.e. $deg(q) \leq deg(f)$
+
+- The *multiplicity* of $\alpha$ as a root in a non-zero polynomial $f$ is the largest power $n \in \mathbb N$ such that 
+\begin{equation*}
+	(X - \alpha)^n \mid f 
+\end{equation*}
+
+- The multiplicity of $\alpha$ in $f$ in denoted $v_{\alpha}(f)$
+	- $v_{\alpha}(f) \leq deg(f)$ and $f=(X-\alpha)^{v_{\alpha}(f)} h$ where $h(\alpha) \neq 0$
+	- A *multi root* in $f$ is a root $\alpha \in R$ with $v_\alpha(f) > 1$
+
+- *Lemma 4.3.4* Let $R$ be a domain and $f,g \in R[X]$. Then $V(fg) = V(f) \cup V(g)$
+
+- *Theorem 4.3.5* Let $R$ be a domain and $f \in R[X] \backslash \{0\}$. If $V(f) = \{\alpha_1, \dots, \alpha_r\}$ then 
+\begin{equation*}
+  f=q\left(X-\alpha_{1}\right)^{v_{\alpha_{1}}(f)} \cdots\left(X-\alpha_{r}\right)^{v_{\alpha_{r}}(f)}
+\end{equation*}
+- where $q \in R[X]$ and $V(q) = \emptyset$. The number of roots of $f$, counted with multiplicity, is bounded by the degree of $f$ 
+
+*** Differentiation of polynomials 
+- Let $R$ be a ring and $f=a_{n} X^{n}+a_{n-1} X^{n-1}+\cdots+a_{1} X+a_{0} \in R[X]$. Then
+\begin{equation*}
+	D(f) = a_nnX^{n-1} + a_{n-1}(n-1)X^{n-2} + \cdots + a_1 
+\end{equation*}
+- is called the *derivative* of $f$.
+	- If one views a polynomial a map $f: \mathbb N \to R$ it can be rephrased as $D(f)(n-1) = nf(n)$ for $n \geq 1$
+
+- *Lemma 4.3.7* Let $f,g \in R[X]$ and $\lambda \in R$. Then
+	a) $D(f + g) = D(f) + D(g)$
+	b) $D(\lambda f) = \lamda D(f)$
+	c) $D(fg) = f D(g) + D(f) g$
+
+- *Lemma 4.3.8* Suppose that $f,g \in R[X]$
+	a) If $f^2 \mid g$ then $f \mid D(g)$
+	b) An element $\alpha \in R$ is a multiple root of $f$ if and only if $\alpha$ is a root of $f$ and $D(f)$
+
+- *Remark 4.3.9* If the polynomial ring $R[X]$ is of prime characteristic $p > 0$ one encounters many non-constant polynomials with zero derivative. 
+
+** Cyclotomic polynomials
+- A complex number $\xi$ is called a nth root of unity for a positive integer $n$ if $\xi^n = 1$
+- $\xi$ is written in polar coordinates as $re^{i \theta} = r(\cos \theta + i \sin \theta)$
+	- It follows that $r=1$ and $\theta=k 2 \pi i / n$ for $k=0, \ldots, n-1$ if $\xi$ is an $n$'th root of unity.
+
+- A complex number $\zeta$ is called a primitive $n$'th root of unity if $\zeta^n = 1$ and 
+\begin{equation*}
+  \zeta, \zeta^{2}, \ldots, \zeta^{n-1} \neq 1
+\end{equation*}
+
+- The eighth roots of unity are plotted below as dots on the unit circle in the complex plane
+	- The bigger dots represent the primitive eighth roots of unity
+[[file:Polynomials/screenshot_2019-11-14_10-43-00.png]] 
+
+- *Lemma 4.4.1* A complex number $\zeta$ is a primitive nth root of unity if and only if 
+\begin{equation*}
+	\zeta=e^{k 2 \pi i / n}
+\end{equation*}	
+- where $1 \leq k \leq n$ and $\text{gcd}(k,n) = 1$ If $\zeta$ is a primitive nth root of unity and $\zeta^m = 1$ then $n \mid n$
+
+- The set of all nth roots of unity is a subgroup of $\mathbb C^*$
+	- It is isomorphic to the cyclic group $\mathbb Z/n \mathbb Z$
+
+- *Definition 4.4.2* Let $n \in \mathcal N$ with $n \geq 1$. The nth cyclotomic polynomial is defined as the polynomial
+\begin{equation}
+	\Phi_{n}(X)=\prod_{1 \leq k \leq n, \operatorname{gcd}(k, n)=1}\left(X-e^{2 \pi i k / n}\right)
+\end{equation}
+- in $\mathbb C[X]$
+	- The coefficients of $\Phi_$ are always $\pm 1$ if $n$ is a product of two distinct prime numbers
+
+- *Proposition 4.4.4* Let $n \geq 1$. Then 
+	- $X^{n}-1=\prod_{d | n} \Phi_{d}(X)$
+	- the cyclotomic polynomials have integer coefficients $\Phi_{n}(X) \in \mathbb{Z}[X]$
+
+** Primitive roots
+- *Definition 4.5.1* Let $R$ be a ring and $n$ a positive natural number. An element $\alpha \in R$ is called a *primitive nth root of unity* in $R$ if $\alpha^n = 1$ and
+\[
+	\alpha, \alpha^{2}, \ldots, \alpha^{n-1} \neq 1
+\]
+
+- *Lemma 4.5.2* Let $\alpha$ be an element in a domain $R$. If $\Phi(\alpha) = 0$ and $\alpha$ is not a multiple root of $X^n-1 \in R[X]$ then $\alpha$ is primitive nth roots of unity in $R$.
+	
+- *Theorem 4.5.3 (Gauss)* Let $F$ be a field and $G \subseteq F^*$ a finite subgroup of the group of the units in $F$. Then $G$ is cyclic
+
+- An integer $a$ such that $[a]$ generates $\mathbb F^*_p$ is called a primitive root modulo $p$
+	- It is very difficult finding such numbers
+
+- *Theorem 4.5.4* There are infinitely many prime number $\equiv 1 (\text{mod } n)$ for a natural number $n \geq 2$.
+
+** Ideals in polynomial rings
+- If $R$ is a unique factorization domain then $R[X]$ is a unique factorization domain
+
+- The case where a ring $R$ is a field is denoted $F$
+- *Proposition 4.6.1* The polynomial ring $F[X]$ is a Euclidean domain, a principal ideal domain and a unique factorization domain
+	- The degree function on $F[X]$ is a Euclidean function $F[X] \backslash \{0\} \to \mathbb N$ which can therefore be used by the Euclidean algorithm
+	- The irreducible elements in $F[X]$ are called irreducible polynomials
+	- If $f \in F[X]$ and $f=f_1f_2$ then
+\begin{equation}
+  \text{deg}(f) = \text{def}(f_1) + \text{deg}(f_2)
+\end{equation}
+- If $f=f_1f_2$ is an honest factorization of $f$ i.e. neither $f_1$ not $f_2$ is constant then $0<\operatorname{deg}\left(f_{1}\right), \operatorname{deg}\left(f_{2}\right)<\operatorname{deg}(f)$
+
+- Polynomials that are units are non-zero constants
+	- If $f$ is not irreducible there is a factorization $f = f_1f_2$ such that
+\begin{equation}
+0<\operatorname{deg}\left(f_{1}\right), \operatorname{deg}\left(f_{2}\right)<\operatorname{deg}(f)
+\end{equation}
+
+- *Proposition 4.6.3* Let $f \in F[X]$. Then we have the following
+	a) The ideal $\langle f \rangle$ is a maximal ideal if and only if $f$ is irreducible. In this case the quotient ring $F[X] / \langle f \rangle$ is a field
+	b) If $f \neq 0$ then $f$ is a unit if and only if $\text{deg}(f) = 0$
+	c) If $\text{deg}(f) = 1$ then $f$ is irreducible
+	d) If $f$ is irreducible and $\text{deg}(f) > 1$ then $f$ does not have any roots
+	e) If $\text{deg}(f) = 2$ or $\text{def} (f) = 3$ then $f$ is irreducible if and only if it has not roots
+
+- *Remark 4.6.5* Cyclotomic polynomials are irreducible as polynomials in $\mathbb Q[X]$
+
+- *Proposition 4.6.7* Let $R$ be a ring and
+\begin{equation}
+	f=X^{n}+a_{n-1} X^{n-1}+\cdots+a_{1} X+a_{0} \in R[X]
+\end{equation}
+- a monic polynomial of positive degree $n$. Then
+	- $R \cap \langle f \rangle = \langle 0 \rangle$
+	- The elements $[g] = g \langle f \rangle$ can be expressed uniquely as polynomials as polynomials of degree $< n$ 
+\begin{equation}
+	b_{0}+b_{1} \alpha+\cdots+b_{n-1} \alpha^{n-1}
+\end{equation}
+
+- $R$ is a natural subring of $R[X] / \langle f \rangle$
+- The natural ring homomorphism $\varphi : R \to R[X] / \langle f \rangle$ given by $\varphi (r) = [r]$ is injective
+
+- *Remark 4.6.8* 	If $F$ is a field and $f \in F[X]$ is an irreducible polynomial then $\langle f \rangle$ is a maximal and $F[X] / \langle f \rangle$ becomes a field extension $E$ of $F$
+	- $\alpha = [X] \in E$ if a root of $f \in F[X] \subseteq E[X]$ since $f(\alpha) = 0$
+
+** Theorema Aureum: the law of quadratic reciprocity
+- The ring used is:
+\begin{equation}
+	R=\mathbb{F}_{p}[X] /\left\langle 1+X+\cdots+X^{q-1}\right\rangle
+\end{equation}
+- An element in $R$ can thus be written uniquely in terms of $\zeta = [X]$ as 
+\begin{equation}
+	a_{0}+a_{1} \zeta+\cdots+a_{q-2} \zeta^{q-2}
+\end{equation}
+- where $a_{0}, \dots, a_{q-2} \in \mathbb{F}_{p}$
+
+- *Lemma 4.7.1* The element $\zeta$ is a primitive qth root of unity in $R$. Let $\xi = \zata^l$ where $q \nmid l$. Then 
+\begin{equation}
+	1+\xi+\cdots+\xi^{q-1}=0
+\end{equation}
+in $R$
+
+- The following is the *Gauss sum*
+\begin{equation}
+	G=\sum_{j=0}^{q-1}\left(\frac{j}{q}\right) \zeta^{j}
+\end{equation}
+- in $R$. The individual terms satisfy
+\begin{equation}
+	\left(\frac{j}{q}\right) \zeta^{j}=\left(\frac{j+q m}{q}\right) \zeta^{j+q m}
+\end{equation}
+- for every $m \in \mathbb Z$.
+
+- *Lemma 4.7.2* The Gauss sum $G \in R$ satisfies the following
+	a) $G^{2}=(-1)^{(q-1) / 2} q$
+	b) $G$ is an invertible element in the ring $R$ if $p \neq q$
+
+** Finite fields
+*** Introduction
+- *Lemma 4.8.1* Let $F$ be a finite field. Then $|F| = p^n$ where $p$ is a prime number, $n \geq 1$ and there exists an irreducible polynomial $f \in \mathbb F_ p[X]$ of degree $n$ such that 
+\begin{equation}
+	F \cong \mathbb{F}_{p}[X] /\langle f\rangle
+\end{equation}
+
+- *Theorem 4.8.2* There exists a unique finite field with $p^n$ elements, where $p$ is a prime number and $n \geq 1$ i.e. the following must be true
+	a) There exists an irreducible polynomial in $\mathbb F_p[X]$ of degree $n$
+	b) Suppose that $F$ and $F^{\prime}$ are finite fields with $p^{n}$ elements. Then there exists a ring isomorphism $F \rightarrow F^{\prime}$
+
+- *Lemma 4.8.3* Let $\tau, d$ and $n$ be natural numbers, where $\tau > 1$. Then $\tau ^d-1$ divides $\tau^n -1$ if and only if $d$ divides $n$.
+
+- *Remark 4.8.4* The unique field constructed in theorem 4.8.2 is denoted $\mathbb F_{p^n}$
+
+*** Existence of finite fields
+- *Theorem 4.8.5* There exists an irreducible polynomial in $\mathbb F_p[X]$ of degree $n \geq 1$. i.e. if $f$ is an irreducible polynomial dividing $\Phi_{p^n-_1}$ in $\mathbb F_p[X]$ then $\text{deg}(f) = n$
+
+- *Remark 4.8.6* Theorem 4.8.5 says that if 
+\begin{equation*}
+		\Phi_{p^{n}-1}=f_{1} \cdots f_{r}
+\end{equation*}
+- is an irreducible factorization of $\Phi_{p^{n}-1}$ in $\mathbb{F}_{p}[X]$ then $\operatorname{deg}\left(f_{i}\right)=n$ In particular, $n | \varphi\left(p^{n}-1\right)$.
+
+*** Uniqueness of finite fields
+- Two fields $F$ and $F'$ with the same number of elements are isomorphic
+
+* Gröbner bases
+** Introduction
+- A symmetric function $f: \mathbb R^2 \to \mathbb R$ is a function satisfying $f(X,Y) = f(Y,X)$ for every $(X,Y) \in \mathbb R^2$
+	- Simple examples of symmetric functions are $s_1(X, Y) = X + Y$ and $s_2(X,Y) = XY$
+	- A symmetric polynomial $f$ is a polynomial satisfying $f(X,Y) = f(Y,X)$
+	- Newtons says that every symmetric polynomial is a polynomial in $s_1$ and $s_2$
+
+** Polynomials in several variables
+*** Definition
+- A polynomial ring $R[X_1, \dots, X_n]$ is defined in $n$ variables as
+\begin{equation}
+  R[X_1, \dots, X_n] = R[\mathbb N^n] = \{f: \mathbb N^n \to R \mid f(v) = 0, |v| >> 0\}
+\end{equation}
+- where $\mathbf{v} = (v_1, \dots, v_n) \in \mathbb N^n$ and $|v| = v_1 + \cdots + v_n$
+	- A polynomial $f \in R[X_1, \dots, X_n]$ is the same as a function $f: \mathbb N^n \to R$ that is non-zero for only finitely many $v \in \mathbb N^n$
+
+- Let $X^v \in R[\mathbb N^n]$ denote the function given by
+\begin{equation*}
+  X^v(w) =
+  \begin{cases} 
+    1  & \text{if } v = w \\
+    0  & \text{if } v \neq w
+  \end{cases}
+\end{equation*}
+
+- Every polynomial $f \in R[\mathbb N^n]$ can be written as a (finite) sum
+\begin{equation*}
+  f = \sum_{v \in \mathbb N^n} a_v X^v
+\end{equation*}
+- where $a_v \in R$
+	- where an element $r \in R$ is identified with the function mapping the zero vector to $r$ and everything else to $0 \in R$
+
+- If $f, g \in R[\mathbb N^n]$ define
+	- $f+g$ by $(f+g)(v) = f(v) + g(v)$
+	- $fg$ by the finite sum
+\begin{equation*}
+  (f g)(v)=\sum_{v_{1}+v_{2}=v} f\left(v_{1}\right) g\left(v_{2}\right)
+\end{equation*}
+- where $v1, v_2 \in \mathbb N^n$
+	- $0 \in R$ is the neutral element for $+$
+	- The function $X^{0,0,\dotsm0}$ mapping the zero vector in $\mathbb N^n$ to $1 \in R$ and everything else to $0$ is the neutral element for multiplication
+
+- In the notation $R[X_1, \dots, X_n]$ for $R[\mathbb N^n]$, $X_1$ refers to $X^{(1,0,\dots,0)}$ and so on
+
+- A *term* is a polynomial $r X^v \in R[\mathbb N ^ n]$, where $r \in R \backslash \{0\}$ is called the *coefficient*
+
+*** Term orderings
+- *Definition 5.1.2* The set $\mathbb N^n$ of $n$ tuples of natural numbers carries a natural component-wise adition $+$ with zero vector $0 = (0, \dots, 0)$ A partial ordering $\leq$ on $\mathbb N^n$ is called a *term ordering* if
+	a) $\leq$ is a total ordering
+	b) $0 \leq v$
+	c) $v_1 \leq v_2 \Rightarrow v_1 + v \leq v_2 + v$
+- for every $v, v_1, v_2 \in \mathbb N^n$
+
+- *Lemma 5.1.5 (Dickson)* Let $S$ be a subset of $\mathbb N^n$. Then there is a finite set vectors $v_1, \dots, v_r \in S$ such that
+\begin{equation*}
+  S \subseteq (v_1 + \mathbb N^n) \cup \cdots \cup (v_r + \mathbb N^n)
+\end{equation*}
+
+- *Corollary 5.1.7* A term ordering $\leq$ on $\mathbb N^n$ is a well ordering
+
+** The initial term of a polynomial
+- *Definition 5.2.1* Let
+\begin{equation*}
+  f = \sum_{v \in \mathbb N^n} a_v X^v
+\end{equation*}
+- be a non-zero polynomial in $R\left[\mathbb{N}^{n}\right]$ and $\leq$ a term order on $\mathbb{N}^{n}$.
+- The *initial term* of $f$ with respect to $\leq$ is defined as
+$$
+\operatorname{in}_{\leq}(f)=a_{w} X^{w}
+$$
+- where $w=\max _{\leq}\left\{v \in \mathbb{N}^{n} | a_{v} \neq 0\right\}$ 
+	- Two terms is sometimes compared as follows $a X^{u} \leq b X^{v}$ if $u \leq v$
+
+- *Remark 5.2.3* Let $R$ be a domain and $f, g$ non-zero polynomials in $R[X_1, \dots, X_n]$. Then
+	- $\text{in}\leq (fg) = \text{in}(f) \text{in}(g)$
+
+** Division algorithm
+- It is assumed that $R$ is a domain for the rest of the chapter
+
+- *Proposition 5.3.1 (The division algorithm)* Fix a term ordering $\leq$ on $\mathbb{N}^{n}$.
+	- Let $f \in R\left[X_{1}, \ldots, X_{n}\right] \backslash\{0\}$ and suppose that $f_{1}, \ldots, f_{m} \in R\left[X_{1}, \ldots, X_{n}\right]$ is a sequence of non-zero polynomials. Then there exist $a_{1}, \ldots, a_{m}, r \in R\left[X_{1}, \ldots, X_{n}\right]$ such that
+$$
+f=a_{1} f_{1}+\cdots+a_{m} f_{m}+r
+$$
+- and either $r=0$ or none of the terms in $r$ is divisible by $\text{in}_{\leq}\left(f_{1}\right), \ldots,\text{in}_{\leq}\left(f_{n}\right)$ Furthermore, in $\text{in}\leq\left(a_{i} f_{i}\right) \leq \operatorname{in}_{\leq}(f)$ if $a_{i} f_{i} \neq 0$
+
+- Division algorithm
+	1) Put $a_{1}:=0, \ldots, a_{m}:=0, r:=0$ and $s:=f$
+		 - giving $f=a_{1} f_{1}+\cdots+a_{m} f_{m}+(r+s)$ (invariant)
+	2) If $s=0$ we are done
+	3) If not there are two cases
+		 - If $\mathrm{in}_{\leq}(s)$ is divisible by some in $_{\leq}\left(f_{i}\right)$ then pick the smallest $i$ with this property and let
+			 - $s:=s-\frac{\operatorname{in}_{\leq}(s)}{\operatorname{in}_{\leq}\left(f_{i}\right)} f_{i}$
+			 - $a_{i}:=a_{i}+\frac{\operatorname{in}_{\leq}(s)}{\operatorname{in}_{\leq}\left(f_{i}\right)}$
+		 - If $\text{in}_\leq (s)$ is not divisible by any $\text{in}_\leq (f_i)$ the following is done
+			 - $r:=r+\operatorname{in}_{\leq}(s)$
+			 - $s:=s-\operatorname{in}_{\leq}(s)$
+	4) Go to step 2)
+
+- *Definition 5.3.2* Suppose that $f \in R[X_1, \dots, X_n]$ and let $F = (f_1, \dots, f_m)$ be a sequence of non-zero polynomials in $R[X_1, \dots, X_n]$. Let $f^F$ denote the remainder $r$ coming from dividing $f$ by $F$ using the division algorithm
+	
+** Gröbner bases
+*** Definition
+- $R$ is assumed to be a field denote by $k$
+ 
+- *Definition 5.4.1* A set of non-zero polynomials
+\begin{equation*}
+  F = (f_1, \dots f_m) \subseteq k[X_1, \dots, X_n]
+\end{equation*}
+- is called a *Gröbner basis*	for an ideal $I$ in $k[X_1, \dots, X_n]$ with respect to a term ordering $\leq$ if $F \subseteq I$ and for every $f \in I \backslash \{0\}$
+\begin{equation*}
+	\mathrm{in}_{\leq}\left(f_{i}\right) | \mathrm{in}_{\leq}(f)
+\end{equation*}
+- for some $i = 1, \dots, m$.
+	- The set $F$ is called a *Gröbner basis* with respect to a term ordering $\leq$ if it is a *Gröbner basis* for the ideal $\langle f_1, \dots, f_m$ with respect to $\leq$
+
+- *Proposition 5.4.2* Let $G = (f_1, \dots, f_m)$ be a Gröbner basis with respect to a term ordering $\leq$. For a polynomial $f \in k[X_1, \dots, X_n]$ the following must hold
+\begin{equation*}
+  f \in I \Leftrightarrow f^G = 0
+\end{equation*}	
+- where $I = \langle f_1, \dots, f_m \rangle$
+
+- *Corollary 5.4.5* Let $G= (f_1, \dots f_m) \subseteq R = k[X_1, \dots, X_n]$ be a Gröbner basis for the ideal $I \subseteq R$ with respect to some term ordering. Then $I = \langle f_1, \dots, f_m \rangle$
+
+- *Proposition 5.4.6* Let $G = (f_1, \dots, f_m)$ be a Gröbner basis in $R= k\left[X_{1}, \ldots, X_{n}\right]$ with respect to a term ordering $\leq$. Then the remainder $r$ in $f=a_{1} f_{1}+\cdots+a_{m} f_{m}+r$ as in Proposition 5.3. I is unique for every $f \in R$.
+	- The remainder from the division algorithm is independent of the order of the elements $f_{1}, \ldots, f_{m}$ in $G$
+
+*** Hilbert's basis theorem
+- *Theorem 5.4.7* Let $k$ be a field, $\leq$ a term ordering and $I \subseteq k\left[X_{1}, \ldots, X\right]$ an ideal. Then $I$ has a Gröbner basis with respect to $\leq$
+
+- *Corollary 5.4.8 (Hilbert)* Let $I$ be an arbitrary ideal in $k\left[X_{1}, \ldots, X_{n}\right]$. Then there are finitely many polynomials $f_{1}, \ldots, f_{m} \in I$ such that every polynomial $f \in I$ can be written
+$$
+f=a_{1} f_{1}+\cdots+a_{m} f_{m}
+$$
+for suitable $a_{1}, \ldots, a_{m} \in k\left[X_{1}, \ldots, X_{n}\right]\left(I=\left\langle f_{1}, \ldots, f_{m}\right\rangle\right)$
+	
+** Newton revisited
+- Let $f, f_1, \dots, f_r \in k[X_1, \dots, X_n]$ if one wants to decide whether the polynomial $f$ can be written as $P(f_1, \dots, f_r)$ where $P \in k[T_1, \dots T_r]$ and find $P$ if this is the case one can consider the polynomial ring $$A=k\left[X_{1}, \ldots, X_{n}, T_{1}, \ldots, T_{r}\right]$$ and find $P$ if one can write
+\[
+	f=a_{1}\left(T_{1}-f_{1}\right)+\cdots+a_{r}\left(T_{r}-f_{r}\right)+h
+\]
+- where $h \in k[T_1, \dots, T_r]$ and $a_1, \dots a_r \in A$, then one may put $T_i = f_i$ so that $f = h(f_1, \dots,f_r)$ and take $P = h$
+
+- *Theorem 5.5.1* Let $f, f_1, \dots, f_r \in k [X_1, \dots, X_n]$. Let $I$ be the ideal
+\begin{equation*}
+  I = \langle T_1 - f_1, \dots, T_r - f_r \rangle
+\end{equation*}
+- in the polynomial ring $A= k[X_1, \dots, X_n, T_1, \dots, T_r]$ and $\leq$ the lexicographic ordering given by 
+\begin{equation*}
+	X_{1} \geq \cdots \geq X_{n} \geq T_{1} \geq \cdots \geq T_{r}
+\end{equation*}
+- Let $G$ be a Gröbner basis of $I$ with respect to $\leq$. Then $f$ can be written as a polynomial in $f_1, \dots, f_r$ if and only if 
+\begin{equation*}
+  f^G \in k[T_1, \dots, T_r]
+\end{equation*}	
+- In this case $f = f^G(f_1, \dots, f_r)$
+
+** Buchberger's $S$ criterion
+*** The $S$ polynomials
+- *Definition 5.6.2* 	We say that $f \in R$ reduces to zero modulo $F=(f_1, \dots, f_m) \subseteq R \backslash \{0\}$ if there exists $a_1, \dots, a_m \in R$ such that
+\begin{equation*}
+  f = a_1 f_1 + \cdots + a_m f_m
+\end{equation*}
+- a $\text{in}_\leq(a_if_i) \leq \text{in}_\leq(f)$ if $a_if_i \noteq 0$. This is denoted
+\begin{equation*}
+  f \rightarrow_F 0
+\end{equation*}
+
+- *Remark 5.6.3* Observer that $f \rightarrow_F 0$ if and only if the maximal initial terms on the RHS do not cancel
+	- $f \rightarrow_F 0$ if $f^F = 0$
+
+- *Proposition 5.6.4* Let $F = (f_1, \dots, f_m)$ and $I = \langle f_1, \dots, f_m \rangle$.
+	- If $f \to_F 0$ for every $f \in I$ then $F$ is a Grôbner basis for $I$.
+	- If $F$ is a Gröbner basis for $I$ then $f^F = 0$ if and only if $f \rightarrow_F 0$ for $f \in I$
+
+- *Definition 5.6.5* The $S$ polynomial of two non-zero polynomials $f$ and $g$ with respect to a term ordering $\leq$ is defined as
+\begin{equation*}
+	S(f, g)=\frac{X^{w}}{\operatorname{in}_{\leq}(f)} f-\frac{X^{w}}{\operatorname{in}_{\leq}(g)} g
+\end{equation*}
+- where $X^w$ is the least common multiple of $\text{in}_\leq(f)$ and $\text{in}_\leq(g)$
+
+- *Lemma 5.6.7* Let $F = (f_1, \dots, f_m)$ and $I = \langle f_1 ,\dots, f_m \rangle$. If $S(f_i, f_j) \to_F 0$ for every $i, j = 1, \dots, m$ then $f \to_F 0$ for every $f \in I$ 
+
+*** The $S$ criterion
+- *Theorem 5.6.8 (Buchberger)* A sequence $F = (f_1, \dots, f_m)$ of polynomials is a Gröbner basis if and only if $S(f_i, f_j) \rightarrow_F 0$ for $1 \leq i < j \leq m$.
+
+- *Corollary 5.6.9* A sequence $F=(f_1 \dots, f_m)$ of polynomials is a Gröbner basis if and only if $S(f_i, f_j)^F=0$ for $1 \leq i < j \leq m$ 
+
+** Buchberger's algorithm
+- Buchberger's algorithm
+	- *Input:* $F \subseteq k[X_1, \dots, X_n]$ and $\leq$
+	- *Output:* G.B. for $\langle F \rangle$ m.h.t. $\leq$
+	- *Algorithm*:
+
+while ($\exists f,g \in F: S(f,g)^F \neq 0$)
+	$F := F \cup \{S(f,g)^F\}$
+return $F$
+
+- *Theorem 5.7.2* Buchberger's algorithm terminates and the output is a Gröbner basis
+- *Lemma 5.7.3* Let $\leq$ be a term ordering on $R = k[X_1, \dots, X_n]$. Let $f,g \in R$ and suppose that $\text{in}_\leq(f)$ and $\text{in}_\leq(g)$ have no common divisors (except constants). Then
+\begin{equation*}
+  S(f,g) \to_{(f,g)} 0
+\end{equation*}
+	
+** Solving equations using Gröbner bases
+- *Theorem 5.9.1* Let $G$ be a Gröbner basis for an ideal $I \subseteq k\left[X_{1}, \ldots, X_{n}\right]$ with respect to the lexicographic ordering $\leq$ given by $X_{1} \leq X_{2} \leq \cdots \leq X_{n}$ Then $G \cap k\left[X_{1}, \ldots, X_{i}\right]$ is a Gröbner basis for the ideal $I$ $I \cap k\left[X_{1}, \ldots, X_{i}\right]$ in $k\left[X_{1}, \ldots, X_{i}\right]$ with respect to the lexicographic ordering $\leq$ for the polynomials in $k\left[X_{1}, \ldots, X_{i}\right]$
+
+* Partial orderings
+- *Definition A.1.1* A relation $R$ on a set $S$ is a subset $R \subseteq S \times S$.
+	- $x R y$ mean $(x, y) \in R$
+
+- *Definition A.1.2* A relation $R$ is called
+	a) An *equivalence relation* if it is reflexive, symmetric and transitive
+	b) An *partial ordering* if it is reflexive, antisymmetric and transitive
+
+- An element $s \in S$ in a set with a partial ordering $\leq$ is said to be *minimal* if 
+\begin{equation*}
+  x \leq s \Rightarrow x=s
+\end{equation*}
+- for every $x \in S$
+
+- An element $t \in S$ is called a *first* element if 
+\begin{equation*}
+  t \leq x
+\end{equation*}
+- for every $x \in S$
+
+- A first element is a minimal element but not the other way around
+
+- *Definition A.3.4* A partial ordering $\leq$ is called a *total ordering* if $x \leq y$ or $y \leq x$ for every $x,y \in S$
+
+- *Definition A.3.5* A partial ordering $\leq$ on a set $S$ is called a *well ordering* if every non-empty subset $M \leq S$ has a first element $m \in M$
+
+- *Definition A.3.6* Let $\leq$ be a total ordering on a finite set $M$ $\text{max}_\leq M$ denotes the maximal element in $M$ and $\text{min}_\leq(M)$ denotes the minimal element
+	- min and max is used instead if ordering is implicit
+
+- *Lemma A.3.8* Let $S$ be a set with a well ordering $\leq$ and $F=\{s_1, s_2, \dots\}$ a subset such that $s_1 \leq s_2 \leq s_3 \leq \dots$. Then $F$ is finite
+
+* Exam
+** Groups
+- *Order of groups:* Proposition 2.6.3
+
+** Cycles and permutations
+- *The order of cycles:* Proposition 2.9.5
+- *Conjugation between cycles:* Lemma 2.9.8
+- *Number of simple transpositions:* Proposition 2.9.14
+
+** Rings
+- *Prime elements is irreducible:* 3.5.2
+- *A subgroup of the group of the units is cyclic:* Theorem 4.5.3 
+	
+** Polynomials
+- *Size of fields of polynomials:* Lemma 4.8.1
+- *Irreducible polynomials:* Proposition 4.6.3
+- *Calculation of cyclotomic polynomials:* Proposition 4.4.3
+
+** Grobner baser
+- *Show that it is a Gröbner base:*
+	- Lemma 5.7.3
+	- Theorem 5.6.9
+	
+* Q&A
+- Brug gentagende kvadrering til at tjekke ordenen af et element
+
+- Jan 15 Opg 3 
+	a) 4.5.3
+	b) 
+	c) Vis at $\Phi_5 \in F_2[X]$ er irreducible
+		 - Man må bruge at $X^2+X+1$ er det eneste irreducible polynomium af grad til hvis man referer til opgaven vi har lavet
+		 - Tjek at intet polynomium af grad 1 går op i $\Phi_5$
+		 - Tjek at $X^2+X+1 \nmid \Phi_5(x)$
+		 - Brug at $\mathbb F_2[X]$ er et UFD
+
+- Marts 16 Opg 2
+	a) 
+	b) 
+	c) 
+	d) Brug Sylow theoremer (ikke pensum)
+
+- Jan 03
+	a) 
+	b) 
+	c) 
+	d) 

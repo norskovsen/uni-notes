@@ -1,0 +1,304 @@
+* Header
+** Packages
+#+LaTeX_HEADER: \usepackage{mathptmx}
+#+LaTeX_HEADER: \usepackage{stmaryrd}
+	
+** Commands
+*** General
+#+LaTeX_HEADER: \renewcommand{\iff}{\Leftrightarrow}
+#+LaTeX_HEADER: \newcommand{\lwb}{\sqsubseteq}
+
+*** Programming Languages for Information Security
+#+LaTeX_HEADER: \newcommand{\lsec}{\lambda_\text{SEC}}
+#+LaTeX_HEADER: \newcommand{\lrs}{\lambda_\text{SEC}^\text{REF}}
+#+LaTeX_HEADER: \newcommand{\dom}{\text{dom}}
+#+LaTeX_HEADER: \newcommand{\bool}{\texttt{bool}_\ell}
+#+LaTeX_HEADER: \newcommand{\booL}{\texttt{bool}_L}
+#+LaTeX_HEADER: \newcommand{\rf}{\texttt{ref}}
+#+LaTeX_HEADER: \newcommand{\pc}{\text{pc}}
+#+LaTeX_HEADER: \newcommand{\lbel}{\text{label}}
+#+LaTeX_HEADER: \newcommand{\conf}{\langle M, \pc, e \rangle}
+	
+* Information
+- *Work notes from Aslan:*	https://docs.google.com/document/d/1TcU6RBjBdAOXJ71e7CnqrceQTGq9KcXFsPuaV5J9iek/edit#heading=h.w49a5ckobazp
+
+* Programming Languages for Information Security
+** Introduction
+*** Flows
+- The computer's memory is divided into two parts
+	- A *low-security* potion visible to all parts of the systems - the ~Public~ part
+	- A *high-security* portion visible to highly trusted component - the ~Secret~ part
+
+- The declaration that ~h~ is ~Secret~ means that it is stored in the ~Secret~ portion of the memory
+	- It should visible to any part of the system that does not have clearance to access secret data
+
+- It is not enough to divide the memory
+	- A party with low-security might be able to deduce some information secret information from a program with access to this being run
+
+- If the ~Public~ observer is able to infer some information about the contents of the ~Secret~ portion of data, then there is said to be an /information flow/ from ~Secret~ to ~Public~
+	- Information flows the other way around are also possible but they are permitted
+
+- Information flows may arise for many reasons:
+	1. *Explicit flows* are information channels that arise from the ways in which it allows data to be assigned to memory locations or variables
+		 - They are easy to detect because they are readily apparent from the text of the program
+
+	2. *Implicit flows* arise from the control-flow structure of the program
+		 - e.g. when a conditional branch instruction is performed
+		 - Flows also arise from other control mechanisms such as function calls, ~goto~'s or exceptions.
+
+	3. *Alias channels* arise from sharing of a mutable resource that can be affected by both high- and low-security data.
+		 - Since the problem of determining whether two program
+
+	4. *Timing channels* are introduces when high-security data influences the amount of time it takes for part of a program to run
+		 - In internal timing channels the program itself is able to determine that time has passed by invoking the $\mathtt{time}()$ routine
+			 - It can be avoided by making the clock high-security but concurrent threads may time each other without using the system clock
+		 - In external timing channels when the user is observing the time it takes for a program to complete it is able to determine extra information about secret data
+			 - Even if the program itself do not has access to the system clock
+			 - A way to avoid this is to force timing behavior to be independent of the high security data by adding extra delays
+
+	5. *Abstraction-violation channels* arise from the under-specification of the context in which a program will be run
+		 - A programming language level of abstraction may hide implementation details that allow someone with knowledge of run-time environment to deduce high-security information
+		 - Some examples are
+			 - The memory allocator and garbage collector may give enough information to an observer who can watch memory consumption behavior
+			 - Catching behavior might cause an external timing leak by affecting the program's running time
+		 - The hardest sources of information flows to prevent since they are not covered by the language semantics
+		 - It is possible to rule out more of them by making the language semantics more specific and detailed
+
+- *Noninterference* is the basic information-flow policy enforced by the security-typed languages considered in this thesis
+	- It prohibits all explicit, implicit, and internal timing information flows from ~Secret~ to ~Public~
+	- It should be thought of as a baseline security policy from which others are constructed
+	- Practical security-typed languages include *declassification* mechanisms that allow controlled release of confidential data and thus relaxing the strict requirements of noninterference
+
+*** Security-typed languages
+- A security-typed language provides end-to-end protection i.e. the data is protected not just at certain points, but throughout the duration of the computation
+	- To the extent that a system can be described as a program or a collection of communicating programming written in a security-typed language, the compositional nature of the type-system extends this protection system-wide
+
+** Definition Information-Flow Security
+*** Security lattices and labels
+- Security-typed languages provide a way for programmers to specify confidentiality and integrity requirements in the program
+	- It is done by adding explicitly annotations at appropriate points in the code
+	- The security levels that can be ascribed to the data should form a lattice
+
+- *Definition 2.1.1 (Lattice)* A *lattice* $\mathcal L$ is a pair $\langle L, \sqsubseteq \rangle$.
+	- $L$ is a set of *elements*
+	- $\sqsubseteq$ is a partial order on $L$
+	- For any subset $X$ of $L$ there must exists both least upper and greatest lower bounds with respect to the $\sqsubseteq$ ordering
+		- An *upper bound* for a subset $X$ of $L$ is an element $\ell \in L$ such that $x \in X \Rightarrow x \sqsubseteq \ell$
+			- The *least upper bound* or *join* of $X$ (denoted $\bigsqcup X$) is an upper bound $\ell$ such that for any other upper bound $z$ of $X$, is uniquely defined
+			- When $X$ consists of two elements $x_1$ and $x_2$ the notation $x_1 \sqcup x_2$ is used to denote their join 
+		- A *lower bound* for a subset $X$ of $L$ is an element $\ell \in L$ such that $x \in X \Rightarrow \ell \sqsubseteq x$
+			- The *greatest lower bound* or *meet* of $X$ (denoted $\bigsqcap X$) is a lower bound $\ell$ such that for any other lower bound $z$ of $X$ it is the case that $z \sqsubseteq l$, is uniquely defined
+			- When $X$ consists of two elements $x_1$ and $x_2$ the notation $x_1 \sqcap x_2$ is used to denote their meet
+		- The join for $L$ its self is defined as $\top \stackrel{def}= \bigsqcup L$ and it is the *greatest* or *top* element of the lattice
+		- The meet for $L$ its self is defined as $\bot \stackrel{def}= \bigsqcap L$ and it is the *least* or *bottom* element of the lattice
+
+*** Lattice constraints
+- The type system can be thought of as generating a system of lattice inequalities based on security annotations of a program in question e.g.
+	- The program $y := x$ has the constraints $\text{label}(x) \sqsubseteq \text{label}(y)$
+	- The program $z := x + y$ has the constraints $\text{label}(z) \sqsubseteq \text{label}(x) \sqcup \text{label}(y)$
+	
+- The type system generates lattice inequations for all of the programs statements and thus reducing the problem of determining whether a program is secure to a lattice inequality constraint satisfaction problem
+	- The correctness theorem for a security-type system says that if the constraints are satisfiable then the program does not leak information
+
+- The complexity of determining whether a program obeys the noninterference policy rest on the ability to solve systems of lattice inequalities
+	- This problem is in general NP-complete for finite lattices
+	- There are properties of the security lattice and the system of inequalities that can make it easier to determine whether a solution exists
+		- One possibility is that the system has only inequalities that can be written in the form $a \sqsubseteq b \sqcup d$
+			- This reduces the search space of candidate solutions
+		- Another useful lattice property is distributivity: $a \sqcap (b \sqcup c) = (a \sqcap b) \sqcup (a \sqcap c)$
+			- Not enough alone to admit a polynomial time constraint satisfaction algorithm
+			- Allows inequalities to be put into normal forms that, with additional restriction make efficient constraint satisfaction algorithms possible.
+
+*** Noninterference
+- The basic approach to defining noninterference is the following:
+	1. Choose an appropriate formal model of computation equipped with a meaningful (implementable) semantics
+		 - The languages should have /values/
+		 - The programs should describe computations over those values
+	2. Derive from the semantics a definition of program equivalence
+		 - Starting from an apparent equivalence on the values of the languages
+		 - The equivalence should be sound with respect to the language semantics
+		 - Equivalent programs should produce equivalent observable results
+	3. Enrich the program model using a security lattice as described in the previous section
+		 - This gives a way of specifying the high- and low-security interfaces (written with a $\Gamma$) to a program $P$
+		 - An interface $\Gamma$ to a program describes a set of contexts in which it makes sense to run the program
+			 - Here interfaces will be type environments that describe what variables or memory locations are available for use within the program $P$
+			 - The following assertion say that program $P$ has high- and low-security interfaces $\Gamma_{\text{High}}, \Gamma_{\text{Low}}$: $\Gamma_{\text{High}}, \Gamma_{\text{Low}} \vdash P$
+	4. Define the powers of the low-security observers of the system
+		 - This is done by coarsening the standard notion of process equivalences $\approx$ to ignore the high security parts of the program
+		 - The new equivalence, $\approx_{\text{Low}}$ represents the low-security view of the computation
+			 - It depends on the low-security interface to the program ($\Gamma_\text{Low}$)
+			 - If one treats the equivalence relations as sets then $\approx \subseteq \approx_\text{Low}$
+		 - The relation $\approx_\ell$ represents the portion of the computation visible to an observer at security level $\ell$
+	5. Define a set of high-security inputs for the program, these values should match the interface $\Gamma_\text{High}$ so that $v \in \text{Values}(\Gamma_\text{High})$
+	6. Define noninterference from the above components:
+		 - There is no illegal information flow through a program $P$ iff the low-security behavior of the program is independent of what high-security inputs are given to the programs
+		 - Formally $P \in \text{Programs}$ is information-flow security iff
+\begin{equation*}
+	\Gamma_\text{High} , \Gamma_\text{Low} \vdash P \Rightarrow \forall v_1, v_2 \in \text{Values}(\Gamma_\text{High}). P(v_1) \approx_\text{Low} P(v_2)
+\end{equation*}
+
+*** Establishing noninterference
+- The security-typed languages rule out insecure information flows by augmenting the type system to constrain how high-security data is handled by the program
+	- To connect these nonstandard to information security it must be proven that well-typed programs satisfy an appropriate definition on noninterference
+
+- The following is a strategy for establishing noninterference
+	1. Construct a labeled operational semantics that safely approximates the information flows in a program
+	2. Show that the security type system is sound with respect to the nonstandard semantics
+	3. Use the additional structure provided by the labeled semantics to show that noninterference conditions hold for instrumented programs
+	4. Use the erasure property to conclude that the standard behavior of a program agrees with the nonstandard behavior, which implies that the standard program satisfies noninterference
+
+** Secure Sequential Programs
+*** $\lambda_\text{SEC}$: a secure, simply-typed language
+**** Definitions
+[[file:Programming Languages for Information Security/screenshot_2020-11-08_20-03-36.png]]
+- $\lambda_\text{SEC}$ is a purely functional variant of the simply-typed lambda calculus that includes security annotations
+	- The meta variable $\ell$ and ~pc~ range over elements of the security lattice
+	- The possible types include the type ~bool~ of Boolean values and the types of functions ($s \to s$) that expect security-annotated value as an argument and produce a security-annotated type as a result
+	- To obtain the underlying unlabeled lambda-calculus term from a $\lambda_\text{SEC}$ term, one simply erase the label annotations on security types and secure values
+	- For any $\lambda_\text{SEC}$ term $e$, let $\text{erase}(e)$ be its label erasure
+
+- *Definition 3.1.1 (Free and Bound Variables)* Let $\text{vars}(e)$ be the set of all variables occuring in an expression $e$
+	- The *free* and *bound* variables of an expression $e$ are defined as usual for the lambda calculus
+	- They are denoted by the functions $\text{fv}(-)$ and $\text{bv}(-)$ respectively
+[[file:Programming Languages for Information Security/screenshot_2020-11-08_20-13-00.png]]
+
+- The terms are identified up to consistent renaming of their bound variables
+	- Two such terms are said to be $\alpha$ equivalent
+	- Indicated using the notation $e_1 =_\alpha e_2$
+
+- *Definition 3.1.2 (Program)* A *program* is an expression $e$ such that $\text{fv}(e)= \emptyset$. Such an expression is said to be *closed*.
+	- Expression that contain free variables are *open*
+
+**** Operational semantics
+[[file:Programming Languages for Information Security/screenshot_2020-11-08_20-22-07.png]]
+[[file:Programming Languages for Information Security/screenshot_2020-11-08_20-23-05.png]]
+- The standard evaluation is of the form $e \Downarrow_S v$, means that the program $e$ evaluates to the value $v$
+
+- *Definition 3.1.3 (Label Stamping)* Let $bv_\ell$ be any secure value and $l'$ be any label in the security lattice
+\[
+	bv_\ell \sqcup \ell' \stackrel{\text{def}}{=} bv_{(\ell \sqsub \ell')}
+\]
+
+- *Definition 3.1.4 (Capture Avoiding Substitution)* Let $e_1$ and $e_2$ be expressions and let $x$ be a variable, the *capture-avoiding substitution* of $e_1$ for $x$ within $e_1$ is written $e_2\{e_1/x\}$
+	- Such a substitution is well defined when $\text{fv}(e_1) \cap \text{bv}(e_2) = \emptyset$
+	- It is always possible to choose a term $\alpha$ equivalent to $e_2$ so that substitution may occur
+	- A substitution $\e_2 \{e_1 / x\}$ results in a new term in which the free occurrences of the variable $x$ in $e_1$ have been replaced by the expression $e_1$
+		- Defined inductively on the structure of $e_2$
+[[file:Programming Languages for Information Security/screenshot_2020-11-08_21-34-10.png]]
+
+- In $\lambda_\text{SEC}-\textsc{Eval-App}$ the security label on the function being applied is stamped into the results of calling the function
+
+- *Lemma 3.1.1 (Erasure)* If $e \Downarrow v$ then $\text{erase}(e)$ \Downarrow \text{erase}(v)$
+
+**** $\lsec$ type system
+[[file:Programming Languages for Information Security/screenshot_2020-11-12_16-27-21.png]]
+[[file:Programming Languages for Information Security/screenshot_2020-11-12_16-49-42.png]]	
+- The type system for $\lsec$ is designed to prevent unwanted information flows
+	- The basic idea is to associate security-labels to the type information of the program
+	- When type checking the confidentiality lattice is taken into account to rule out illegal information flows
+	- Well-typed programs are thus secure
+	- The rule $\lsec-\textsc{SLab}$  allows a low-security type to be treated as a high-security type
+		- Anywhere a high security type can be used safely a low-security type can also be used
+
+- *Definition (Type Environment)* A *type environment* is a finite map from variables to security types. Syntactically, type environments are written as terms in the following grammar
+\[
+	\Gamma ::= \cdot \mid \Gamma, x: s
+\]
+- $\cdot$ stands for the empty type environment	
+	
+- *Definition (Substitution)* A *substitution* $\gamma$ is a finite map from variables to values. If $\Gamma$ is a typing environment and $\gamma$ is a substitution
+	- $\gamma \vDash \Gamma$ means that $\gamma$ assigns each variable a value of the type required by $\Gamma$
+		- substitution $\gamma$ satisfies environment $\Gamma$ written out formally
+	- We have $\dom(\Gamma)=\dom(\gamma) \land \forall x \in \dom(Gamma) \vdash \gamma(x) : \Gamma(x)$
+	- The notation $\gamma(e)$ is short hand for the simultaneous capture-avoiding substitutions:
+		- i.e. defined as $\gamma(e) \stackrel{\text{def}}{=} e {\gamma(x_1)/x_1} {\gamma(x_2)/x_2} \dots {\gamma(x_n)/x_n} \text{ where } \{x_1, \dots, x_n\} = \dom (\gamma)$
+
+- *Lemma (Value Substitutions)* If $\Gamma \vdash e : s$ and $\gamma \vDash \Gamma$ then $\vdash \gamma(e) : s$
+	- Implies that the $\lsec-\textsc{Eval-App}$ rule preserves typing
+
+- *Lemma (Canonical Forms)*
+	- If $\vdash v : \bool$ then $v = t_{\ell'}$ or $v = f_{\ell'}$ and $\ell' \lwb \ell$
+	- If $\vdash v: (s_1 \to s_2) \ell$ then $v = (\lambda x : s_1' .e)_{\ell'}$ and $\s_1 \leq s_1'$ and $\ell' \lwb \ell$
+
+- *Lemma 3.1.4 ($\lsec$ Preservation)* If $\vdash e:s$ and there exists a value $v$ such that $e \Downarrow v$ then $\vdash v :s$
+
+**** Noninterference for $\lsec$
+- *Theorem (Noninterference)* If $x : t_H \vdash e : \booL$ and $\vdash v_1, v_2 : t_H$ then
+\begin{equation*}
+	e \{v_1 / x\} \Downarrow v \iff e\{v_2 / x\} \Downarrow v
+\end{equation*}
+
+[[file:Programming Languages for Information Security/screenshot_2020-11-21_12-42-31.png]]
+
+- *Lemma 3.1.5 (Subtyping Relations)* If $v_1 \approx_\zeta v_2 : s_1$ and $\vdash s_1 \leq s_2$ then $v_1 \approx_\zeta v_2 : s_2$. If $e_1 \approx_\zeta e_2 : C(s_1)$ and $\vdash s_1 \leq s_2$ then $e_1 \approx_\zeta e_2 : C (s_2)$.
+
+- *Definition (Related Substitutions)* Two substitutions $\gamma_1$ and $\gamma_2$ are related, indicated by writing $\Gamma \vdash \gamma_1 \approx_\zeta \gamma_2$, if $\gamma_i \vDash \Gamma$ and
+\[
+	\forall x \in \dom (\Gamma). \gamma_1 (x) \approx_\zeta y_2(x) : \Gamma(x)	
+\]
+
+- *Lemma 3.1.6 (Substitution)* If $\Gamma \vdash e : s$ and $\Gamma \vdash \gamma_1 \approx_\zeta \gamma_2$ then $\gamma_1(e) \approx_\zeta \gamma_2(e) : C(s)$
+
+*** $\lrs$: a secure language with state
+**** Definitions
+[[file:Programming Languages for Information Security/screenshot_2020-11-21_13-19-32.png]]
+
+ - $\lsec$ is augmented to include mutable state
+ - $\lrs$ includes a new type $s \ \rf$ that describes mutable references that point to objects of type $s$
+
+ - A memory location $L$
+	 - can be updated to contain a value $v$ by using the expression $L := v$
+	 - can be bound to a variable $x$ using the following operation $\text{let } x = !L \text{ in } e$
+
+ - It is unsafe to assign a high-security value to a low-security memory location
+	 - This prevents /aliases/ from being used to leak information
+
+ - The type system for $\lrs$ associates a label $\text{pc}$ which approximates the information that can be learned by observing that the program has reached a particular point during the execution
+
+ - To prevent implicit flow the labeled semantics requires that $\pc = \top$ whenever an assignment to a reference of type $s \ \rf_\ell$ occurs in the context with program counter label $\pc$
+
+ - To detect and rule out implicit flows which can occur when calling a method with side effects
+	 - The function types in $\lrs$ include an additional label which are of the form $[\ell] s_1 \to s_2$
+	 - The label $\ell$ is a lower bound on the labels of any locations that might be written when calling the function
+	 - To call a function of this type in a context with program counter label $\pc$ the operational semantics and type system require that $\pc \lwb \ell$
+
+ - To model state $\lrs$ includes locations, ranged over by $L^s$, which are the names of the memory cells that contain values of type $s$
+	 - Concrete memory location are written using lowercase letters like $a^s$, $b^{s'}$ etc.
+	 - The type $s$ decorating a location is used for type checking purposes
+
+ - The type $s$ decorating a location is used for type checking purposes
+
+ - $\lrs$ provides a mechanism for allocating a new memory cell and storing a value there:
+ - The expression $\rf^s \ e$ first evaluates the expression $e$ to a value $v$, creates a fresh location in memory, and then stores the value into that location
+	 - The result of $\rf^s \ e$ is the newly created location
+
+[[file:Programming Languages for Information Security/screenshot_2020-11-21_13-38-04.png]]
+
+- An additional difference between $\lsec$ and $\lrs$ is that $\lrs$ allows functions to be recursive
+	- The syntax $\lambda [\pc] f(x:s) . e$ describes a function $f$ whose body is able to assign to references that point to data with confidentiality label $\pc$ or higher
+	- The name $f$ is abound within the body $e$ and is used to invoke the function recursively
+
+**** Operational semantics
+[[file:Programming Languages for Information Security/screenshot_2020-11-21_13-46-45.png]]
+
+- *Definition (Machine configuration)* A *machine configuration* is a triple, written $\conf$, containing a memory $M$, a program counter label $\pc \in \mathcal{L}$ and an expression $e$ representing the program
+
+- A given machine configuration $\conf$ may evaluate to a final state of the form $\langle M', v \rangle$ or it may diverge 
+
+**** Type system
+[[file:Programming Languages for Information Security/screenshot_2020-11-21_13-50-42.png]]	
+[[file:Programming Languages for Information Security/screenshot_2020-11-21_13-53-46.png]]	
+[[file:Programming Languages for Information Security/screenshot_2020-11-21_13-54-14.png]]
+
+- The judgement $\Gamma [\pc] \vdash e : s$ sows that expression $e$ has source type $s$ under type context $\Gamma$
+
+- *Lemma* If $\Gamma [\pc] \vdash e : s$ then $\pc \lwb \lbel(s)$
+	- Shows that this type system takes into account the information flows from the context of the program to the value produced by the computation
+
+	
+[[file:Programming Languages for Information Security/screenshot_2020-11-21_13-55-49.png]]
+[[file:Programming Languages for Information Security/screenshot_2020-11-21_13-56-12.png]]
+
+* Troupe
+** Attacker knowledge	
+	

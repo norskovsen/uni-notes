@@ -1,0 +1,220 @@
+\contentsline {section}{\numberline {1}TA Instructor Info}{7}{section.1}
+\contentsline {section}{\numberline {2}Important}{7}{section.2}
+\contentsline {subsection}{\numberline {2.1}Dictionary}{7}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Jacobian}{7}{subsection.2.2}
+\contentsline {section}{\numberline {3}The Learning Problem (1)}{7}{section.3}
+\contentsline {subsection}{\numberline {3.1}Components of Learning}{7}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}A Simple Learning Model}{8}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}Types of Learning}{9}{subsection.3.3}
+\contentsline {subsubsection}{\numberline {3.3.1}Supervised Learning}{9}{subsubsection.3.3.1}
+\contentsline {subsubsection}{\numberline {3.3.2}Reinforcement Learning}{10}{subsubsection.3.3.2}
+\contentsline {subsubsection}{\numberline {3.3.3}Unsupervised Learning}{10}{subsubsection.3.3.3}
+\contentsline {subsection}{\numberline {3.4}Linear Regression and Orthogonal Projections}{11}{subsection.3.4}
+\contentsline {subsection}{\numberline {3.5}Is Learning Feasible}{11}{subsection.3.5}
+\contentsline {subsubsection}{\numberline {3.5.1}General}{11}{subsubsection.3.5.1}
+\contentsline {subsubsection}{\numberline {3.5.2}Feasibility of Learning}{12}{subsubsection.3.5.2}
+\contentsline {subsection}{\numberline {3.6}Error and Noise}{12}{subsection.3.6}
+\contentsline {subsubsection}{\numberline {3.6.1}Error Measures}{12}{subsubsection.3.6.1}
+\contentsline {subsubsection}{\numberline {3.6.2}Noisy target}{13}{subsubsection.3.6.2}
+\contentsline {section}{\numberline {4}Training versus Testing (2)}{13}{section.4}
+\contentsline {subsection}{\numberline {4.1}Theory of Generalization}{13}{subsection.4.1}
+\contentsline {subsubsection}{\numberline {4.1.1}General}{13}{subsubsection.4.1.1}
+\contentsline {subsubsection}{\numberline {4.1.2}Effective Number of Hypotheses}{13}{subsubsection.4.1.2}
+\contentsline {subsubsection}{\numberline {4.1.3}Bounding the growth function}{14}{subsubsection.4.1.3}
+\contentsline {subsubsection}{\numberline {4.1.4}The VC Dimension}{14}{subsubsection.4.1.4}
+\contentsline {subsubsection}{\numberline {4.1.5}The VC Generalization Bound}{15}{subsubsection.4.1.5}
+\contentsline {subsection}{\numberline {4.2}Interpreting the Generalization Bound}{15}{subsection.4.2}
+\contentsline {subsubsection}{\numberline {4.2.1}General}{15}{subsubsection.4.2.1}
+\contentsline {subsubsection}{\numberline {4.2.2}Sample Complexity}{15}{subsubsection.4.2.2}
+\contentsline {subsubsection}{\numberline {4.2.3}Penalty for Model Complexity}{16}{subsubsection.4.2.3}
+\contentsline {subsubsection}{\numberline {4.2.4}The Test Set}{17}{subsubsection.4.2.4}
+\contentsline {subsection}{\numberline {4.3}Approximation-Generalization Tradeoff}{17}{subsection.4.3}
+\contentsline {subsubsection}{\numberline {4.3.1}Bias and Variance}{17}{subsubsection.4.3.1}
+\contentsline {subsubsection}{\numberline {4.3.2}The Learning Curve}{18}{subsubsection.4.3.2}
+\contentsline {section}{\numberline {5}The Linear Model (3)}{18}{section.5}
+\contentsline {subsection}{\numberline {5.1}Linear Regression}{18}{subsection.5.1}
+\contentsline {subsubsection}{\numberline {5.1.1}The algorithm}{18}{subsubsection.5.1.1}
+\contentsline {subsection}{\numberline {5.2}Logistic Regression}{19}{subsection.5.2}
+\contentsline {subsubsection}{\numberline {5.2.1}Predicting a Probability}{19}{subsubsection.5.2.1}
+\contentsline {subsubsection}{\numberline {5.2.2}Gradient Descent}{20}{subsubsection.5.2.2}
+\contentsline {subsection}{\numberline {5.3}Nonlinear Transformation}{23}{subsection.5.3}
+\contentsline {subsubsection}{\numberline {5.3.1}The \(\mathcal Z\) space}{23}{subsubsection.5.3.1}
+\contentsline {subsubsection}{\numberline {5.3.2}Computation and generalization}{25}{subsubsection.5.3.2}
+\contentsline {section}{\numberline {6}Multinomial/Softmax Regression}{25}{section.6}
+\contentsline {subsection}{\numberline {6.1}Setup}{25}{subsection.6.1}
+\contentsline {subsection}{\numberline {6.2}Probabilistic Outputs}{26}{subsection.6.2}
+\contentsline {subsection}{\numberline {6.3}The Negative Log Likelihood}{27}{subsection.6.3}
+\contentsline {subsection}{\numberline {6.4}Implementation Issues}{28}{subsection.6.4}
+\contentsline {subsubsection}{\numberline {6.4.1}Numerical Issues with Softmax}{28}{subsubsection.6.4.1}
+\contentsline {subsubsection}{\numberline {6.4.2}One in k encoding}{28}{subsubsection.6.4.2}
+\contentsline {subsubsection}{\numberline {6.4.3}Always check your shapes}{29}{subsubsection.6.4.3}
+\contentsline {subsubsection}{\numberline {6.4.4}Bias Variable}{29}{subsubsection.6.4.4}
+\contentsline {section}{\numberline {7}Overfitting (4)}{29}{section.7}
+\contentsline {subsection}{\numberline {7.1}When Does Overfitting Occur?}{29}{subsection.7.1}
+\contentsline {subsubsection}{\numberline {7.1.1}General}{29}{subsubsection.7.1.1}
+\contentsline {subsubsection}{\numberline {7.1.2}Catalysts for Overfitting}{29}{subsubsection.7.1.2}
+\contentsline {subsection}{\numberline {7.2}Regularization}{31}{subsection.7.2}
+\contentsline {subsubsection}{\numberline {7.2.1}General}{31}{subsubsection.7.2.1}
+\contentsline {subsubsection}{\numberline {7.2.2}A Soft Order Constraint}{31}{subsubsection.7.2.2}
+\contentsline {subsubsection}{\numberline {7.2.3}Weight Decay and Augmented Error}{32}{subsubsection.7.2.3}
+\contentsline {subsubsection}{\numberline {7.2.4}Choosing a Regularizer}{33}{subsubsection.7.2.4}
+\contentsline {subsection}{\numberline {7.3}Validation}{33}{subsection.7.3}
+\contentsline {subsubsection}{\numberline {7.3.1}The Validation Set}{33}{subsubsection.7.3.1}
+\contentsline {subsubsection}{\numberline {7.3.2}Model Selection}{35}{subsubsection.7.3.2}
+\contentsline {subsubsection}{\numberline {7.3.3}Cross Validation}{37}{subsubsection.7.3.3}
+\contentsline {section}{\numberline {8}Support Vector Machines}{39}{section.8}
+\contentsline {subsection}{\numberline {8.1}Notation}{39}{subsection.8.1}
+\contentsline {subsection}{\numberline {8.2}Functional and geometric margins}{39}{subsection.8.2}
+\contentsline {subsection}{\numberline {8.3}The optimal margin classifier}{40}{subsection.8.3}
+\contentsline {subsection}{\numberline {8.4}Lagrange duality}{40}{subsection.8.4}
+\contentsline {subsection}{\numberline {8.5}Optimal margin classifiers}{42}{subsection.8.5}
+\contentsline {subsection}{\numberline {8.6}Kernels}{43}{subsection.8.6}
+\contentsline {subsection}{\numberline {8.7}Regularization and the non-separable case}{43}{subsection.8.7}
+\contentsline {subsection}{\numberline {8.8}The SMO algorithm}{44}{subsection.8.8}
+\contentsline {subsubsection}{\numberline {8.8.1}General}{44}{subsubsection.8.8.1}
+\contentsline {subsubsection}{\numberline {8.8.2}Coordinate ascent}{44}{subsubsection.8.8.2}
+\contentsline {subsubsection}{\numberline {8.8.3}SMO}{46}{subsubsection.8.8.3}
+\contentsline {section}{\numberline {9}Deep Feedforward Networks}{46}{section.9}
+\contentsline {subsection}{\numberline {9.1}General}{46}{subsection.9.1}
+\contentsline {subsection}{\numberline {9.2}Gradient-Based Learning}{48}{subsection.9.2}
+\contentsline {subsubsection}{\numberline {9.2.1}General}{48}{subsubsection.9.2.1}
+\contentsline {subsubsection}{\numberline {9.2.2}Cost Functions}{48}{subsubsection.9.2.2}
+\contentsline {subsubsection}{\numberline {9.2.3}Output Units}{49}{subsubsection.9.2.3}
+\contentsline {subsection}{\numberline {9.3}Hidden Units}{50}{subsection.9.3}
+\contentsline {subsubsection}{\numberline {9.3.1}General}{50}{subsubsection.9.3.1}
+\contentsline {subsubsection}{\numberline {9.3.2}Recti\GenericError {(inputenc) }{Package inputenc Error: Unicode character ﬁ (U+FB01)\MessageBreak not set up for use with LaTeX}{See the inputenc package documentation for explanation.}{You may provide a definition with\MessageBreak \GenericError { }{LaTeX Error: Can be used only in preamble}{See the LaTeX manual or LaTeX Companion for explanation.}{Your command was ignored.\MessageBreak Type I <command> <return> to replace it with another command,\MessageBreak or <return> to continue without it.}}ed Linear Units and Their Generalizations}{50}{subsubsection.9.3.2}
+\contentsline {subsubsection}{\numberline {9.3.3}Logistic Sigmoid and Hyperbolic Tangent}{51}{subsubsection.9.3.3}
+\contentsline {subsection}{\numberline {9.4}Architecture Design}{51}{subsection.9.4}
+\contentsline {subsubsection}{\numberline {9.4.1}General}{51}{subsubsection.9.4.1}
+\contentsline {subsubsection}{\numberline {9.4.2}Universal Approximation Properties and Depth}{52}{subsubsection.9.4.2}
+\contentsline {subsubsection}{\numberline {9.4.3}Other Architectural Considerations}{53}{subsubsection.9.4.3}
+\contentsline {subsection}{\numberline {9.5}Back-Propagation and Other Differentiation Algorithms}{53}{subsection.9.5}
+\contentsline {subsubsection}{\numberline {9.5.1}General}{53}{subsubsection.9.5.1}
+\contentsline {subsubsection}{\numberline {9.5.2}Computational Graphs}{54}{subsubsection.9.5.2}
+\contentsline {subsubsection}{\numberline {9.5.3}Chain Rule of Calculus}{54}{subsubsection.9.5.3}
+\contentsline {subsubsection}{\numberline {9.5.4}Recursively Applying the Chain Rule to Obtain Backprop}{56}{subsubsection.9.5.4}
+\contentsline {subsubsection}{\numberline {9.5.5}Back-Propagation Computation in Fully-Connected MLP}{58}{subsubsection.9.5.5}
+\contentsline {subsubsection}{\numberline {9.5.6}Symbol-to-Symbol Derivatives}{59}{subsubsection.9.5.6}
+\contentsline {subsubsection}{\numberline {9.5.7}General Back-Propagation}{59}{subsubsection.9.5.7}
+\contentsline {subsection}{\numberline {9.6}Backpropagation equations}{61}{subsection.9.6}
+\contentsline {section}{\numberline {10}Convolutional Networks}{63}{section.10}
+\contentsline {subsection}{\numberline {10.1}General}{63}{subsection.10.1}
+\contentsline {subsection}{\numberline {10.2}The Convolution Operation}{63}{subsection.10.2}
+\contentsline {subsection}{\numberline {10.3}Motivation}{64}{subsection.10.3}
+\contentsline {subsection}{\numberline {10.4}Pooling}{65}{subsection.10.4}
+\contentsline {section}{\numberline {11}Tree-Based Methods}{66}{section.11}
+\contentsline {subsection}{\numberline {11.1}Background}{66}{subsection.11.1}
+\contentsline {subsection}{\numberline {11.2}Regression Trees}{66}{subsection.11.2}
+\contentsline {subsection}{\numberline {11.3}Classification Trees}{69}{subsection.11.3}
+\contentsline {subsection}{\numberline {11.4}Other Issues}{70}{subsection.11.4}
+\contentsline {section}{\numberline {12}Random forests}{71}{section.12}
+\contentsline {subsection}{\numberline {12.1}Introduction}{71}{subsection.12.1}
+\contentsline {subsection}{\numberline {12.2}Bootstrap aggregating technique}{71}{subsection.12.2}
+\contentsline {subsection}{\numberline {12.3}Definition of Random Forests}{72}{subsection.12.3}
+\contentsline {section}{\numberline {13}Boosting and Additive Trees}{74}{section.13}
+\contentsline {subsection}{\numberline {13.1}Boosting Methods}{74}{subsection.13.1}
+\contentsline {subsection}{\numberline {13.2}Boosting Fits an Additive Model}{75}{subsection.13.2}
+\contentsline {subsection}{\numberline {13.3}Forward Stagewise Additive Modeling}{76}{subsection.13.3}
+\contentsline {subsection}{\numberline {13.4}Exponential Lost and AdaBoost}{77}{subsection.13.4}
+\contentsline {subsection}{\numberline {13.5}Why Exponential Loss?}{77}{subsection.13.5}
+\contentsline {subsection}{\numberline {13.6}Loss Functions and Robustness}{77}{subsection.13.6}
+\contentsline {subsubsection}{\numberline {13.6.1}Robust Loss Functions for Classification}{77}{subsubsection.13.6.1}
+\contentsline {subsubsection}{\numberline {13.6.2}Robust Loss Functions for Regression}{79}{subsubsection.13.6.2}
+\contentsline {subsection}{\numberline {13.7}"Off-the-Shelf" Procedures for Data Mining}{80}{subsection.13.7}
+\contentsline {subsection}{\numberline {13.8}Boosting Trees}{81}{subsection.13.8}
+\contentsline {subsection}{\numberline {13.9}Numerical Optimization via Gradient Boosting}{83}{subsection.13.9}
+\contentsline {subsubsection}{\numberline {13.9.1}General}{83}{subsubsection.13.9.1}
+\contentsline {subsubsection}{\numberline {13.9.2}Steepest Decent}{84}{subsubsection.13.9.2}
+\contentsline {subsubsection}{\numberline {13.9.3}Gradient Boosting}{84}{subsubsection.13.9.3}
+\contentsline {subsubsection}{\numberline {13.9.4}Implementations of Gradient Boosting}{86}{subsubsection.13.9.4}
+\contentsline {subsection}{\numberline {13.10}Right-Sized Trees for Boosting}{86}{subsection.13.10}
+\contentsline {subsection}{\numberline {13.11}Regularization}{88}{subsection.13.11}
+\contentsline {subsubsection}{\numberline {13.11.1}General}{88}{subsubsection.13.11.1}
+\contentsline {subsubsection}{\numberline {13.11.2}Shrinkage}{88}{subsubsection.13.11.2}
+\contentsline {subsubsection}{\numberline {13.11.3}Subsampling}{89}{subsubsection.13.11.3}
+\contentsline {subsection}{\numberline {13.12}Interpretation}{89}{subsection.13.12}
+\contentsline {subsubsection}{\numberline {13.12.1}General}{89}{subsubsection.13.12.1}
+\contentsline {subsubsection}{\numberline {13.12.2}Relative Importance of Predictor Variables}{90}{subsubsection.13.12.2}
+\contentsline {subsubsection}{\numberline {13.12.3}Partial Dependence Plots}{90}{subsubsection.13.12.3}
+\contentsline {section}{\numberline {14}Sequential Data}{91}{section.14}
+\contentsline {subsection}{\numberline {14.1}Markov Models}{91}{subsection.14.1}
+\contentsline {subsection}{\numberline {14.2}Hidden Markov Models}{94}{subsection.14.2}
+\contentsline {subsubsection}{\numberline {14.2.1}General}{94}{subsubsection.14.2.1}
+\contentsline {subsubsection}{\numberline {14.2.2}Decodings}{98}{subsubsection.14.2.2}
+\contentsline {subsubsection}{\numberline {14.2.3}Problems}{99}{subsubsection.14.2.3}
+\contentsline {subsubsection}{\numberline {14.2.4}Maximum likelihood for the HMM}{99}{subsubsection.14.2.4}
+\contentsline {subsubsection}{\numberline {14.2.5}The forward-backward algorithm}{103}{subsubsection.14.2.5}
+\contentsline {subsubsection}{\numberline {14.2.6}The Viterbi decoding}{106}{subsubsection.14.2.6}
+\contentsline {subsubsection}{\numberline {14.2.7}Extension of the hidden Markov model}{107}{subsubsection.14.2.7}
+\contentsline {section}{\numberline {15}Conditional probabilities and graphical models}{108}{section.15}
+\contentsline {subsection}{\numberline {15.1}You have a joint probability \IeC {\textemdash } Now what?}{108}{subsection.15.1}
+\contentsline {subsection}{\numberline {15.2}Dependency graphs}{110}{subsection.15.2}
+\contentsline {section}{\numberline {16}Johnson-Lindenstrauss Dimensionality Reduction}{110}{section.16}
+\contentsline {subsection}{\numberline {16.1}Intro}{110}{subsection.16.1}
+\contentsline {subsection}{\numberline {16.2}Simple JL Lemma}{111}{subsection.16.2}
+\contentsline {section}{\numberline {17}Principal Component Analysis}{112}{section.17}
+\contentsline {subsection}{\numberline {17.1}Intuition}{112}{subsection.17.1}
+\contentsline {subsubsection}{\numberline {17.1.1}Problem statement}{112}{subsubsection.17.1.1}
+\contentsline {subsubsection}{\numberline {17.1.2}Projection and reconstruction error}{113}{subsubsection.17.1.2}
+\contentsline {subsubsection}{\numberline {17.1.3}Reconstruction error and variance}{113}{subsubsection.17.1.3}
+\contentsline {subsubsection}{\numberline {17.1.4}Covariance matrix}{113}{subsubsection.17.1.4}
+\contentsline {subsubsection}{\numberline {17.1.5}Covariance matrix and higher order structure}{114}{subsubsection.17.1.5}
+\contentsline {subsubsection}{\numberline {17.1.6}PCA by diagonalizing the covariance matrix}{114}{subsubsection.17.1.6}
+\contentsline {subsection}{\numberline {17.2}Formalism}{115}{subsection.17.2}
+\contentsline {subsubsection}{\numberline {17.2.1}Definition of the PCA-optimization problem}{115}{subsubsection.17.2.1}
+\contentsline {subsubsection}{\numberline {17.2.2}Matrix \(V^T\): Mapping from high-dimensional old coordinate system to low-dimensional new coordinate system}{116}{subsubsection.17.2.2}
+\contentsline {subsubsection}{\numberline {17.2.3}Matrix \(V\): Mapping from low-dimensional new coordinate system to subspace in old coordinate system}{117}{subsubsection.17.2.3}
+\contentsline {subsubsection}{\numberline {17.2.4}Matrix \((\pmb V^T \pmb V)\): Identity mapping within new coordinate system}{117}{subsubsection.17.2.4}
+\contentsline {subsubsection}{\numberline {17.2.5}Matrix (\(VV^T\)): Projection from high- to low-dimensional (sub)space within old coordinate system}{117}{subsubsection.17.2.5}
+\contentsline {subsubsection}{\numberline {17.2.6}Variance}{118}{subsubsection.17.2.6}
+\contentsline {subsubsection}{\numberline {17.2.7}Reconstruction error}{118}{subsubsection.17.2.7}
+\contentsline {subsubsection}{\numberline {17.2.8}Covariance matrix}{118}{subsubsection.17.2.8}
+\contentsline {subsubsection}{\numberline {17.2.9}Eigenvalue equation of the covariance matrix}{118}{subsubsection.17.2.9}
+\contentsline {subsubsection}{\numberline {17.2.10}Total variance of data \(\pmb x\)}{119}{subsubsection.17.2.10}
+\contentsline {subsubsection}{\numberline {17.2.11}Diagonalizing the covariance matrix}{120}{subsubsection.17.2.11}
+\contentsline {subsubsection}{\numberline {17.2.12}Constraints of matrix \(V^'\)}{120}{subsubsection.17.2.12}
+\contentsline {subsubsection}{\numberline {17.2.13}Finding the optimal subspace}{120}{subsubsection.17.2.13}
+\contentsline {subsubsection}{\numberline {17.2.14}Interpretation of the result}{120}{subsubsection.17.2.14}
+\contentsline {subsubsection}{\numberline {17.2.15}Whitening or sphering}{121}{subsubsection.17.2.15}
+\contentsline {subsubsection}{\numberline {17.2.16}Singular value decomposition}{121}{subsubsection.17.2.16}
+\contentsline {section}{\numberline {18}Representative-based Clustering}{122}{section.18}
+\contentsline {subsection}{\numberline {18.1}General}{122}{subsection.18.1}
+\contentsline {subsection}{\numberline {18.2}K-Means Algorithm}{123}{subsection.18.2}
+\contentsline {subsection}{\numberline {18.3}Expectation-Maximization Clustering}{124}{subsection.18.3}
+\contentsline {subsubsection}{\numberline {18.3.1}General}{124}{subsubsection.18.3.1}
+\contentsline {subsubsection}{\numberline {18.3.2}Gaussian Mixture Model}{125}{subsubsection.18.3.2}
+\contentsline {subsubsection}{\numberline {18.3.3}Maximum Likelihood Estrimation}{126}{subsubsection.18.3.3}
+\contentsline {subsubsection}{\numberline {18.3.4}EM in one Dimension}{127}{subsubsection.18.3.4}
+\contentsline {subsubsection}{\numberline {18.3.5}EM in \(d\) Dimensions}{130}{subsubsection.18.3.5}
+\contentsline {section}{\numberline {19}Density-based Clustering}{133}{section.19}
+\contentsline {subsection}{\numberline {19.1}The DBSCAN Algorithm}{133}{subsection.19.1}
+\contentsline {subsection}{\numberline {19.2}Kernel Density Estimation}{136}{subsection.19.2}
+\contentsline {subsubsection}{\numberline {19.2.1}General}{136}{subsubsection.19.2.1}
+\contentsline {subsubsection}{\numberline {19.2.2}Univariate Density Estimation}{136}{subsubsection.19.2.2}
+\contentsline {subsubsection}{\numberline {19.2.3}Multivariate Density Estimation}{138}{subsubsection.19.2.3}
+\contentsline {subsubsection}{\numberline {19.2.4}Nearest Neighbor Density Estimation}{139}{subsubsection.19.2.4}
+\contentsline {subsection}{\numberline {19.3}Density-Based Clustering: DENCLUE}{139}{subsection.19.3}
+\contentsline {section}{\numberline {20}Clustering Validation}{142}{section.20}
+\contentsline {subsection}{\numberline {20.1}General}{142}{subsection.20.1}
+\contentsline {subsection}{\numberline {20.2}External Measures}{143}{subsection.20.2}
+\contentsline {subsubsection}{\numberline {20.2.1}General}{143}{subsubsection.20.2.1}
+\contentsline {subsubsection}{\numberline {20.2.2}Matching Based Measures}{144}{subsubsection.20.2.2}
+\contentsline {subsection}{\numberline {20.3}Internal Measures}{146}{subsection.20.3}
+\contentsline {subsubsection}{\numberline {20.3.1}General}{146}{subsubsection.20.3.1}
+\contentsline {subsubsection}{\numberline {20.3.2}BetaCV Measure}{148}{subsubsection.20.3.2}
+\contentsline {subsection}{\numberline {20.4}Davies\IeC {\textendash }Bouldin Index}{149}{subsection.20.4}
+\contentsline {subsection}{\numberline {20.5}Silhouette Coefficient}{150}{subsection.20.5}
+\contentsline {subsection}{\numberline {20.6}Relative Measures}{151}{subsection.20.6}
+\contentsline {section}{\numberline {21}Hierarchical Clustering}{151}{section.21}
+\contentsline {subsection}{\numberline {21.1}General}{151}{subsection.21.1}
+\contentsline {subsection}{\numberline {21.2}Preliminaries}{152}{subsection.21.2}
+\contentsline {subsection}{\numberline {21.3}Agglomerative Hierarchical Clustering}{153}{subsection.21.3}
+\contentsline {subsubsection}{\numberline {21.3.1}General}{153}{subsubsection.21.3.1}
+\contentsline {subsubsection}{\numberline {21.3.2}Distance between Clusters}{153}{subsubsection.21.3.2}
+\contentsline {subsubsection}{\numberline {21.3.3}Updating Distance Matrix}{154}{subsubsection.21.3.3}
+\contentsline {section}{\numberline {22}DBSCAN Revisted}{155}{section.22}
+\contentsline {subsection}{\numberline {22.1}General}{155}{subsection.22.1}
+\contentsline {subsection}{\numberline {22.2}Geometric results}{155}{subsection.22.2}
+\contentsline {subsection}{\numberline {22.3}DBSCAN in \(\geq \) 3 dimensions}{157}{subsection.22.3}
+\contentsline {subsection}{\numberline {22.4}\(\rho \) Approximate DBSCAN}{158}{subsection.22.4}
+\contentsline {section}{\numberline {23}Exam}{159}{section.23}

@@ -1,0 +1,30 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file /home/martin/Dropbox/Notebook/UNI/S5/Machine-Learning/Machine-Learning.org
+
+
+* General 
+	:PROPERTIES:
+	:ARCHIVE_TIME: 2018-11-29 Thu 12:51
+	:ARCHIVE_FILE: ~/Dropbox/Notebook/UNI/S5/Machine-Learning/Machine-Learning.org
+	:ARCHIVE_OLPATH: Representative-based Clustering
+	:ARCHIVE_CATEGORY: Machine-Learning
+	:END:
+- Given a dataset with $n$ points in a $d$ dimensional space, $\mathbf D = \{ \pmb x_1 \}_{i=1}^n$ and given the number of desired clusters $k$, the goal of *representative-based clustering* is to divide the dataset into $k$ groups or clusters
+	- This is called a *clustering*
+	- It is denoted as $\mathcal C = \{C_1, C_2, \dots, C_k\}$
+	- For each cluster $C_i$ there exists a representative point that summarizes the cluster
+		- A common choice being the mean (centroid) $\pmb \mu_i$ of all points in the clusters i.e. 
+\begin{equation}
+  \pmb \mu_i = \frac1{n_i} \sum _{x_j \in C_i} \pmb x_j
+\end{equation}
+- where $n_i = |C_i|$
+
+- A brute-force algorithm for finding a good clustering is simply to generate all possible partitions of $n$ points into $k$ clusters
+	- A optimization score is evaluated for each of them an the clustering with the best score is used
+	- The number of ways of partitioning $n$ points into $k$ nonempty and disjoint parts is given by the Stirling number of the second kind given as 
+\begin{equation}
+    S(n,k) = \frac1{k!} \sum_{t=1}^k (-1)^t \binom{k}{t} (k-t)^n
+\end{equation}
+

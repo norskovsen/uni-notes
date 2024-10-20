@@ -1,0 +1,19 @@
+* Probabilistic Analysis and Randomized Quicksort
+** Worst-case, average-case, and randomized algorithms
+- $I$ is an input and $T(I)$ is running time on input $I$
+\begin{align*}
+	T_\text{worstcase}(n) &= \max_{\text{inputs } I \text{ of size } n} T(I) \\
+	T_\text{averagecase}(n) &= \stackrel{\text{avg}}{\text{inputs } I \text{ of size } n} T(I)
+\end{align*}	
+
+- *Quicksort:* Given array of some length $n$
+	1. Pick an element $p$ of the array as the pivot (or halt if the array has size $0$ or $1$) 
+	2. Split the array into sub-arrays LESS, EQUAL, and GREATER by comparing each element to the pivot
+		 - LESS has all elements less than $p$
+		 - EQUAL has all element equal to $p$
+		 - GREATER has all elements greater than $p$
+	3. recursively sort LESS and GREATER
+
+- *Basic-Quicksort:* Run the Quicksort algorithm as given above, always choosing the leftmost element in the array as the pivot
+	- Worst-case running time is $O(n^2)$
+	- 

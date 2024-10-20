@@ -1,0 +1,425 @@
+* Generelt
+- Citeringer
+	- Hvis man bruger en andens argument
+		- e.g. Kragh (2004) skriver af positivisme...
+	- Hvis man referer til en anden 
+		- e.g. .... (Kragh 2004, s.xx)
+		- e.g. [y, pp xx-xx]
+		- e.g. [y, p xx]
+
+* Experiments
+** Relevant facts
+- It is assumed that secure facts can be established by the use of senses
+- Most facts can be established using observation
+	- Most are irrelevant for science
+- Many kinds of processes are at work in the world around us
+	- The interact with each other in complicated ways
+	- It is necessary to do experiments
+	- The discussion take a different perspective when focusing on experiments rather than facts
+
+** Producing and updating experimental results
+- It is hard and take time to obtain experimental results
+	- A significant new experiment takes month or even years to successfully execute
+	- It requires practical trial and error and exploitation of the available technology
+	- Judgments about the adequacy of experimental results are not straightforward
+	- Experiments are only adequate and interpretable  
+- Experimental results can be faulty if the knowledge informing them is deficient or faulty
+- Experimental results are fallible and can be updated or replaced for straightforward reasons
+	- It can be due to advances in technology or advancement in understanding 
+
+** Transforming the experimental base of science	
+- The problem with Hertz experiment was not inadequacies in his observation or lack of repeatability
+	- The problem was the experimental setup
+- Experiments are typically designed to cast light on some signification question
+ 
+** Experiments as basis for science  
+- The experimental basis for science is fallible and revisable
+	- This poses a threat to the way scientific theories are borne out of experiments
+- One cannot make the outcomes conform to our theories
+
+* Induction
+** Baby logic
+- Logic is concerned with deduction of statements from other statements
+	- What follows from what
+	- If the premises are true then the conclusion must be true
+	- An argument is perfectly valid even though the premises may be wrong
+- Logic is not alone a source to new truth
+	- Logic can reveal what follows from the statements which we already has
+	- Logics great strength is it truth preserving character
+
+** Scientific laws from facts?
+- Scientific knowledge cannot be logically deduced from the facts
+- Arguments who proceed from a finite number of specific facts to a general conclusion is called *inductive* arguments
+- *Inductive* arguments are used for general scientific laws need to go beyond what is contained in the premises
+
+** Good inductive argument?
+- If an inductive inference from observable facts to laws is to be justified the following conditions must be satisfied
+	1. The number of observations forming a basis for the generalization must be large
+		 - A large number of independent observations is needed
+		 - A good argument cannot just jump to conclusions 
+	2. The observations must be repeated under a wide variety of conditions
+	3. No accepted observation statement should conflict with the derived law
+	
+- *The principle of induction*
+[[file:Induction/screenshot_2019-01-27_15-24-02.png]]
+
+- Problems with the conditions
+	1. How many is large? and in some scenarios a large number of observations might not be a good idea
+	2. What counts as a signification variation in circumstances?
+		 - Prior knowledge is used to look at which factors might have some influence
+		 - What knowledge can one used and what should one require of that knowledge?
+	3. Little scientific knowledge would survive this demand, that there is no known exceptions 
+
+** Problems with inductivism 
+ - *Inductivism* is the position according to which scientific knowledge is to derived from using some kind of inductive interference
+	 - Those who subscribe to that is called *inductivists*
+ - Any kind of generalization from facts about the observable world can only yield generalizations about the observable world
+	 - i.e. inductive reasoning cannot be used for the unobservable world
+ - Since exact mathematically formulated laws always have some error when measured it is hard to escape the inexactness of the measurements to obtain a law
+ - A problem about induction is how can it itself be justified
+	 - To justify it induction is needed
+ - Another problem with inductiveness is when one tries to be precise about how probable a law or truth is in the light of the specified evidence 
+	 - The probability of any general law is zero per standard probability theory
+ - One cannot provide a rational argument for the rational argument itself without assuming the rational argument
+
+** The appeal of inductivism 
+[[file:Induction/screenshot_2019-01-27_16-26-08.png]]	
+ 
+- For the inductivists the source of scientific truth is experience not logic
+- Sets of statements which describe the set-up under investigation is referred to as *initial conditions*
+- The general form of all scientific explanation and predictions can be summarized as thus
+[[file:Induction/screenshot_2019-01-27_16-33-38.png]]	
+
+* Postakademisk videnskab
+[[file:Postakademisk videnskab/screenshot_2019-02-03_08-34-48.png]]	
+	
+* The Structure of Scientific Revolutions
+** Genesis
+- Kuhn believed that science is the activity in which scientists engage rather than a body of developed laws and techniques
+	- It is guided by certain orientations or preconditions which mark out what scientific problems and their solutions might look like
+	- They do not simply proceed from objective experimental facts to unique immutable laws
+	- Theories and facts are provided together by the scientific orientation
+	
+- Kuhn thinks that science progresses by a series of repeated attempts to apply differing points of view to the natural world
+	- It was the nature of science to develop in such as pattern
+
+** Main concepts of Structure
+- The history of science should be used to arrive at a different image of the development of science than had been seen previously
+	- In order to obtain this goal a new historiography had to be develop
+	 
+- Rather than focus on how the science has developed to the present believing Kuhn advocated a historiography that focused on the historical integrity of science at a particular time of its development
+	- Instead of describing the cumulative develop toward a specific point in history, the present, the history of science should see science as developing onwards from a given point in history
+	- Kuhn claimed that the image of science implied by this new diachronic historiography would differ fundamentally implied by the previous anachronic historiography
+	 
+- He described the development of science as successive periods of cumulative normal science separated by non-cumulative revolutions
+	- The account of the development of science described *normal science* as dependent on some set of received believes
+	- A paradigm which marks out what the acceptable research problems are and what acceptable solutions to these problems must look like
+	- Some of the scientific problem defined by a paradigm may turn out to be unsolvable within the framework of the paradigm
+		- The turn into *anomalies*
+		- If anomalies cannot be resolved they may cause a crisis in the scientific community which may lead to a revolution
+	- The paradigms separated by a revolutionary divide will in some areas be so different that the relation between the new paradigm and the old cannot be seen simply as one of extension or refinement
+		- Kuhn termed this relation *incommensurability*
+	- The phase development of science requires that a paradigm has been established
+		- This means that the scientific community has reached a consensus on various fundamentals
+		 
+** Normal science
+- Kuhn defined *normal science* as "research based firmly upon one or most past scientific achievements
+	- Achievements that some particular scientific community acknowledges for a time as supplying the foundation for its success
+	- Kuhn thinks that research of this kind is not aimed at calling forth new sorts of phenomena or inventing new theories
+		- It is solely at increasing the success of the accepted theory
+	- It usually falls within three classes
+		1) Determination of significant facts
+		2) Matching of facts with theory
+		3) Articulation of theory
+	- He called these kinds of reach /'puzzle-solving'/ or /'mopping up operations'/
+	- The analogy between puzzle-solving and normal science is based on two similarities
+		1) Both puzzles and reach problems have an assured solution
+		2) Certain rules must be obeyed in achieving the solution in normal science
+			 - The rules are e.g.
+				 - The scientific laws provided by the accepted theory
+				 - Commitments to preferred types of instrumentation
+				 - Metaphysical beliefs about what kinds of objects nature does and does not contain
+			 - The rules provide a set of tools accepted by and shared among the members of the scientific community
+			 - In using the tools the scientists expect the solutions of new problems to be similar to the solutions of problems previously examined within the discipline 
+			 - An alleged solution to a scientific puzzle that implicitly violets one of the rule are usually not considered an acceptable solution
+	- Kuhn argued that the confident and continuous use of the accepted tools enables science to move faster and penetrate deeper than if the tools were continuously changed
+		- He argued that the puzzle-solving character of normal science implies that scientific achievements are measured by solved problems
+			- As long as the provided tools are used faithfully it is well-defined which problem have already been solved and which problems have not
+		- Retooling will usually appear as a retrogression 
+			- It is to be reserved for he occasion that demands it
+			 
+** Paradigm
+- Kuhn introduced the concept paradigm to describe the consensus within the scientific community regarding both past exemplary achievements and future expectation of how to model reach on these achievements
+	- It was developed in trying to grasp the difference he had observed between social sciences and natural sciences
+		- Natural science communities do not have much controversy over fundamentals
+		- Social sciences seemed to show a striking number of overt disagreements about the nature of legitimate scientific problems and methods
+		- The source of the difference, according to Kuhn, was that recognized scientific achievements in the natural sciences play the role of exemplary problems and problem solutions
+		- Kuhn saw it as "an open question what parts of social science have  yet acquired such paradigms at all"
+	- Kuhn had introduced the term 'paradigm' to denote standard examples
+		- He intended its usage to be similar to how the term was used within language teaching
+		- In /structure/ he first used the term to denote past scientific achievements
+		- He both used it to denote
+			- Concrete exemplary problems and problems solutions which have previously been achieved
+			- A more loose or open-ended structure that marks out further problems to solve and what means by which to solve
+		- He was criticized for the ambiguity of the word and therefore used other words such as
+			- A *disciplinary matrix* to denote the entire constellation of beliefs and techniques
+			- It contains
+				- The symbolic generalization which is scientific laws in their most fundamental forms
+				- Beliefs about which objects and phenomena exist in the world
+				- Values by which the quality of research can be evaluated
+				- Exemplary problems and problem solution which is now called *exemplars* rather than paradigms
+
+** Anomalies
+- Problems that turn out not to be solvable in consonance with the previously accepted exemplary problem solutions is what Kuhn called *anomalies*
+	- They may question that the accepted tools and understandings
+	- They may suggest that they must at least be seriously modified or even be given up
+		- That is if anomalous findings are to be assimilated in such a way that they are no longer anomalous but, rather unsurprising and expected findings
+	- The process by which anomalies get recognized and bring into question the accepted tools and understandings is complicated
+		- At first it cannot be perceived as a phenomenon or an object, but only as something wrong
+		- This is not until a category has been formed by which it can be classified
+	- Not all anomalies are equally severe
+		- Some discrepancy between theoretical predictions and experimental findings can always be found but without question the foundation of normal science research
+			- Kuhn argued /"The scientist who pauses to examine every anomaly he notes will seldom get significant work done"/
+		- Some anomalies will simply be neglected
+	- For an anomaly to be a *severe anomaly* that leads to questioning the accepted tools and understandings, the anomaly must have some special importance
+	- Without any claims to completeness Kuhn list three different routes by which an anomaly may gain in severity
+		1. An anomaly is likely to be severe if it calls some very fundamental generalizations into question
+		2. An anomaly may be severe if it calls achievements into question that have a particular practical importance
+		3. The development of normal science may emphasize specific aspects of an anomaly and turn it into a severe anomaly
+	- Severe anomalies are not simply falsifying instances
+		- Kuhn says /"Anomalous experiences may bot be identified with falsifying ones. Indeed, I doubt that the latter exists"/
+		- Kuhn claim that even for severe anomalies which do cause scientist to question the accepted theory, the anomaly does not lead them to abandon it unless they have another theory to replace it
+		- By making judgments about theories, scientist do not falsify but only compare theories
+			- Rejecting a theory without giving a replacement would be giving up the guidelines by which to conduct research at all 
+
+** Crisis and extraordinary science 
+- When severe anomalies occur, a pronounced professional insecurity arises
+	- This is labeled a 'crisis' by Kuhn
+	- This crisis in the scientific community is generated by the persistent failure of the puzzles of normal science to come out as the should
+	- The response to crisis is a different kind of scientific activity than normal science
+		- This is called extraordinary research by Kuhn
+ 
+- In the transition from normal science to extraordinary science the fixation point of the scientific scrutiny is gradually changed
+	- It starts when an anomaly ceases to be just another puzzle and develops into a severe anomaly
+	- When it happens more and more attention is devoted to it by more and more of the fields most eminent men
+	- If it still continues to resists, which it usually does not, many of them may come to view its solution as the subject matter of their discipline
+		- The field for them will no longer be quite the same as it had earlier
+	- From this point, a change in the nature of the scientific activity follows
+		- Early attempts to solve the recalcitrant problem usually model the attempted solution quite closely on exemplary problem solutions
+		- Put as the problem continues to resist solution the attempts to solve it may gradually diverge more and more from the solutions hitherto accepted as exemplary
+		- Even though there is still a paradigm, few practitioners prove to be entirely agreed about what it is
+		- Even formerly standard solutions of solved problems are called into question
+	- During this phase the previous firm consensus within the scientific community on the foundations of their activity may be replaced by an increasing dissent
+	- The willingness to develop alternatives may vary considerable for different scientists
+		- Especially the younger less committed people in the fields are better at suggesting alternatives
+	- The crisis starts with the loosing of rules for normal research
+		- This may lead scientist to recognize strange results as actual anomalies rather than just something is wrong
+	- The new paradigm emerges all at once
+
+** Revolution 
+- According to Kuhn, the dissent which arises during a state of crisis may come to an end in three different ways
+	1. It may happen that the recalcitrant problems find a solution within the framework of the old theory
+		 - Scientists will the return to normal science research in its previous form and a consensus on the previous theory is restored
+	2. The recalcitrant problems may resist solution even by the most radical new approaches
+		 - Scientists may agree that no solution is likely to be found in the present state of their field
+		 - They then simply set aside for future scientists to solve with more developed tools
+		 - They return to normal science in its previous form
+	3. The recalcitrant problems may be solved by a new theory that gradually receives acceptance until eventually a new consensus is established
+		 - This is called a 'scientific revolution' by Kuhn
+
+- For Kuhn a scientific revolution is not an incremental development
+	- This was in direct opposition to the logical positivist view that held the development of science to be cumulative
+		- The old theory was incorporated into the new theory
+	- Kuhn sees it as a reconstruction of the field from new fundamentals
+		- It changes some of the field's most elementary theoretical generalization as well as many of its paradigm methods and applications
+	- The reason for this is that the new theory is developed to solve anomalies that could not be solved within the old
+	- Adopting a new theory in favour of the old has both constructive and destructive elements
+
+- Kuhn claimed a scientific revolution to be a "relative sudden and unstructured event"
+	- This can be document historically according to Kuhn
+	- It happens in a flash of intuition
+	- The conversions will occur a few at a time until, after the last holdouts have died, the whole profession will again be practicing under a single different paradigm
+	- For a scientists the switch may be instant but for the scientific community the transition may be substantially extended in time
+		- Until the last scientist convert the battle is a fight between two groups  
+
+** Mature science versus pre-paradigmatic science  
+- Kuhn emphasized that the phase development of science which he described is not a pattern that arises in science until it reaches a certain level or maturity
+	- *The phase development of science:* normal science → crisis and extraordinary science → revolution → normal science
+	- It happens at different times in history for different areas of scientific inquire
+	- Before a given area of inquire reached the state of maturity required for the pattern to emerge, it consisted of a number of competing schools and subschools which disagree on various fundamentals
+		- Kuhn called these immature state "pre-paradigmatic" science
+	- In the pre-paradigmatic state scientists were not able to take a common body of belief for granted
+		- Each of them "felt forced to build his field anew from its foundations"
+		- Lacking a common body of belief there is no way to distinguish between relevant and irrelevant facts
+		- "Fact-gathering is a far more nearly random activity" than for mature sciences
+		- "Though the fields practitioners were scientists, the net result of their activity was something less than a science
+	- Maturity in the form of a consensus within the scientific community on the foundation of their trade has to come to various areas of scientific inquiry at different times 
+
+** Incommensurability
+- To describe the relation between normal science traditions separated by a scientific revolution Kuhn adopted the term incommensurability from mathematics
+	- Kuhn claimed that "the normal-scientific tradition that emerges from a scientific revolution is not only incompatible but often actually
+	 
+- Kuhn introduced the notion of incommensurability to cover three aspects of the relation between the pre- and post-revolutionary normal science traditions
+	1. It covers a change in the set of scientific problems and in the way in which scientific problems are attacked
+		 - Scientists with different paradigms engage in different concrete laboratory manipulations
+	2. It covers conceptual change
+		 - In the new paradigm, old terms, concepts and experiments fall into new relationships one with the other
+	3. It covers a change in the world of the scientists research
+
+- Different normal science traditions would cause scientists to perceive differently
+
+- Kuhn has emphasized that "since the new paradigms are born from the old ones they ordinarily incorporate much of the vocabulary and apparatus
+	- This is both conceptual and manipulative
+	- Parts of the achievements of a normal science tradition will always prove to be permanent even through a revolution
+
+- Incommensurability is a relation that holds only between minor parts of the object domains of two competing theories 
+
+* A Transformed Scientific Method
+** General
+- The tools at for capturing data both at the mega-scale and at the milli-scale are just dreadful
+	- After the data has been captured one needs to organize it before doing any kind of data analysis
+	- Good tools for both data curation and data analysis are missing
+	- There is a lot of data that is collected but not curated or published in any systematic way
+
+** eSCIENCE: What is it 
+- escience is where "IT meets science."
+	- Researchers are using many different methods to collect or generate data
+		- From sensors and CCDS to supercomputers and particle colliders
+	- What do one do with the do when it is one the computer?
+	
+** Science Paradigms
+[[file:A Transformed Scientific Method/screenshot_2019-02-03_20-02-15.png]]
+- Theoretical models has for many sciences grown too complicated to solve analytically and people had to start simulating
+	- They have carried us through much of the last millennium
+	- Simulation are at this point generating a lot of data along with a huge increase in data from experimental sciences
+
+- The world of science has changed
+	- The new model is for the data to be captured by instruments or generated by simulations before being processed by software
+	- The resulting information is stored on computers 
+	- Scientists only get to look on their data fairly late in the pipeline
+	- The techniques and technologies for this science are so different that it is worth distinguishing data-intensive science from computational science as a new *fourth paradigm* for scientific exploration
+
+** X-Info and Comp-X
+[[file:A Transformed Scientific Method/screenshot_2019-02-04_10-35-57.png]]	
+	
+- We are seeing the evolution of two branches of every discipline X
+	- There are X-info which is collecting and analyzes the information from many different experiments 
+	- Comp-X which simulates how the different systems in the discipline X works
+	 
+** Experimental budget are 1/4 to 1/2 software
+- There is a lot of need to write code to analyze data gathered from instruments
+	- Even in "small data" sciences, one sees people collecting information and then having to put a lot more energy into the analysis of the information than in collecting it
+	- The software is typically very quirky since there are very few generic tools that the bench scientists has for collecting, analyzing and processing the data
+		- This is something computer scientists could help fix by building generic tools for the scientists
+
+- We have made fair progress on simulation tools, but not very much on data analysis tools 
+
+** Project Pyramids and Pyramid Funding
+- An observation about the way most science projects seem to work
+	- There are a few international project, then there are more multi-campus projects and then there are lots and lots of single-lab projects
+	- One has this Tier 1, Tier 2, Tier 3 facility pyramid which is used in many different fields
+	- The Tier 1 and Tier 2 projects are generally faily systematically organized and managed
+		- There are relatively few
+		- They can afford to have both a software and hardware budget and they allocate teams of scientists to write custom software for the experiment
+	- If one is a bench scientist at the bottom of the pyramid and with a small budget
+		- One typically uses MATLAB and Excel or some similar software
+		- There is not much else one can do
+	- Tier 1 facilities typically get funded by an internation consortium of agencies
+		- Tier 2 experiments and Tier 3 facilities get funded by researchers who bring with them their own sources of funding
+		- Funding agencies need to fully fund the Tier 1 giga-projects but then allocate the other half of their funding for cyberinfrastructure for smaller projects
+
+** Laboratory Information Management Systems
+- What is needed are effectively "Laboratory Information Management Systems."
+	- They provide a pipeline from the instrument or simulation data into a data archive
+	- Its close to be happening in some places
+		- Data is collected from a bunch of instruments into a pipeline which calibrates and "cleans" the data
+		- This is including filling in gaps as necessary
+		- Then the information is "re-grid" and eventually put into a database
+		- The database should "publish" the information on the internet to let people access it
+	- The problem with existing systems are that they are really geared towards people who are fairly rich and are in an industrial setting
+		- The are often fairly specific to one or another task for a particular community e.g. taking data from a sequencing machine or mass spectrometer running it through the system and getting results on the other side 
+
+** Information Management and Data Analysis
+- People are collecting data either from instruments or sensors or from running simulations
+	- This means that we have millions of files and there is no easy way to manage or analyze their data
+	- Scientists generally are doing one of two things
+		1. They are looking for needles in haystacks
+			 - These queries are easy
+			 - One is looking for anomalies in the data
+			 - One typically has some idea of what type of signal you are looking for
+			 - Grids of shared clusters are great for this task
+		2. Looking for the haystacks themselves
+			 - Grids of shared clusters are lousy at trend analysis, statistical clustering and discovering global patterns in the data
+			 - Cluster algorithms are not in order N or N log N
+				 - They are cubic in N and therefore it does not work for a large N
+				 - One needs approximate algorithms that have much lower running time e.g. approximate median
+	- Much of the statistical analysis deals with creating uniform samples, performing some data filtering, incorporating or comparing some Monte Carlo simulations and so on
+		- This generates a large amount of files
+		- Each file contains a bundle of bytes 
+			- One has to work hard to figure out hat the data in this file means
+		- It is really important that the files are self-describing
+		- When people use the word database they are saying that the data should be self-describing and it should have a schema
+			- This enables one to make queries for specific data with specific properties
+			- One can also aggregate the data and use parallel search on the data
+			- It is much easier to build some generic visualization tools
+
+** Data Delivery: Hitting a Wall
+- Databases can help when the files get too large to use FTP
+	- They can use indices and parallel data access
+	- It is typically more efficient to move the question than to move the data
+	 
+** The Need for Data Tools: Let 100 Flowers Bloom
+- In science one cannot afford to build their own data management software
+	- Many only have MATLAB and Excel to their disposal
+
+** The Coming Revolution in Scholarly Communication
+	 [[file:A Transformed Scientific Method/screenshot_2019-02-04_13-56-15.png]]	
+	 - We are likely to see all of the publicly funded science literature forced online by the funding agencies
+	 - The internet can do more than just make the full text of research paper available
+		 - It can unify all the scientific data with all the literature to create a world in which data and the literature interoperate with each other
+		 - One can look and the original data when reading the paper and even redo their analysis
+		 - One might look at the data and find all the literature about the data
+		 - This will increase the "information velocity" of the sciences and improve the scientific productivity of researchers
+			 - It will be a very good development
+
+** The New Digital Library
+	 - One can stick an article in one the online archives and it will get replicated to all the other archives
+		 - It is fairly cheap to run one of these archives
+		 - The big challenges are how you do curation and peer review 
+
+** Overlay Journals
+- The idea is that you have data archives and literature archives
+	- The articles get deposited in the literature archives and the data goes into the data archives
+	- Then there is a journal management system that somebody builds that allows us, as a group to form a journal on X
+	- We let people submit articles to our journal by depositing them in the archive
+		- We do peer review on them and the ones we like we make a tile page and put it into the archive as well
+		- The search engine comes along and cranks up the page rank on all of those articles being because their are referenced by this significant front page
+		- The articles can also of course point back to the data
+		- There will be a collaboration system that comes along that allows people to annotate and comment on the journal articles
+			- It is not stored in the peer reviewed archieve but on the side since they have not been per reviewed though they might be moderated
+
+** What happens to peer review ?
+- The answer to why want to have a peer review is that it is very structured, it's moderated and there is a degree of confidentiality
+
+** Publishing Data
+- It is important when one is publishing data that you show your work in context
+	- It is called the data provenance
+	- How does one publish it so one can read it and reproduce the results in the future
+		- It's a mess and we've got to work on this problem 
+
+** Data, Information and Knowledge: Ontologies and Semantics
+- We are trying to objectify knowledge
+	- We can help with basic things units, and what is a measurement, who took the measurement and when the measurement was taken
+		- This is generic things and can be applied all fields
+	- What are the object, what are the attributes and what are the methods in the object-oriented sense
+
+- In this world we traditionally had authors, publishers, curators and consumers
+	- In the new world, individual scientists now work in collaborations and journals are turning into Websites for data and other details of the experiments
+	- Curators now look after large digital archives 
+	- About the only the same is the individual scientists
+	- It is a fundamental change in the way we do science
+
+- In the same sense we need archives for journal publication we need archives for the data
+	- People can use other datasets to create new data sets
+
+		

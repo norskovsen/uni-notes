@@ -1,0 +1,331 @@
+* Introduction (1)
+#+NAME: compilePhases
+#+CAPTION: Phases of a compiler and interfaces between them
+[[file:Introduction (1)/screenshot_2018-09-04_08-35-20.png]]
+
+* Lexical Analysis (2)
+** General
+- The analysis of a program is usually broken into
+	- *Lexical analysis:* breaking the input into individual words or "token"
+	- *Syntax analysis:* parsing the phrase structure of the program
+	- *Semantic analysis:* calculating the programs meaning
+
+- The lexical analyzer takes a stream of characters and produces a stream of names, keywords and punctuation marks
+	- It discards white space and comments between tokens
+
+** Lexical Tokens
+- A *lexical token* is a sequence of character that can be treated as a unit in the grammar of a programming language.
+	- A programming language classifies lexical tokens into a finite set of token types
+
+#+NAME: tokenTypesExamples
+#+CAPTION: Examples of token types
+[[file:Lexical Analysis (2)/screenshot_2018-09-04_08-50-30.png]]
+
+
+- Punctuation tokens such as ~IF~, ~VOID~, ~RETURN~ constructed from alphabetic characters are called reserved words and can in most languages not be used as IDs 
+
+#+NAME: nonTokens examples
+#+CAPTION: Examples of nontokens 
+[[file:Lexical Analysis (2)/screenshot_2018-09-04_08-50-46.png]]
+
+** Regular Expressions
+- A lexer is defined in the book using regular expressions and a FA.
+
+- There are two important disambiguation rules used by Lex, ML-Lex and other similar lexical analyzer generators
+	- *Longest match:* The longest initial substring of the input that can match any regular expression is takes as the next token
+	- *Rule priority:* For a /particular/ longest initial substring the first regular expression that can match determines its token type
+		- This means that the order of writing down the regular expression rules has significance 
+
+** FA
+- To recognize the longest match just means remembering the last time the automaton was in a final state with two variables, ~Last-Final~ (the state number of the most recent final state encountered) and ~Input-Position-at-Last-Final~
+	- Every time it enters a final state it updates the variables
+	- When a /dead/ state (a nonfinal state with no output transitions) is reached the variables tell that the token was matched and where it ended 
+
+** ML-Lex: A Lexical Analyser Generator 
+- ML-Lex is a lexical analyser generator that produces a ML program from a lexical specification
+
+- For each token type in the programming language to be lexical analysed the specification contains a regular expression and an action
+	- The action communicates the token type to the next phase of the compiler
+	- The output of ML-Lex is a program in ML that interprets a DFA 
+
+#+NAME: mlLexSpecExample
+#+CAPTION: An example of an ML-Lex specification
+[[file:Lexical Analysis (2)/screenshot_2018-09-04_09-59-26.png]]
+
+- The first part of the specification contains functions and types written in ML
+	- These must include the type ~lexresult~ which is the result type of each call to the lexing function
+	- It must also include the function ~eof~, which the lexing engine will call at end of file
+
+- The second part of the specification contains regular-expression abbreviations and state declarations
+	- e.g. ~digits=[0-9]+ allows the name ~{digits}~ to stand for a nonempty sequence of digits within regular expressions allows
+
+- The third part of the specification contains regular-expression abbreviations and state declarations
+	- The actions are fragments of ordinary ML code
+	- Each action return a value of type ~lexresult~
+	- In the action fragments, several special variables are available
+		- The string matched by the regular expression is ~yytext~
+		- The file position of the beginning of the matched string is ~yypos~
+		- The function ~continue()~ calls the lexical analyser recursively 
+
+- It is possible to declare a set of /start states/
+	- Each regular expression can be prefixed by the set of start states in which it is valid
+	- The action statements can explicitly change the start states 
+
+#+NAME: mlLexSpecExample
+#+CAPTION: An example of explicity declaring startes
+[[file:Lexical Analysis (2)/screenshot_2018-09-04_14-21-13.png]]
+
+* Parsing (3)
+** Context-Free Grammars
+#+NAME: syntaxStraight
+[[file:Parsing (3)/screenshot_2018-09-10_16-50-07.png]]
+
+- Parsers must read not only terminal symbols such as ~+~, ~-~, ~num~ and so on, but also the end-of-file marker
+	- ~$~ is used to represent the end of file
+
+** Predictive Parsing
+*** General 
+- Some grammars are easy to parse using an algorithm known as /recursive descent/
+	- Each grammar production turns into one clause of a recursive function
+	- Works only on grammars where the first terminal symbol of each sub-expression provides enough information to choose which production to use
+	- The advantage of this is that it can be constructed by hand without the need for automatic tools
+
+*** First And Follow Sets
+- Given a string $\gamma$ of terminal and nonterminal symbols, FIRST($\gamma$) is the set of all terminal symbols that can begin any string derived from $\gamma$
+	- If two different productions $X \to \gamma_1$ and $X \to \gamma_2$ has overlapping FIRST sets the grammar cannot be parsed using predictive parsing
+
+- With respect to a particular grammar, given a string $\gamma$ of terminals and nonterminals
+	- nullable($X$) is true if $X$ can derive the empty string
+	- FIRST($\gamma$) is the set of terminals that can begin strings derived from $\gamma$
+	- FOLLOW($X$) is the set of terminals that can immediately follow X
+		- That is $t \in \text{FOLLOW} (X)$ if there is any derivation containing $Xt$
+
+- The following is true for the FIRST relation to strings of symbols
+	- $\text{FIRST}(X\gamma) = \text{FIRST}[X\gamma]$ if not nullable$[X]$
+	- $\text{FIRST}(X\gamma) = \text{FIRST}[X] \cup \text{FIRST}(\gamma)$ if not nullable$[X]$
+
+*** Constructing a predictive parser
+[[file:Parsing (3)/screenshot_2018-09-10_17-34-52.png]]
+
+- A predictive parsing table is a table that is indexed by nonterminals $X$ and terminals $T$
+	- Constructed by entering a production $X \to \gamma$ in row $X$, column $T$ of the table for each $T \in \text{FIRST}(\gamma)$
+	- If $\gamma$ is nullable enter the production in row $X$, column $R$ for each $T \in \text{FOLLOW}[X]$
+	- If one of the entries contain more than one production predictive parsing will not work on the grammar
+	- Grammars whose predictive parsing table tables contain no duplicate entries are called $\text{LL}(1)$
+
+- $LL(k)$ parsing tables is a table whose rows and columns are every sequence of $k$ terminals
+	- Rarely used in done, because the of the large tables
+
+- Grammars parsable with $LL(k)$ parsing tables are called $LL(k)$ grammars
+	- Any $LL(k-1)$ grammar is also a $LL(k)$ grammar
+
+*** Error recovery
+- When during error recovery one must:
+	- Print out a meaning full message
+	- Delete the thing causing the error to avoid running forever
+
+** LR Parsing
+*** General 
+[[file:Parsing (3)/screenshot_2018-09-11_18-03-40.png]]
+
+- A powerfull technique for parsing is called $\text{LR}(k)$ parsing
+	- It is able to postpone the decision until it has seen  input tokens corresponding to the entire right-hand side of the production in question
+		- $k$ more input tokens beyond
+
+- The parser has a stack and an input
+- The first $k$ tokens of the input are the *lookahead*
+- Based on the contents of the stack and the lookahead the parser performs two kinds of actions
+	- ~Shift~: move the first input token to the top of the stack
+	- ~Reduce~: Choose a grammar rule $X \to A \ B \ C; \text{pop} \ C,B,A$  
+- The action of shifting the end-of-file marker ~$~ is called *accepting* and cause the parser to stop successfully  
+
+*** LR Parsing Engine
+- The LR parser know when to shift and reduce by using a FA
+	- It is not applied to the input but to the stack
+	- The edges are labeled by symbols that can appear on the stack
+
+[[file:Parsing (3)/screenshot_2018-09-10_18-46-04.png]]
+
+- The elements in a transition table are labeled with four kinds of actions:
+	- $\pmb sn$ Shift into state $n$;
+	- $\pmb gn$ Goto state $n$;
+	- $\pmb r k$ Reduce by rule $k$;
+	- $\pmb a$ Accept;
+	- Error is denote by a blank entry in the table
+
+- To use a transition table in parsing treat the shift and goto actions as edges of the DFA and scan the stack
+- Rather than rescan the stack again the parser can remember the state reached for each stack element.
+
+#+NAME: parsingAlgorithm
+#+CAPTION: The parsing algorithm
+[[file:Parsing (3)/screenshot_2018-09-10_18-50-49.png]]
+
+*** $LR(0)$ Parser generation
+- An $L(k)$ parser uses the contents of its stack and the next $k$ tokens of the input to decide which action to take
+	- In practice $k>1$ is not used for compilation
+	- Grammars which has $k=0$ is too weak to be very useful
+
+** Using Parser Generators
+*** ML-Yacc General
+#+NAME:mlYaccExample
+#+CAPTION: Example of ML-Yacc without Semantic Actions 
+[[file:Parsing (3)/screenshot_2018-09-11_18-11-59.png]]
+
+- ML-Yacc is a parser generator
+- An ML-Yacc specification is divided into three sections separated by %% marks
+#+BEGIN_SRC 
+user declarations
+%%
+parser declarations
+%% 
+grammar rules
+#+END_SRC
+
+- The *user declarations* are ordinary ML declarations usable from the semantic actions in later sections
+- The *parser declarations* include a list of the terminal symbols nonterminals and so on
+- The *grammars rules* are productions of the form
+#+BEGIN_SRC 
+	exp: exp plus exp (semantic action)
+#+END_SRC
+- Where ~exp~ is a nonterminal producing a right hand side of ~exp+exp~ and ~PLUS~ is a terminal symbol
+	- The semantic action is written in ordinary ML and will be executed whenever the parser reduces using this rule
+
+*** Conflicts 
+- ML-Yacc reports shift-reduce and reduce-reduce conflicts
+	- A *shift-reduce conflict* is a choice between shifting and reducing
+	- A *reduce-reduce conflict* is a choice between reducing and reducing
+	- By default ML-Yacc resolves shift-reduce conflicts by shifting and reduce-reduce conflicts by using the rule that appears earlier in the grammar
+
+- Most shift-reduce conflicts and reduce-reduce conflicts are serious problems and should be eliminated by rewriting the grammar
+
+*** Precedence Directives
+- ML-Yacc has precedence directives to indicate the resolution of the class of *shift-reduce conflicts* that are caused by ambiguity in the grammar
+
+#+NAME: precedenceDirective
+#+CAPTION: Example of precedence directives that are used to indicate that + and - are left-assciative and bind equally tightly and that * and / are left-assciative and bind more tightly than +, that = $\ne$ are nonassociative and binds more weekly than + and that ^ is rightassociative and bind most tightly.
+[[file:Parsing (3)/screenshot_2018-09-11_18-27-07.png]]
+
+*** Syntax Versus Semantics 
+- When given an identifier which can have multiple types e.g. numbers and booleans, one must change the grammar to make the two identifiers equal and let the semantic part of the compiler handle it
+
+** Error Recovery
+*** Recovery Using The Error Symbol
+- Local error recovery mechanisms work by adjusting the parse stack and the inputs /where the error was detected/ in a way that will allow parsing to resume
+	- Many versions of the Yacc parser generator uses a special /error/ symbol to control the recovery process
+	- Can be done by adding error-recovery productions 
+
+- When the LR parser reaches an error state it does not following actions
+	1. Pop the stack (if necessary) until a state is reached in which the action for the /error/ token is /shift/
+	2. Shift the /error/ token
+	3. Discard input symbols (if necessary) until a state is reached that has a non-error action on the current lookahead token
+	4. Resume normal parsing
+
+*** Global Error Repair
+- *Global error repair* finds the smallest set of insertions and deletions that would turn the source string into a syntactically correct string
+	- Even if the insertions and deletions are not at a point where an LL or LR parser would first report an error 
+
+- *Burke-Fisher error repair:* Tries every possible single-token insertion, deletion or replacement at every point that occurs no earlier that $K$ tokens before the point where the parser reported the error
+	- The correction that allows the parser to parse furthest past the original reported error is taken as the best error repair
+	- Generally if a repair carries the parser $R=4$ tokens beyond where it originally got stuck it is "good enough"
+	- The advantage of this technique is that the grammar is not modified at all, nor are the parsing tables modified, only the parsing engine
+	- The parsing engine must be able to back up $K$ tokens and reparse
+		- Needs to remember what the parse stack looked like $K$ tokens ago.
+		- The algorithm maintains two parse stack the /current/ stack and the /old/ stack
+		- Queue of $K$ tokens is kept, as a new token is shifted it is pushed on the current stack and put onto the tail of the queue and the head is pooped 
+
+- *Semantic actions:* Shift and reduce actions are tried repeatedly and discarded during the search for the best error repair
+	- The Burke-Fisher parser does not execute any of the semantic actions as the reductions are performed on the current stack
+		- Waits until the same reductions are performed on the /old/ stack
+
+- *Semantic value for insertions*: In repairing an erro by insertion the parser needs to provide a semantic value for each token it inserts
+	- Done in ML-Yacc by using the ~%value~ directive
+
+#+NAME: exampleOfValue
+#+CAPTION: Value directive example
+[[file:Parsing (3)/screenshot_2018-09-11_19-16-35.png]]
+
+- *Programmer-specified substitutions:* Some common kinds of errors cannot be repaired by the insertion or delection of a single token
+	- Should be tried first
+	- In the ML-Yacc grammar specification the probrammer can use the ~%change~ directive to suggest error corrections to be tried first, forfore the default "delete or insert each possible token" repairs 
+
+#+NAME: exampleOfChange
+#+CAPTION: Change directive example
+[[file:Parsing (3)/screenshot_2018-09-11_19-19-52.png]]
+
+* Abstract Syntax (4)
+** Semantic Actions 
+- For a rule $A \to B \ C \ D$, the semantic action must return a value whose type is the one associated the nonterminal $A$
+	- It can build this value from the values associated with the matched terminals and nonterminal $B,C,D$ 
+
+- In a recursive-descent parser, the semantic actions are the values returned by the parsing functions, or the side effects of those functions, or both
+
+#+NAME: semanticExample
+#+CAPTION: ML-Yacc grammar with semantic actions  
+[[file:Abstract Syntax (4)/screenshot_2018-09-12_20-37-16.png]]
+
+- A parser specification for ML-Yacc consists of a set of grammar rules each annotated with a semantic action that is an ML expression
+	- When ever the generated parser reduces by a rule it will execute the corresponding semantic action fragment
+	- The semantic rules can refer to the semantic value of right-hand-side symbols
+	- The value produced by every semantic expression must match the nonterminal
+	- Implement semantic values by keeping a stack of them parallel to the state stack
+		- Where each symbol would be on a simple parsing stack the now is a semantic value
+
+[[file:Abstract Syntax (4)/screenshot_2018-09-12_20-44-49.png]]
+
+** Abstract Parse Trees
+[[file:Abstract Syntax (4)/screenshot_2018-09-12_21-05-30.png]]
+
+- A way to separate the issues of parsing from the issues of semantics is to produce a *parse tree*
+	- A data structure that later phases of the compiler can traverse
+	- It has exactly one leaf for each token of the input and one internal node for each grammar rule reduced during phase
+		- Is called a *concrete parsing tree* for concrete syntax
+		- Is inconvenient to use directly
+		- Depends too much on the grammar
+
+- An *abstract syntax* makes a clean interface between the parser and the later phases of the compiler
+	- The compiler will need to represent and manipulate abstract syntax trees as data structures (in ML using ~datatype~)
+
+- Since a grammar using abstract syntax tree often separates the different compiler operations one need to remember the position for reporting failures
+	- To remember positions accurately the abstract-syntax data structures must be sprinkled with ~pos~ fields
+	- The ML-Yacc parser makes the beginning and end positions of each token available to the parser
+
+* Semantic Analysis (5)
+** General
+- The *semantic analysis* phase of a compiler
+	- connects variable definitions to their uses
+	- checks that each expression has a correct type
+	- translates the abstract syntax into a simpler representation suitable for generating machine code
+
+** Symbol Tables
+*** General
+- This phase is characterized by the maintenance of *symbol tables* mapping identifiers to their types and locations 
+	- Also called *environments*
+	- As the declarations of types, variables and functions are processed, these identifiers are bound to "meanings" in the symbol tables
+	- When *uses* (non-defining occurrences) of identifiers are found, they are looked up in the symbol tables
+	- Each local variable in a program has a scope in which it is visible
+		- As the semantic analysis reaches the end of each scope, the identifier bindings local to that scope are discarded 
+
+- An *environment* is a set of bindings
+	- Denoted by the $\mapsto$ arrow
+	- e.g. an environment $\sigma_0$ which contains the bindings $\{g \mapsto \text{string}, a \mapsto \text{int}\}$ meaning that $a$ is an integer variable and $g$ is a string variable
+	- When two environments are added the new variables, i.e. the left hand side, has precedence over the existing types
+	- Can be implemented in to ways
+		- *Functional style:* where the original environment are kept in pristine condition
+		- *Imperative style:* where the environment is modified to become a new environment and a undo stack is kept
+
+- In some languages there can be several active environments at once
+	- Each module or class or record in the program has a symbol table $\sigma$ of its own
+
+*** Efficient Imperative Symbol Tables
+[[file:Semantic Analysis (5)/screenshot_2018-09-16_18-28-18.png]]
+
+- Because a large program may contain thousands of distinct identifiers symbol tables must permit efficient lookup
+	- Imperative-style environments are usually implemented using hash table, which are very efficient
+	- The operation $\sigma' = \sigma + \{a \mapsto \tau \}$ is implemented by inserting $\tau$ in the hash table with key $a$
+	- A simple *hash table with external chaining* works well and supports deletion easily
+		- When we will need to delete $\{a \mapsto \tau \}$ to recover $\sigma$ at the end of the scope of $a$ 
+
+*** Efficient Functional Symbol Tables
+- In the functional style, we wish to compute $\sigma' = \sigma + \{a \mapsto \tau\}$ in such a way that we still have $\sigma$ available to look up identifiers
+	- Instead of altering a table we create a new table by computing the "sum" of an existing table and a new binding
+	- By using binary search tree we can perform functional additions to search trees efficiently

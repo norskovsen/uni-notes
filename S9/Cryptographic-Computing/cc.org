@@ -1,0 +1,151 @@
+* Header	
+#+LaTeX_HEADER: \renewcommand{\Z}{\mathbb{Z}}
+#+LaTeX_HEADER: \renewcommand{\P}{\mathsf{P}}
+#+LaTeX_HEADER: \renewcommand{\S}{\mathsf{S}}
+#+LaTeX_HEADER: \renewcommand{\F}{\mathsf{F}}
+#+LaTeX_HEADER: \renewcommand{\A}{\mathsf{A}}
+#+LaTeX_HEADER: \renewcommand{\B}{\mathsf{B}}
+#+LaTeX_HEADER: \newcommand{\view}{\text{view}}
+#+LaTeX_HEADER: \newcommand{\IS}{\mathcal{IS}}
+#+LaTeX_HEADER: \newcommand{\Env}{\text{Env}}
+#+LaTeX_HEADER: \newcommand{\COM}{\mathtt{COM}}
+#+LaTeX_HEADER: \newcommand{\infl}{\mathtt{infl}}
+#+LaTeX_HEADER: \newcommand{\leak}{\mathtt{leak}}
+#+LaTeX_HEADER: \newcommand{\FCOM}{\F_{\COM}}
+#+LaTeX_HEADER: \newcommand{\commit}[2]{\langle #1 \rangle_{#2}}
+#+LaTeX_HEADER: \newcommand{\verf}[2]{\llbracket #1 \rrbracket_{#2}}
+	
+* Formal definition of security against semi-honest adversaries (Passive Security)
+** Preliminaries
+- A *probability ensemble* $X = \{X(a,n)\}_{a \in \{0,1\}^*;n\in\mathbb N}$ is an infinite sequence of random variables indexed by $a, n \in \mathbb N$
+	- $a$ will represent the parties' inputs and $n$ will represent the security parameter
+
+- All parties are assumed to run in time that is polynomial in the security parameter
+	- PPT is used as shorthand for *probabilistic polynomial time*
+	- For a set $X$ the process of choosing an element $x$ of $X$ under the uniform distribution is denoted as
+\[
+	x \leftarrow_R X
+\] 
+
+** Security in the Presence of Semi-honest Adversaries
+- The model considered is a two-party computation in the presence of *static semi-honest* adversaries
+	- An adversary controls one of the parties and follows the protocol specification exactly
+	- It may try and learn more information than allowed by looking at the transcript of messages that it received and its internal state
+
+- *Two-party computation.* A two-party protocol problem is cast by specifying a random process that maps pairs of inputs to pairs of outputs (one for each party)
+	- This kind of process is refereed to as a *functionality* and denoted $f : \{0,1\}^* \times \{0,1\}^* \to \{0,1\}^* \times \{0,1\}^*$, where $f = (f_1, f_2)$
+	- For every pair of inputs $x, y \in \{0,1\}^n$ the output pair is a random variable $(f_1(x,y),f_2(x,y))½ ranging over pairs of strings.
+		- The first party using input $x$ wishes to obtain $f_1(x, y)$
+		- The second party using input $y$ wishes to obtain $f_2(x, y)$
+	- The functionality is denoted by $(x,y) \mapsto (f_1(x,y), f_2(x,y))$
+	- When the functionality $f$ is probabilistic the notation $f(x, y, r)$ is sometimes used where $r$ is a uniformly chosen random tape used for computing $f$
+
+- *Privacy by simulation.* A protocol is secure if whatever can be computed by a party participating in the protocol can be computed based on its input and output only
+	- Formalized according to the simulation paradigm
+	- It is required that a party's view in a protocol is simulatable given only its input and output
+	- This implies that the parties learn nothing from the protocol *execution* itself
+
+* Highly-Efficient and Composable Password-Protected Secret Sharing
+** Introduction
+- *Password-Protected Secret Sharing (PPSS):*
+	- A user distributes its information (a secret) among $n$ servers
+	- The compromise of any $t$ of them leaks no information on the secret and password
+	- Contacting $t+1$ with the right password reconstructs the secret
+
+- A PPSS is implied by any Threshold Password Authenticated Key Exchange (T-PAKE)
+
+- Oblivious PRF is a protocol between two parties:
+	- One holding a key $k$ for a PRF $f$
+	- One holding an input $x$ where no party learns anything except for the input holder that learns $f_k(x)$
+
+- PPSS has obvious applications for protecting data whose security depends on a user-momorable password
+	- This data can take the form of credentials and keys that when reconstructed enable strong authentication by the user
+	- Another application is for multi-factor authentication protocols where a user's device acts as a "server" in a T-PAKE scheme
+		
+** The OPRF Functionality $\mathcal F_{\text{OPRF}}$
+[[file:Highly-Efficient and Composable Password-Protected Secret Sharing/screenshot_2020-10-28_16-15-32.png]]
+	
+- The following notational conventions is used
+	- If $x$ is the string then $x[L]$ denotes the left half
+	- If $n$ is an integer, then $[n] = \{1,\dots,n\}$
+	- $\mathbf 0$ is the vector of $n$ $0$'s
+		- $n$ is a constant defined elsewhere
+		- $0^l$ is the $l$ length string of all zeroes
+	- ":=" denotes the computation of a deterministic function
+	- "<-" denotes the computation of a randomized algorithm
+	- If $D$ is a set then $x \leftarrow_R D$ corresponds to picking $x$ uniformly at random from $D$
+	- If $\mathbf{G}$ is a game and $E$ is an evenet, then $Pr[E || \mathbf{G}]$ denotes the probability that $E$ occurs in $\mathbf{G}$
+
+- The functionality $\mathcal{F}_{\text{OPRF}}$ involves users, senders and an (ideal-world) adversary denoted $U,S, \mathcal{A}^*$, respectively
+	- $l$ the security parameter which determines the output size of the PRF
+	- OPRF evaluation is triggered by an $(\textsc{EVAL}, sid, S, x)$ command from user $U$ requesting the computation of the PRF of server $S$ on input $x$
+	- $\textsc{SndrComplete}$ and $\textsc{RcvComplete}$ denote the completion of $S$'s and $U$'s computation respectively
+	- An $(\textsc{Eval}, sid, S, x)$ operation from a user $U$ with sender $S$ is completed by a $(\textsc{RcvComplete}, sid, U, S, S^*)$ where $S^*$ is the identity of a server that is specified by $\mathcal A^*$
+		- In the case $S=S^*$ we have a computation with the intended sender $S$
+		- In the case $S \neq S^*$ corresponds to the attacker channeling the request to a different sender, which is possibly corrupt
+		- The identity $S^*$ that is specified by $\mathcal A^*$  may or may not be a server identity
+			- In these cases $S^*$ will be interpreted as a pointer to a function table
+		- There is no guarantee of correctness of the evaluation request
+		- Two requests with the same $S$ and $x$ can be answered differently
+	- While $\mathcal A^*$ to route a user's request to the wrong sender, $\mathcal A^*$ cannot forge computations by honest senders
+		- Enforced via a ticketing mechanism that ensures that for any honest server $S$, the number of user-completed OPRF evaluations ($\textsc{RcvComplete}$ activations) with $S$ is no more than the number of $\textsc{SendrComplete}$ activations of $S$
+		- Each sender $S$ is associated with a ticket value $\text{tx}(S)$
+			- Each time that a sender $S$ completes his interaction with a user $\text{tx}(S)$ increases by $1$
+			- Each time a user completes an interaction that is associated to $S$, $\text{tx}(S)$ decreases by $1$ (if it is not zero)
+		- It maintains a table $T$ used to record the results of the PRF evaluation by different senders on user-requested inputs
+			- Entry $T(S,x)$ is defined as the sender's $S$ PRF evaluated on input $x$
+			- The entries are initially undefined and are filled with random values by $\mathcal F_{\text{OPRF}}$ upon $\textsc{RcvComplete}$ activations
+				- It is chosen at random even in the case when the server $S$ is corrupted or it corresponds to a function table of the adversary
+		- The values $T(S,x)$ are communicated to the requesting user but the inputs $x$ remain fully hidden as they are never communicated to any party including $\mathcal A^*$
+		- $\mathcal F_{\text{OPRF}}$ provides the adversary with direct access to all function tables by allowing the issuance of $\textsc{Eval}$ requests directly to $\mathcal{F}_{\text{OPRF}}$
+
+- The definition of the functionality $\mathcal{F}_{\text{VOPRF}}$ differs from $\mathcal{F}_{\text{OPRF}}$ fundamentally since it ensures correct and user-verifiable OPRF computation
+
+** Realization of $\mathcal F_{\text{OPRF}}$
+*** Definition
+[[file:Highly-Efficient and Composable Password-Protected Secret Sharing/screenshot_2020-10-29_11-17-59.png]]
+- *The 2HashDH scheme.* is an efficient realization of $\mathcal{F}_\text{OPRF}$ in the random oracle model
+	- It relies on a cyclic group of prime order $m$
+		- let $g$ be a generator of th group
+	- The private key $k$ is chosen at random from $\mathbb Z_m$,
+	- Each user $U$ maintains a table $T_U$ which consists of tuples of the form $(S,x,r,f)$
+	- Let $\mathcal Z$ be the environment
+	- The construction uses two hash function $H_1$ and $H_2$
+
+- The PRF is defined using blinded exponentiation
+	- i.e. $f_k(x) = H_2(x, H_1(x)^k)$
+
+- For each value $x$ the user $U$ wants to evaluate
+	- $U$ picks a random element $r$ in $\Z_m$ this remains the same among different senders
+	- When $U$ wants to compute $f_k(x)$ where $k$ is the private key of a specific sender $S$
+		- $U$ sends $a=H_1(x)^r$ to $S$
+		- $S$ sends back $b = a^k = H_1(x)^{rk}$ to $U$
+		- $U$ outputs $f=H_2(x, b^{1/r}) = H_2(x, H_1(x)^k)$
+
+*** Security analysis
+- $(N,Q)$ one-more Diffie-Hellman (DH) assumption, which states that for any polynomial time adversary $\mathcal A$
+\[
+	\Pr_{k \leftarrow_R \Z_m, g_i \leftarrow_R \langle g \rangle}[\mathcal A^{(\cdot)^k, \text{DDH}(\cdot)} (g, g^k, g_1, \cdots g_n) = S]
+\]
+- is negligible, where $S = \{(g_{j_s}, g_{j_s})\ \mid s= 1, \dots, Q+1\}$
+	- $Q$ is the number of $\mathcal A$'s queries to the $(\cdot)^k$ oracle
+	- $j_s \in [N]$ for $s \in [Q+1]$
+
+- *Theorem 1.* Suppose the $(N,Q)$ one more assumption DH assumption holds for $\langle g \rangle$, wher $Q$ is the number of functionality executions (i.e. the total amount of messages with $\textsc{Eval}$ sent by $U$) and $N=Q +q_1$ where $q_1$ is the number of $H_1(\cdot)$ queries. Then protocol 2Hash-DH UC realizes the $\mathcal{F}_{\text{OPRF}}$ functionality
+
+** PPSS: Security Definitions
+*** Definition
+- *Definition 1.* PPSS scheme $(\text{ParGen}, \text{SKeyGen}, \textsc{Init}, \textsc{Rec})$ involves user $U$ and $n$ servers $S_1, \dots, S_n$:
+	- $\text{ParGen}$: Given security parameter $\ell$, generates public parameters $crs$
+	- $\text{SKeyGen}$: $S_i$, given $crs$, generates its private state $\sigma_i$
+	- $\textsc{Init}$ is a protocol between $U$ and $S_1, \dots, S_n$ s.t.
+		- $U$ runs algorithm $\mathsf{U}_{\mathsf{Init}}$, which given $crs$ and a password $\text{pw}$, outputs a private key $K \in \{0,1\}^\ell$.
+		- $S_i$ runs algorithm $\mathsf{S}_{\mathsf{Init}}$, which given $crs$ and $\sigma_i$, outputs user-specific information $\omega_i$
+	- $\textsc{Rec}$ is a protocol between $U$ and $S_1, \dots, S_n$ s.t.
+		- $U$ runs algorithm $\mathsf{U}_{\mathsf{Rec}}$, which given $crs$ and $\text{pw}$, outputs a private key $K' \in \{0,1\}^\ell \cup \{\bot\}$.
+		- $S_i$ runs algorithm $\mathsf{S}_{\mathsf{Rec}}$ on input $crs, \sigma_i, \omega_i$
+
+*** The Game-Based Definition
+- *Correctness.* If user $U$ interacts with uncorrupted servers then it must reconstruct the same key that was generated in the initiation process i.e. any $\ell$, any $crs \leftarrow \sc{ParGen}(1^\ell)$, any $(\sigma_1, \dots, \sigma_n) \leftarrow \text{SKeyGen}(crs)$, any $\text{pw} \in \mathsc{D}$, any $K \leftarrow \textsc{Init}(crs, \text{pw})$, and any $K' \leftarrow \textsc{Rec}(crs, \text{pw})$, we have $K' = K$
+
+- *Security.* Assume that an adversary $\mathcal A$ corrupts subset $B$ of up to $t$ out of the $n$ servers and 

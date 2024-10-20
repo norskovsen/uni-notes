@@ -1,0 +1,28 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file /home/martin/Dropbox/Notebook/UNI/S5/Distribuerede-Systemer-og-Sikkerhed.org
+
+
+* Types of Distributed Systems Models 
+	:PROPERTIES:
+	:ARCHIVE_TIME: 2018-08-25 Sat 17:56
+	:ARCHIVE_FILE: ~/Dropbox/Notebook/UNI/S5/Distribuerede-Systemer-og-Sikkerhed.org
+	:ARCHIVE_OLPATH: Introduction (Chapter 1)/Distributed Systems
+	:ARCHIVE_CATEGORY: Distribuerede-Systemer-og-Sikkerhed
+	:END:
+- *Fully synchronous:* Each process $P$ has a clock $c(P)$ and there is a known bound $\Delta_\text{CLOCK}$ on how far they drift from real time.
+	- There is also a known upper bound $\Delta_\text{SEND}$ on how long it takes to send a message between any two parties
+	- The model often assumes some noting of global time what is used to define what the real time is.
+	- $N$ is used to denote nature and $c(N)$ to denote real time: the time of nature
+
+- *Fully asynchronous:* The process $P$ do not even have clocks
+	- The protocols cannot be specified b asking parties to do things at specific times
+	- There are no know upper bound on how long it takes to send a message
+	- It is assumed that if a message is sent by a correct process and that process never crashes
+	- The delivery is model as follows
+		- There is a value $\Delta_\text{SEND}$
+		- If a message is send by a correct process that does not crash then it is delivered within that bound
+
+- *Eventually synchronous:* A popular mixed model, where the processors have clocks.
+	- Two bounds $\Delta_{CLOCK}$ and $\Delta_{SEND}$ are given 

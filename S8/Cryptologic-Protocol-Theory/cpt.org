@@ -1,0 +1,886 @@
+* General
+** Info
+- *Lectures:* https://aarhusuniversity.zoom.us/j/631604452
+
+** Header
+*** Packages
+#+LaTeX_HEADER: \usepackage{stmaryrd}
+	
+*** Commands
+#+LaTeX_HEADER: \renewcommand{\P}{\mathsf{P}}
+#+LaTeX_HEADER: \renewcommand{\S}{\mathsf{S}}
+#+LaTeX_HEADER: \renewcommand{\F}{\mathsf{F}}
+#+LaTeX_HEADER: \renewcommand{\A}{\mathsf{A}}
+#+LaTeX_HEADER: \renewcommand{\B}{\mathsf{B}}
+#+LaTeX_HEADER: \newcommand{\view}{\text{view}}
+#+LaTeX_HEADER: \newcommand{\IS}{\mathcal{IS}}
+#+LaTeX_HEADER: \newcommand{\Env}{\text{Env}}
+#+LaTeX_HEADER: \newcommand{\COM}{\mathtt{COM}}
+#+LaTeX_HEADER: \newcommand{\infl}{\mathtt{infl}}
+#+LaTeX_HEADER: \newcommand{\leak}{\mathtt{leak}}
+#+LaTeX_HEADER: \newcommand{\FCOM}{\F_{\COM}}
+#+LaTeX_HEADER: \newcommand{\commit}[2]{\langle #1 \rangle_{#2}}
+#+LaTeX_HEADER: \newcommand{\verf}[2]{\llbracket #1 \rrbracket_{#2}}
+
+* Graph Nonisomorphism 
+- $P$ is trying to convince $V$ that two graphs $G_0$ and $G_1$ are not isomorphic
+	- The graphs has $n$ vertices and $n$ edges
+	- Let $B = \{0,1\}$
+	- Making a *random isomorphic copy* of $G$ means: choose a random permutation $\phi$ on $n$ points and compute $\phi(G)$
+
+- Protocol for Graph Nonisomorphism which are repeated $n$ times
+	1. $V$ chooses a random bit $\alpha$ and constructs a graph $H$ as a random isomorphic copy of $G_{\alpha}$. He then does the following for $i= 1, \dots, s$
+		 a) Choose $\alpha_i \in B$
+		 b) Construct a pair $(H_0^i, H_1^i)$ of graphs, such that
+				- if $\alpha_i = 0$ then $H_0^i$ is a random isomorphic copy of $G_0$ and $H_1^i$ is a random isomorphic copy of $G_1$
+				- otherwise $H_0^i$ is a random isomorphic copy of $G_1$ and $H_1^i$ is a random isomorphic copy of $G_0$
+		 c) He sends $H$ and all pairs $(H_0^i, H_1^i)$ to $P$
+	2. $P$ chooses $b_1, \dots, b_s$ at random in $B$ and sends them to $V$
+	3. For each $i=1,\dots, s$, $V$ sends the following to $P$
+		 - If $b_i = 0$ the isomorphisms between $(H_0^i, H_1^i)$ and $(G_0, G_1)$ are sent
+		 - If $b_i = 1$ an isomorphism from $H$ to one of $(H_0^i, H_1^i)$ is sent
+	4. For each value of $i$, $P$ checks that the appropriate isomorphisms were sent
+		 - If not he stops
+		 - Otherwise, he computes $b$ such that $G_b$ is isomorphic to $H$ and sends $b$ to $V$
+		 - If no such $b$ exists he sends a randomly chosen value
+	5. $V$ accepts, if $\alpha = b$, otherwise he reject
+
+- *Theorem 1.* The above protocol is an interactive proof system for graph nonisomorphism
+
+- *Theorem 2.* The above protocol is perfect zero-knowledge
+
+* Zero-Knowledge for all of NP
+- If the prover $P$ claims $x \in L$ for some $L \in NP$ it can be assumed that $P$ knows some witness $w$ either he can computed it using his infinite computing power or he knows it in advance
+
+- *Theorem 3.* If a perfectly hiding and computational binding commitment scheme is used, then the Graph Hamiltonicity protocol is a perfect zero-knowledge interactive argument for Graph Hamltonicity
+	- *Remark 1.* If the commitment scheme was only unconditionally, the protocol would have been statistically and not perfect zero-knowledge
+
+- *Lemma 1.* Consider any matrix of commitments $C$ sent in step (a). Let $R_{0}$ be a possible reply from a (not necessarily honest) prover to $b=0$, similarly $R_{1}$ is a possible reply to $b=1$. If $V$ accepts both $R_{0}$ and $R_{1}$ and if every commitment from $C$ that is opened in $R_{1}$ is also opened to reveal 1 's in $R_{0}$, then $G$ is Hamiltonian.
+
+* MPC Protocols with Passive Security
+** Introduction
+- *Semihonest* or *passive security* is when all the players learn nothing more than their own inputs and the outputs they were supposed to receive even if their computing power is unbounded if all the players follow the protocol
+- It is assumed that each pair of players can communicate through a perfectly secure channel
+
+** Secret Sharing
+*** Sharmir's secret-sharing scheme
+ - It is based on polynomials over a finite field $\mathbb F$
+ - The only restriction on $\mathbb F$ is that $|\mathbb F| > n$
+	 - It is assumed for correctness and simplicity that $\mathbb F = \mathbb Z_p$ for some prime $p>n$
+ - A value $s \in \mathbb F$ is *shared* by
+	 a) Choosing a random polynomial $f_s(X) \in \mathbb F[X]$ of degree at most $t$ such that $f_s(0) = s$
+	 b) Sending privately to player $P_j$ the share $s_j = f_s(j)$
+ - Any set of $t$ or fewer shares contains no information on $s$
+
+*** *Lagrange Interpolation*
+- If $h(X)$ is a polynomial over $\mathbb F$ of degree at most $l$, and if $C$ is a subset of $\mathbb F$ with $|C| = l+1$ then
+\[
+	h(X) = \sum_{i \in C} h(i) \delta_i(X)
+\]
+- where $\delta_i(X)$ is the degree $l$ polynomial such that for all $i,j \in C$, $\delta_i(j) = 0$ if $i \neq j$ and $\delta_i(j) = 1$ if $i=j$ i.e.
+\[
+	\delta_i(X) = \prod_{j \in C, j \neq i} \frac{X-j}{i-j}
+\]	
+	
+- A consequence of Lagrange interpolation is that there exist easily computable values $\mathbf r = (r_1, \dots, r_n)$ such that 
+\[
+	h(0) = \sum_{i=1}^n r_i h(i)
+\]
+- for all polynomials $h(X)$ of degree at most $n-1$ i.e. $r_i = \delta_i(0)$
+	- $\mathbf r = (r_1, \dots, r_n)$ is called the recombination vector
+	- The *same* recombination vector $\bf r$ works for all $h(X)$ since $\delta_i(X)$ does not depend on $h(X)$
+
+- Another consequence is that for all secrets $s \in \mathbb F$ and all $C \subset \mathbb F$ with $|C| = t$ and $0 \notin C$, if one sample a uniformly random $f$ of degree $\leq t$ and with $f(0) = s$, then the distribution of the $t$ shares 
+\[
+	(f(i))_{i \in C}
+\]
+- is the uniform distribution on $\mathbb F^t$	
+
+** A Passively Secure Protocol
+*** Arithmetic Circuits
+- A protocol that can securely evaluate a function with inputs and outputs in a finite field $\mathbb F$
+	- It is constructed for the case where each party has exactly one input and one output from $\mathbb F$ i.e. $f: \mathbb F^n \to \mathbb F^n$, $(x_1, \dots, x_n) \to (y_1, \dots, y_n)$
+	- It is assumed that the mapping is described using an arithmetic circuit
+
+- An *arithmetic circuit* is an acyclic directed graph where each node is called a *gate* and the edges are called *wires*
+	- Each gate has at most two incoming wires
+	- Types of gates
+		- $n$ input gates
+			- No incoming wires and any number of outcoming wires
+			- Labeled by $i$ for a player $P_i$
+			- Player $P_i$ supplies that secret input value $x_i$ which it copied onto all outgoing wires
+		- Some number of internal addition and multiplication gates
+			- Two incoming wires and any number of outcoming wires
+			- Add or multiply their two inputs onto the outgoing wires
+		- Multiply-by-constant gates
+			- One input wire and any number of output wires
+			- Labeled by a constant $\alpha \in \mathbb F$ and does multiplication by $\alpha$
+		- $n$ output gates
+			- Labeled by $i$ for a player $P_i$
+			- Assigned to the input wire of this gate is eventually $y_i$
+	- Evaluating a circuit can be done as follows
+		1) Assign the value $x_i$ to the wire(s) coming out of the input gate labeled $i$
+		2) Take the first gate for which all input values have been assigned to (some numbering is assumed)
+			 a) Compute the output value
+			 b) Assign it to the output wire(s) of the gate
+			 c) Repeat until all wires have had values assigned
+	- The order in which one visit the gates in this procedure is called the *computational ordering*
+	- This can be used to simulate a boolean circuit with and negation and therefore be used to compute any function
+		- It can be simulated by operations in $\mathbb F$
+		- Boolean values ~true~ or ~false~ can be encoded as 1 resp. 0
+		- The negation of bit $b$ is $1-b$
+		- The and of bits $b$ and $b'$ is $b \cdot b'$
+
+- It is assumed that a circuit that is to computed securely contains a multiplication gate immediately before each output gate and this only has one output wire
+	- If the circuit does not satisfy the condition for output $y_j$ one can introduce an extra input $x_j'$ from $P_j$ and then change to a new circuit that multiplies $y_j$ by $x_j'$ just before the output gate
+	- It makes the circuit at most a constant factor larger
+	- By choosing $x_j' = 1$, $P_j$ will still learn the same value
+
+*** The Protocol
+- The protocol given assume secure channels between all parties
+- It is assumed that some subset $C$ of size at most $t$ together after the protocol and learn as much information as the can from the data they have seen
+	- The players in $C$ are *corrupt*
+	- The players not in $C$ are *honest*
+
+- *Definition 3.1* Define $[a;f]_t$, where $a \in \mathbb F$ and $f$ is a polynomial over $f$ with $f(0) = a$ and degree at most $t$:
+\[
+	[a;f]_t = (f(1), \dots, f(n))
+\]
+- i.e. the set of shares in secret $a$ computed using polynomial $f$
+	- Sometimes written as $[a;f]$ or just $[a]$
+	- It describes an object i.e. shares $(f(1), \dots, f(n))$ and a statement $f(0) = a$
+	- The notation $[a;f]_t$ describes the same object, $(f(1), \dots, f(n))$ but also states that $\deg(f) \leq t$
+
+- Using the standard notation for entrywise addition, multiplication by a scalar and the Schur product, we have for $\alpha \in \mathbb F$
+\begin{align*}
+	[a;f] + [b;g] &= (f(1) + g(1), \dots, f(n) + g(n)) \\
+	\alpha[a;f] &= (\alpha f(1), \dots, \alpha,f(n)) \\
+	[a;f] * [b;g] &= (f(1)g(1), \dots, f(n)g(n))
+\end{align*}	
+
+- *Lemma 3.2* The following holds for any $a,b,\alpha \in \mathbb F$ and any polynomials $f,g$ over $\mathbb F$ of degree at most $t$ with $f(0) = a$ and $g(0) = b$
+\begin{align*}
+	[a;f] + [b;g] &= [a+b ; f + g]_t \\
+  	\alpha[a;f] &= [\alpha a; \alpha f]_t \\
+	[a;f] * [b;g] &= [ab;fg]_2t
+\end{align*}	
+
+- *Definition 3.3* A player $P_i$ *distributes* $[a;f_a]_t$ means the it chooses a random polynomial $f_a(X)$ of degree $\leq t$ with $f_a(0) = a$ and then sends the share $f_a(j)$ to $P_j$ for $j=1,\dots,n$
+	- Whenever players have obtained shares of a value $a$ based on polynomial $f_a$ then the players *hold* $[a;f_a]_t$
+	- If players hold $[a;f_a]_t, [b;f_b]_t$ then one says that the players compute $[a;f_a]_t + [b;f_b]_t$ to mean that each player $P_i$ computes $f_a(i) + f_b(i)$ and thus players now  $[a+b;f_a + f_b]_t$
+
+*** Analysis
+[[file:MPC Protocols with Passive Security/screenshot_2020-03-24_12-13-17.png]]	
+- The two conditions is required for the CEPS protocol to get security
+	- *Perfect correctness* With probability $1$ all players receive outputs that are correct based on the inputs supplied
+	- *Perfect privacy* Any subset $C$ of corrupt players of size at most $t<n/2$ learns no information beyond $\{x_j,y_j\}_{P_j \in C}$ from executing the protocol, regardless of their computing power
+	
+** Optimality of the Corruption Bound
+TODO	
+	
+* Interactive Systems
+** Definition
+- An *interactive agent* $A$ is a computational device that receives and sends messages on named ports and that holds an internal state
+
+- An *interactive agent* is formally a tuple $A = (\text{In}, \text{Out}, \text{State}, \text{State}, \text{Msg}, T, \sigma_0)$ where
+	- $\text{In}$ is a finite set of names of inports
+	- $\text{Out}$ is a finite set of names of outport
+	- $\text{State}$ is a set of possible states
+	- $\text{Msg}$ is a set of possible messages with at least $0,1 \in \text{Msg}$
+	- $T$ is the transition algorithm
+		- It takes an input $(\kappa, \sigma, I)$, where
+			- $\kappa \in \mathbb N$ is the security parameter
+			- $\sigma \in \text{State}$ is the current state
+			- $I \in \text{Msg}$, or $I \in \text{In}$ or $I \in \{\mathtt{EOQ}, \mathtt{SNT}, \mathtt{ILM}\}$
+		- If the agent just tried to read on one of its inports, then it receives $I \in \text{Msg}$ if there were messages ready and otherwise $I = \mathtt{EOQ}$
+		- The input $I = \mathtt{SNT}$ is given to the agent when it just sent a message
+		- The input $I \in \text{In}$ is for the first activation of an agent to tell it on which port it was activated
+			- Called the *activation port*
+		- The input $I=\mathtt{ILM}$ indicates that the queue that was read contained an illegal message, that is, a message not from Msg.
+		- The output of $T$ is of one of the following forms:
+			- $(\mathtt{send}, \P, m)$ where $\P \in \text{Out}$ is the port to send on and $m \in \text{Msg}$ is the message to send
+			- $(\mathtt{read}, \P)$ where $\P \in \text{In}$ is the port to read on
+			- $(\mathtt{return}, \mathsf{RP})$ where $\mathsf{RP} \in \text{Out}$ is the return port
+		- The purpose of the *return port* is to specify which agent to activate next in a larger system
+			- The agent connected to the return port will be activated next
+	- Let $\text{In}(A)$ be the component In from $\mathsf{A}$, we let $\text{Out}(A)$ be the component Out from $\mathsf{A}$ let
+		- $\text{Ports}(\A) \stackrel{\text{def}}{=} \text{In}(\A) \cup \text{Out}(\A)$
+
+[[file:Preliminaries/screenshot_2020-04-15_12-43-55.png]]
+- Running an agent is called an *activation*
+	- In each activation the agent can
+		- Read on ports several times
+		- Send on ports several times
+		- Update its current state
+	- The initial state is $\sigma_0$
+	- At the end of the activation it the specifies a return port
+
+[[file:Preliminaries/screenshot_2020-04-15_12-48-53.png]]
+	
+[[file:Preliminaries/screenshot_2020-04-15_12-50-06.png]]
+
+- *Proposition 2.14* The following properties hold for all interactive systems $\IS_1, \IS_2, \IS_3$:
+	1. $\IS_1 \diamond \IS_2 = \IS2 \diamond \IS_1$
+	2. $(\IS_1 \diamond \IS_2) \diamond \IS_3 = \IS_1 \diamond (\IS_2 \diamond \IS_3)$
+
+- For an interactive system $\IS$ and a port name $\P$ that is an inport $\IS$ $\A_\P$ is used to denote the agent from $\IS$ that has an inport named $\P$
+
+- For an interactive system $\IS$ let $\text{In}(\IS)$ be the inports that are not connected to outports, and let $\text{Out}(\IS)$ be the outports that are not connected to inports i.e.
+\begin{align*}	
+	\text{In}(\IS) &\stackrel{\text{def}}{=} (\cup_{\A \in \IS} \text{In}(A)) \backslash (\cup_{A \in \IS} \text{Out}(A)) \\
+	\text{Out}(\IS) &\stackrel{\text{def}}{=} (\cup_{\A \in \IS} \text{Out}(A)) \backslash (\cup_{A \in \IS} \text{In}(A))
+\end{align*}	
+
+- $\text{In}(\IS)$ and $\text{Out}(\IS)$ are called the *open ports* of the system
+- An interactive system is *closed* if $\text{In}(\IS)= \emptyset$ and \text{Out}(\IS) = \emptyset$
+
+[[file:Preliminaries/screenshot_2020-04-15_13-07-33.png]]
+- $\IS$ is *executable* if it is closed and there is some agent $\A$ in $\IS$ that has an inport named $\epsilon$ and an outport named $\epsilon$
+	- The execution begin by activating on the port $\epsilon$ and will end the first time an agent returns on the port $\epsilon$
+	- The execution is activation driven
+		- In each step we activate an agent
+		- Initially an agent $\A_\epsilon$ is activated with inport $\epsilon$ and do it on port $\epsilon$
+		- After this the next agent to be activated is the one that has an inport with the name that the previous agent specified as return port and the agent is activated on that port
+		- This is though of as some activation token $\mathtt @$ being passed around
+
+[[file:Preliminaries/screenshot_2020-04-15_13-08-03.png]]
+
+[[file:Preliminaries/screenshot_2020-04-15_13-08-52.png]]	
+
+[[file:Preliminaries/screenshot_2020-04-15_13-11-41.png]]
+- The port name $\epsilon$ is reserved for closures
+	- i.e. it is assumed that normal interactive systems such as $\IS$ do not use this port name for internal communication since we want the closure $\mathcal Z$ to be the one the one that defines the output of the execution
+
+[[file:Preliminaries/screenshot_2020-04-15_13-11-59.png]]
+** Indistinguishable Interactive Systems
+- Two interactive system are (behaviorly) *indistinguishable* if one cannot tell the difference between them by sending and receiving messages over the open ports of the systems.
+
+[[file:Interactive Systems/screenshot_2020-04-15_13-18-52.png]]
+- For the class of interactive systems $\text{Env}$ let $\text{Env}^\diamon$ be the class of interactive system $\IS$ for which $\mathcal Z \diamond \IS \in \text{Env}$ whenever $\mathcal Z \in \text{Env}$ and $\mathcal Z$ and $\IS$ are port compatible
+
+[[file:Interactive Systems/screenshot_2020-04-15_13-21-33.png]]
+[[file:Interactive Systems/screenshot_2020-04-15_13-29-23.png]]	
+- The same properties hold for $\stackrel{\text{perf}}{=}$, $\stackrel{\text{stat}}{=}$ and $\stackrel{\text{comp}}{=}$
+
+* Models
+** Introduction
+*** Defining Privacy
+- Protocols which are correct and private even if some parties do not follow the protocol are called *robust*
+
+- A protocol is defined to be *private* against corruptions of size $t$ as follows:
+	- Pick an input $(x_1, \dots, x_n)$ to the protocol and make a run of the protocol on this input
+	- Pick some $C \subset \{\P_1, \dots, \P_n\}$ with $|C| \leq t$ and consider the values $\{\text{view}_j\}_{\P_j \in C}$
+		- Where $\text{view}_j$ is the view of party $\P_j$ in the execution
+	- $\{\text{view}_j\}_{\P_j \in C}$ is exactly the information leaked to the corrupted parties $C$ during an execution
+		- The values are called the *leaked values*
+	- The corrupted parties should not be able to learn more than their own inputs and outputs
+		- The values $\{x_j,y_j\}_{\P_j \in C}$ are called the *allowed values*
+
+- A protocol is *private* if it always holds that the leaked values can be computed efficiently from the allowed values
+
+- The actual definition of privacy says the following:
+	- There exists an efficient simulator $\S$ such that the simulated values $\S(\{x_j, y_j\}_{\P_j \in C})$ and the leaked values $\{\view_j \}_{\P_j \in C}$ have the same distribution
+
+*** Defining Robustness
+- An attack on robustness tries to achieve influence rather than knowledge
+- One cannot make any assumption on how the corrupted parties behave
+	- It is assumed that an adversary has taken control over the corrupted parties
+	- The adversary can send any message it likes
+
+- The *actual influence* on a protocol is that any corrupted adversary can change any message he likes in the protocol
+
+- The *allowed influence* on a protocol is that any corrupted adversary can change any of the inputs $x_i$ of the corrupted parties to any $x_i'$
+	- Allowed since this corresponds to running the input with an honest party that has input $x_i'$
+
+- A protocol is *robust* if it always holds that the effect of an actual influence can also be obtained using an allowed influence
+
+- A protocol is *robust* if there exists an efficient simulator $\S$ such that for every adversary attacking the protocol, $\S$ can efficiently compute an allowed influence with the same effect
+
+*** Combining Privacy and Robustness
+- One must require existence of *one single simulator* that simultaneously demonstrates both privacy and robustness
+	- It receives information on how the adversary tries to influence the real protocol and it must translate this efficiently into an allowed influence
+	- It also receives the allowed values and must efficiently simulate the leaked values
+
+*** A sketch of UC Security
+**** Interactive systems
+- Interactive systems consist of a number of interactive agents that can communicate by sending messages on ports
+	- The ports of an agent are names and are divided into inports and outport
+		- Used to describe how the agents are connected
+		- If some agent $\A_1$ outputs a message $m$ on an output named $\mathsf{P}$ and some agent $\A_2$ has an inport also name $\mathsf P$, then $m$ will be input to $\A_2$ on port $\mathsf P$
+	- An agent only changes states when it is explicitly activated on an input
+	- The port which an interactive agent is activated by is called the *activation port*
+		- It is called the activation of the agent
+		- It might
+			- read some of the messages waiting on its inport
+			- possibly change state
+			- possibly sends messages on some of its outports
+		- In the end of an activation, the agent also outputs the name $\mathsf{RP}$ of one of its outports
+			- This is called the *return port*
+			- In a larger system this specifies the next activation port
+			- This is though of as some activation token $\mathsf @$ being passed around between agents
+
+- An *interactive system* $\IS$ is just a set of agents, where no two agents have inports with the same name  and no agents have outports with the same name
+	- To ensure that it is uniquely given how the ports should be connected
+	- If some agent $\mathsf{A}$ have an outport named $\P$ and some agent $\mathsf{B}$ has an inport named $\P$ then $\A$ and $\mathsf{B}$ are connected by $\P$
+	- When the interactive system is executed a message queue will be associated with $\P$
+		- When $\A$ sends a message on $\P$ it is entered to the end of the queue
+		- When $\B$ reads from $\P$ it pops the front element of the queue and receives ~EOQ~ if the queue is empty
+	- If some agent $\A$ in an interactive system $\IS$ has an inport named $\P$ and no agent in $\IS$ has an outport named $\P$ then $\P$ is called an *open inport* of the system $\IS$
+	- An interactive system can $\IS$ can receive messages from its environment on its open inports
+		- Happens by specifying an open inport $\mathsf{AP}$ of the system
+	- The system is activated as follows:
+		1. The agent who has $\mathsf{AP}$ as inport is activated with activation port $\mathsf{AP}$
+			 - It reads messages on some of its inports
+			 - Changes states and sends messages on some of its outports
+			 - Specifies a return port $\mathsf{RP}$
+		2. The agent with an inport named $\mathsf{RP}$ is the activated next with the activation port being $\mathsf{RP}$ and so on
+		3. Done until at some point an agent specifies a return port $\mathsf{RP}$ that is an open outport of the system
+			 - Then activation of the program stops
+			 - It is said that $\IS$ returned with return port $\mathsf{RP}$
+
+- An interactive system is much like an interactive agent it just has more internal structure
+
+**** Behavioral Equivalence
+- Seen from outside the system the only observable events in an activation of $\IS$ are that some values were input on some open inports and that later some values appeared on some open outports
+- One are often not interested in the internal structure of the system
+	- Since it depends on how it is implemented
+	- Only interested in the externally observable input-output behavior
+
+- Two systems are indistinguishable if they give the same outputs on the same outports whenever they get the same inputs on the same open inports
+	- Sometimes called *behaviorally equivalent*
+
+**** Security by Behavioral Equivalence
+- In the UC model the security of a protocol is based on the notion of behaviorally equivalent systems
+- The first step in the formalization is to model the protocol using an interactive system $\pi$
+	- The system $\pi$ will contain an agent $\P_i$ for each party in the protocol
+	- An agent $\mathcal R$ modeling the communication resources that the parties have access to
+		- e.g. an agent securely moving messages between the parties
+	- The party $\P_i$ will have
+		- An inport $\mathtt{in}_i$ on which it receives inputs for the protocol
+		- An output $\mathtt{out}_i$ on which delivers outputs from the protocol
+		- Ports connecting it to resource $\mathcal{R}$
+	- The resource $\mathcal R$ also models the leakage of the communication network and the possible influence that an attacker might have on the communication network
+
+- A potentially much simpler system $\mathsf{F}$ is formulated to specify how a protocol is *supposed* to work
+	- It is formulated such that it always has the intended input-output behavior
+	- It only leaks the allowed values
+	- It only allows the allowed influence
+	- $\mathsf{F}$ is sometimes the *intended functionality* or *ideal functionality*
+	- It is often without internal structure i.e. just a single agent
+		- Since its only job is to have the correct input-output behavior such that we can compare the protocol $\pi$ to $\mathsf{F}$
+
+- A protocol $\pi$ is said to be secure if the system $\pi$ behaves "in the same way" as the ideal functionality $\mathsf{F}$
+	- One says that the protocol $\pi$ is at least as secure as $\mathsf{F}$
+	- When $\pi$ is a secure as the intended functionality $\mathsf{F}$ then one also says that $\pi$ securely implements $\mathsf{F}$
+
+**** The simulator
+- The simulator is used to fix the problem that the protocol $\pi$ and an ideal functionality $\mathsf{F}$ have different amounts of leakage an influence ports
+	- It is another interactive agent $\mathcal{S}$ meant to be connected to $\mathsf{F}$
+	- It connects to the leakage port ~F.leak~ of $\mathsf{F}$ and the influence port ~F.infl~ of $\mathsf{F}$
+		- i.e. it sees the leakage of $\mathsf{F}$ and gets to influence $\mathsf{F}$
+	- It has all the same leakage and influence ports of the players in $\pi$ and of $\mathcal R$
+	- If one connect $\mathcal{S}$ and $\mathsf{F}$ then $F \diamond S$ has the same set of open ports as $\pi$
+
+- $\IS_0 \diamond \IS_1$ is used for composing interactive systems
+	- The two systems are composed by connecting open inports in one system with the open outports in the other system with the same name if they exists with the same name
+	- The ports that are not matched by name becomes the open ports of the composed system
+	- If the systems have two inports or two outports with the same name, the composition is defined to be an erroneous system denoted by $\bot$
+
+- The job of $\mathcal S$ is to make the systems look the same to any distinguisher
+	- Done in a way such that $\mathsf{F} \diamond \mathcal{S}$ behaves like $\pi$
+
+**** Universal Composition
+- The popularity of the UC model comes from its universal composition theorem (UC theorem)
+
+- *The UC theorem:* if $\pi$ is a secure protocol for some task specified by an intended functionality $\F$m then it is safe to use the protocol $\pi$ as a subprotocol in any context where one needs to solve the task at hand
+	- Allows one to analyze a complex protocol $\pi_{\mathsf{CMPLX}}$ in an easier way by abstracting away some subprotocol $\pi$
+	- Calls to $\pi$ are replaced with calls to an ideal functionality $\F$ with the intended input-output behavior of $\pi$
+	- Two things are then needs to be proved to use the UC theorem to conclude that $\pi_{\mathsf{CMPLX}}$ is also secure when it uses $\pi$ as subprotocol instead of calling $\F$
+		1) $\pi_{\mathsf{CMPLX}}$ is secure when it uses the ideal subsystem $\F$ as resource
+		2) The protcol $\pi$ securely implements $\F$
+
+** The UC Model
+*** Clock-Driven Execution
+- Clock-driven execution is used in the UC framework
+	- To capture both synchronous and asynchronous protocols
+
+- All clocked entities in the framework are going to have one or more inports with a name ending in $\mathtt{infl}$ or $\mathtt{infl}_i$
+	- If a clock entry has an inport named $\mathsf{N}.\mathtt{infl}$ then it must have a matching outport names $\mathsf{N}.\mathtt{leak}$ called a *leakage port* a vice versa
+	- A clocked entity receives a clocking signal if it receives the activation token on an inport with the name of the form $\mathsf{N}.\mathtt{infl}$ or $\mathsf{N}.\mathtt{infl}_i$
+		- When it is clocked it must eventually return the activation on the matching outport $\mathsf{N}.\mathtt{leak}$ or $\mathsf{N}.\mathtt{leak}_i$
+	- Before returning the activation token on $\mathsf{N}.\mathtt{leak}$ or $\mathsf{N}.\mathtt{leak}_i$ a clocked entity $\mathsf{C}$ is allowed to do recursive calls to other clocked entities
+		- If $\mathsf C$ has an outport with a name of the form $\mathsf{R}.\mathtt{leak}$ or $\mathsf{R}.\mathtt{leak}_i$ it is allowed to send the activation token on that port
+		- If it later receives the activation token back on $\mathsf{R}.\mathtt{leak}$ or $\mathsf{R}.\mathtt{leak}_i$ it must either return the activation token on $\mathsf{N}.\mathtt{leak}$ or $\mathsf{N}.\mathtt{leak}_i$ or do another recursive call to a clocked entity
+
+- A clocked entity must obey the following rules for activation
+	- *Initialization.* A clocked entity holds as part of its state
+		- A bit $\text{active} \in \{0,1\}$ which is initially set to $0$
+			- When $\text{active}=0$ the clocked entity is said to be inactive
+			- When $\text{active} = 1$ the clocked entity is said to be active
+		- A bit $\text{calling} \in \{0,1\}$ initially set to $0$
+			- When $\text{calling}=1$, the clocked entity is said to be calling
+	- *Activation bounce during inactivity.* If an inactive clocked entity receives the activation token on any port with a name not the form $\mathsf{N}.\mathtt{leak}$ or $\mathsf{N}.\mathtt{leak}_i$
+		- It returns the activation token on the matching outport without doing anything else
+		- It does not read messages, it does not change state and it does not send messages
+	- *Clocking.* If an inactive clocked entity receives the activation token on an open inport with a name of the form $\mathsf{N}.\mathtt{leak}$ or $\mathsf{N}.\mathtt{leak}_i$
+		- It sets $\text{active} \leftarrow 1$ and stores the $\mathsf{CP}$ of the inport on which it was activated
+		- It is said that it was called on $\mathsf{CP}$
+	- *Return or clock.* An active clocked entity is only allowed to send the activation token on an outport
+		- Matching the inport $\mathsf{CP}$ on which it was called
+		- An open outport with the name of the form $\mathsf{R}.\mathtt{leak}$ or $\mathsf{R}.\mathtt{leak}_i$
+	- *Return the call.* If an active clocked entity sends the activation token on the outport matching the inport $\mathsf{CP}$ on which it was called
+		- It sets $\text{active} \leftarrow 0$
+		- It is said that it returned the call
+	- *Recursive call.* If an active clocked entity sends the activation token on an open outport named $\mathsf{R}.\mathtt{leak}$ or $\mathsf{R}.\mathtt{leak}_i$
+		- It first sets calling $\rightarrow 1$
+		- Stores the name $\mathsf{RP}$ of the port on which it did the recursive call
+		- It is said that it did a recursive call on $\mathcal{RP}$
+	- *Activation bounce during calls.* If a calling clocked entity receives the activation token on any inport $\mathsf P$ that does match the outport $\mathsf{RP}$ on which it did the recursive call, then it returns the activation token on the outport matching $\mathsf{P}$ without doing anything else
+	- *Result.* If a calling clocked entity receives the activation token on the inport matching the outport $\mathsf{RP}$ on which it did the recursive call, then it sets calling $\leftarrow 0$
+
+- The definition of a clocked entity can be extended to an interactive system $\IS$ composed of several clocked entities
+	- A system $\IS$ composed of clocked entities is defined to be active if and only if at least one of its constituents is active
+
+- *Lemma 4.5* A composition of clocked entities is a clocked entity
+- *Definition 4.5* A clocked entity is recursive polytime if all its internal computation is expected polytime time (in the security parameter $\kappa$) and it does at most an expected polynomial (in $\kappa$) number of recursive calls before it returns its own call
+- *Lemma 4.7* A composition of recursive polytime clocked entities is a recursive polytime clocked entity
+
+*** Ideal Functionalities
+- An ideal functionality will be an interactive agent
+- Each ideal functionality has a name $\F$
+- The interface of $\F$ is as follows
+	- It has $n$ inports named $\F.\mathsf{in}_1, \dots, \F.\mathsf{in}_n$ and $n$ outports named $\F.\mathsf{in}_1, \dots, \F.\mathsf{in}_n$
+	- The $2n$ ports are called the protocol ports
+	- In addition to the protocol ports $\F$ has two special ports
+		- An inport $\F.\mathsf{infl}$ called the influence port
+		- An outport $\F.\mathsf{leak}$ called the leakage port
+
+*** Protocols
+- A simple protocol $\pi$ consists of just $n$ parties $\P_1, \dots, \P_n$, where each $\P_i$ is an agent
+	- The protocol is the interactive system $\pi = \{\P_1, \dots, \P_n\}$
+	- A simple protocol has a protocol name $\F$
+		- The protocol $\pi$ and the ideal functionality $\F$ that $\pi$ is supposed to implement has the same name
+	- It also has a resource name $R$
+		- This is the name of the resource that $\pi$ uses for communication
+	- The agent $P_i$ is called a simply party and it has six ports 
+		- The port structure of $\P_i$ is derived from the names $\F$ and $R$
+		- It has an inport $\F.\mathtt{in}_i$ and an outport $\mathsf{F}.\mathtt{out}_i$
+			- Called protocol ports
+		- It has an outport named $R.\mathsf{in}_i$ and an inport named $R.\mathsf{out}_i$
+			- Called resource ports
+		- It has an inport named $R.\mathsf{infl}_i$ and an inport named $R.\mathsf{leak}_i$
+			- Called the special ports and are used to model corruption of $\P_i$ and to clock $\P_i$
+
+- All parties have the following standard corruption behavior:
+	- If a party $\P_i$ receives a special symbol (passive corrupt) on $R.\mathtt{infl}_i$, then $\P_i$ returns its internal state $\sigma$ on $R.\mathtt{leak}_i$
+		- The internal state $\sigma$ consists of all randomness used by the party so far along with all inputs sent and received on its ports and the messages in the message queues of its inports
+	- If a party $\P_i$ receives a special symbol (active corrupt) on $R.\mathtt{infl}_i$ then $\P_i$ outputs its current state on $R.\mathtt{leak}_i$ and starts executing the following rules and only these rules:
+		- On input $(\mathtt{read}, \P)$ on $\mathsf{R}.\mathtt{infl}_i$, where $\P$ is an inport of $\P_i$, it reads the next message $m$ on $\P$ and returns $m$ on $R.\mathtt{leak}_i$
+		- On input $(\mathtt{send}, \P, m)$ on $\mathsf{R}.\mathtt{infl}_i$, where $\P$ is an outport of $\P_i$, it sends $m$ to $\P$
+
+*** The Environment
+- Two systems are indistinguishable to an environment $\mathcal Z$ is $\mathcal Z$ cannot tell them apart (except with negligible advantage) by sending and receiving messages on the open ports of the systems
+	- Two systems $S$, $F$ are called *indistinguishable* to a class $Z$ of environments if they are indistinguishable to all $\mathcal Z \in Z$ written $S \stackrel{Z}{\equiv} F$
+	
+*** Comparing Protocols to Their Ideal Functionalities
+- *Definition 4.10 (Security for Simple Protocols)* Let $ST$ and $AT$ denote arbitrary protocol names. Let $F_{ST}$ be any ideal functionality with name $ST$, let $\pi_{st}$ be any simple protocol with protocol name $ST$ and resource name $AT$ and let $F_{AT}$ be any ideal functionality with name $AT$. Then $\pi_{ST} \diamond F_{AT}$ securely implements $F_{ST}$ in environments from $Z$ if there exists a simulator $\mathcal{S}$ for $\pi_{ST}$ such that $\pi_{ST} \diamond F_{AT} \stackrel{Z}{\equiv} F_{ST} \diamond \mathcal S$.
+	- It is also written as $\pi_{ST} \diamond F_{AT} \stackrel{Z}{\geq} F_{ST}$
+	- $\pi_{ST} \diamond F_{AT}$ is at least as secure as $F_{ST}$ in environments from $Z$
+
+*** Composed protocols
+- A composed protocol is just an interactive system composed of simple protocols
+	- The term protocol is used to cover both simple and composed protocols
+
+- A composed party is just an interactive system consisting of simple parties
+
+- The security of composed protocols is defined in the same way as for simple protocols
+
+*** The UC Theorem
+- It is required that is one takes a protocol $\pi$ and an environment $\mathcal Z$ for $\pi$, then $\mathcal Z \diamond \pi$ is again an environment
+
+- *Definition 4.13* Let $\text{Pro}$ be the set of simple and composed protocols in which all simple parties follows the rules for clocked entities and are recursive polytime
+
+- *Lemma 4.14* If $\pi_F \in \text{Pro}$ is a protocol with protocol name $\F$ and resource name $R$ and $\pi_R \in \text{Pro}$ is a protocol with protocol name $R$ and $\pi_{\F} \diamond \pi_R \neq \bot$ then $\pi_{\F} \diamond \pi_R \in \text{Pro}$
+
+- *Definition 4.15* Let $\text{Sim}$ be the set of interactive systems $\mathcal S$ that are a simulator for some protocol. i.e. for $\mathcal S \in \text{Sim}$, it holds that
+	1. There exists a protocol $\pi_{\F}$ (composed or simple) with protocol name $\F$ and an ideal functionality $\F_{F}$ with name $F$ such that $\pi_{F}$ and $\F_{F} \diamond \mathcal S$ have the same special ports
+	2. $\mathcal S$ follows the rules for clocked entities and is recursive polytime
+	3. $\mathcal S$ is corruption preserving
+	4. $\mathcal S$ is clock preserving
+
+- *Lemma 4.16* If $\mathcal S \in \text{Sim}$ and $\mathcal T \in \text{Sim}$ and $\mathcal T$ have two open special ports that connect it to the ideal functionality ports of $\mathcal S$ and $\mathcal S \diamond \mathcal \tau \neq \bot$, then $\mathcal S \diamond \mathcal T \in \text{Sim}$
+
+- *Definition 4.17* $\text{Env}$ is an environment class if the following holds:
+	1. Each $\mathcal Z \in \text{Env}$ has the open port structure of an environment for some simple or composed protocol
+	2. For all $\mathcal Z \in \text{Env}$ and all $\pi \in \text{Pro}$, where $\pi \diamond \mathcal Z \neq \bot$ and the protocol ports of $\pi$ connect to the protocol ports of $\mathcal Z$ in $\pi \diamond \mathcal Z$, it holds that $\pi \diamond \mathcal Z \in \text{Env}$.
+	3. For all $\mathcal Z \in \text{Env}$ and all $\mathcal S \in \text{Sim}$, where $\mathcal S \diamond \mathcal Z \neq \bot$ and the simulation ports of $\mathcal S$ connect to the special ports of $\mathcal Z$, it holds that $\mathcal S \diamond \mathcal Z \in \text{Env}$
+
+- An environment $\mathcal Z$ is called *recursive polytime* if it is polytime and it makes at most an expected polynomial number of calls before it makes its guess
+
+- *Proposition 4.18* Let $\text{Env}^{poly}$ be the set of all recursive polytime systems that have an open port structure of an environment for some simple or composed protocol. Then $\text{Env}^{poly}$ is an environment class
+
+- *Definition 4.19 (UC Security for Protocols)* Let $\F_F$ be an ideal functionality with name $F$, let $\pi_F$ be a protocol with protocol name $\F$ and resource name $R$, and let $\F_R$ be an ideal functionality with name $R$. Let $\text{Env}$ be an environment class.
+	- Then $\pi_F \diamond \F_R$ securely implements $\F_F$ in environments $\text{Env}$ if there exists a simulator $\mathcal S \in \text{Sim}$ for $\pi_F$ such that $\pi_{F} \diamond \F_R \stackrel{\text{Env}}{\equiv} \F_F \diamond \mathcal S$
+	- It is written $\pi_F \diamond \F_R \stackrel{\text{Env}}{\geq} \F_F$
+	- $\pi_F \diamond \F_R$ is at least as secure as $\F_F$ for environments in $\text{Z}$
+
+- *Theorem 4.20 (The UC Theorem)* Let $\text{Env}$ be an environments class. Let $\pi_F \in \text{Pro}$ be a protocol with protocol name $F$ and resource name $G$. Let $\pi_G$ be a protocol with protocol name $G$ and resource name $H$ for which $\pi_F \diamond \pi_G \neq \bot$. Let $\F_F$, $\F_G$ and $\F_H$ be ideal functionalities with names $\F$, $\mathsf{G}$ and $\mathsf{H}$. If $\pi_{\F} \diamond F_G \stackrel{\text{Env}}{\geq} \F_{F}$ and $\pi_{\G} \diamond F_G \stackrel{\text{Env}}{\geq} \F_{G}$, then $(\pi_F \diamond \pi_G) \diamond \F_H \stackrel{\text{Env}}{\geq} \F_F$
+
+** Adversaries and Their Powers
+*** Threshold Security
+- *Threshold security* states that a protocol is secure against at most $t$ corrupted parties for some $t < n$
+	- For any $t$ let $\text{Env}^t$ be the set of $\mathcal Z \in \text{Env}$ that corrupts at most $t$ parties
+
+*** Adaptive Security vs Static Security
+- *Adaptive* security is when the Environments in Env are allowed to corrupt parties when they desire
+	- Called adaptive corruption
+	- The environment is called an *adaptive adversary*
+	- Protocols that can be proven secure against adaptive adversaries are called *adaptively secure*
+
+- Adaptive security sometimes makes security proofs hard or impossible
+	- Therefore static security is specified
+
+- A *static adversary* must specify which parties it is going to corrupt before the protocol starts
+	- Called *static corruption*
+	- Protocols that can be proven secure against static adversaries are called *statically secure*
+	- Env is restricted to the set of $Z \in \text{Env}$ which behaves as follows: before $\mathcal Z$ sends any other messages it does a corruption of some subset $C$ of the parties either passively or actively
+		- This is called the *preamble*
+		- In the simulation $\mathcal S$ sees the initial corruptions done by $\mathcal Z$ and can therefore learn the set $C$ before it has to simulate any leakage or influence
+		- $\text{Env}^{\mathtt{static}}$ is used to denote this set of environments
+
+*** Active Security vs Passive Security
+- Environments $\mathcal Z \in \Env$ are allowed active corruptions by definition
+	- i.e. where the environment takes complete control over the corrupted party
+
+- $\Env^\mathtt{passive}$ is used to denote the set of $\mathcal Z \in \Env$ that only does passive corruptions
+
+- Defines the notions of a *passive adversary* and *passively secure* and *active adversary* and *active secure*
+
+- A protocol that is active secure is called robust
+- A protocol that is passive secure is called private
+
+*** Unconditional Security vs Computational Security
+- When security can be proven against a computationally unbounded adversary we walk about unconditional security
+- When security can only be proven against a polytime adversary we talk about computational security
+	- $\Env^{\mathtt{poly}}$ is used to denote the set of recursive polytime environments
+
+- If it is possible to prove security against unbounded environments and it in addition holds for all $\mathcal Z$ that
+\[
+	\pi_{\mathrm{F}} \diamond \mathrm{F}_{\mathrm{R}} \diamond \mathcal{Z} \stackrel{\mathrm{peff}}{=} \mathrm{F}_{\mathrm{F}} \diamond \mathcal{S} \diamond \mathcal{Z}
+\]
+- instead of just
+\[
+	\pi_{\mathrm{F}} \diamond \mathrm{F}_{\mathrm{R}} \diamond \mathcal{Z} \equiv \mathrm{F}_{\mathrm{F}} \diamond \mathcal{S} \diamond \mathcal{Z}
+\] 
+- then it has *perfect security* 
+
+*** Synchronous vs Asynchronous
+- When talking about synchronous computation we talk in terms of rounds
+	- Each round will consist of two clockings of each party
+		- The first clocking called *inward clocking*, allows the party to send its messages to the ideal functionality that round
+		- The second clocking called *outward clocking*, allows the party to receive its messages from the ideal functionality that round
+	- $\mathcal Z$ is a synchronous environment if it proceeds in rounds, where in each round it behaves as follows:
+		1. It does an inward clocking of all parties that are not actively corrupted
+			 - It is up to $\mathcal Z$ to set the order in which the parties are inward clocked
+		2. Then it possible interacts with $\mathsf{F}_{\mathsf{AT}}$ by sending messages on $\text{AT}.\mathtt{infl}$, clocking $\mathsf{F}_{\mathsf{AT}}$ and looking at the messages output on $\text{AT}.\mathtt{leak}$
+		3. Then it does an outwards clocking of all parties which are not actively corrupted.
+			 - It is up to $\mathcal Z$ to set the order in which the parties are outwards clocked
+
+- In each round the phase from the point at which the first party $\mathsf{P}_i$ that is not actively corrupted is clocked in until the point at which the last party $\P_i$ that is not actively corruption is clocked the *clock-in phase*
+
+- The phase from the point at which the last party $\P_i$ that is not actively corrupted is clocked in until the until the point at which the first party $\P_i$ that is not actively corrupted is clocked out the *negotiation phase*
+
+- The phase from the point in round $r$ at which the last party $\P_i$ that is not actively corrupted is clocked out until the point in round $r+1$ at which the first party $\P_i$ that is not actively corrupted is clocked in the *transition phase*
+	- It is said that the transition phase belongs to round $r$
+
+- The environment $\mathcal Z$ is allowed to do corruption in all phases
+
+- $\Env^\mathtt{sync}$ is used to denote the class of synchronous environments
+
+- If $n$ parties $\mathcal P_1, \dots, \mathcal P_n$ are using $\F_{\mathsf{AT}}$ as communication resource, then even though the parties are synchronized the communication is not since $\F_{\mathsf{AT}}$ is formulated in an inherently asynchronous manner
+	- It is simple to turn $\F_{\mathsf{AT}}$ into an ideal functionality for synchronous communication by adding the following two rules:
+		1. On $(\mathsf{inclock},i)$, process all messages on $\mathsf{AT}.\mathsf{in}_j$ as $\F_{\mathsf{AT}}$ does
+		2. On $(\mathsf{outclock},i)$, for all stored values $(mid, j, i, m)$, delete $(mid,j,i,m)$, and output $(mid, j, m)$ on $\mathsf{AT}.\mathsf{out}_i$
+
+- A *synchronous protocol* is a protocol using an ideal functionality for synchronous communication run in synchronous environment
+		- i.e. a protocol using both clock synchronization and synchronous communication
+
+*** Consensus Broadcast vs Point-to-Point Communication
+- In consensus broadcast all honest receivers are guaranteed to receive the same message even if the sender and some of the other parties are corrupted
+	- This is so hard that it is sometime impossible to implement
+	- One has to make a distinction between the case where a consensus broadcast channel is given for free as part of the model and whether such a channel has to be securely implemented by a subprotocol
+
+*** Combining Environment Classes
+- One can combine the different environment class and get new environment classes e.g.
+\[
+	\Env^{\text {sync, poly, t, static }} \stackrel{\text { def }}{=} \Env ^{\text {sync }} \cap \Env ^{\text {poly }} \cap \Env ^{t} \cap \Env ^{\text {static }}$
+\]
+
+- The intersection of environment classes produces an environment class
+
+** Some Ideal Functionalities
+*** Complete Break Down
+- When we say an ideal functionality $\F_{\mathtt F}$ does a complete breakdown it means that it starts behaving as if all parties were actively corrupted i.e. it starts ignoring all its other code and only executes the following rule:
+	- It first outputs the ideal internal state of all parties on $\F.\mathtt{leak}$
+	- On all subsequent inputs $(\mathtt{send},i,m)$ on $\F.\mathtt{infl}$, it outputs $m$ on $\F.\mathtt{out}_i$
+	- On all subsequent inputs $m$ on $\F.\mathtt{in}_i$, it outputs $(i,m)$ on $\F.\mathtt{leak}$
+
+- One can think of a complete breakdown of an ideal functionality as a technical way to say that from the point in time of the complete breakdown, no security properties of an implementation of $\F_{\mathtt F}$ are required
+
+*** Secure Synchronous Communication and Broadcast
+[[file:Models/screenshot_2020-04-15_10-01-13.png]]
+
+- In the box Agent $\F_{\mathtt{SC}}$ an ideal functionality is given for secure synchronous communication and consensus broadcast
+	- In each round, each party $\P_i$ specifies on message $m_{i,j}$ for each of the other parties $\P_j$ plus a message $m_i$ that $\P_i$ wants to broadcast
+	- At the end of the round each $\P_j$ receives the messages $m_{i,j}$ and $m_i$ from each $\P_i$
+	- The message $m_i$ output to different parties $\P_j$ and $\P_k$ is guaranteed to be the same
+	- All messages are guaranteed to be delivered and there is no way to send different broadcast messages to different parties
+	- Corrupted parties are allowed to see their message first and change their mind on their own message until the round is over
+		- Allows them to change their own message based on what the honest parties are sending
+		- It is called *rushing*
+		- If this was not allowed then it is very hard and sometimes impossible to securely implement this ideal functionality
+	- If a party fails to sends a message in some round then all its messages is set to be the empty string $\epsilon$
+
+*** Secure Synchronous Function Evaluation
+[[file:Models/screenshot_2020-04-15_10-05-50.png]]
+
+- In the box Agent $\F_\mathsf{SFE}^f$ an ideal functionality is given for secure synchronous function evaluation
+	- The case where one parties gives just one input is studies
+	- The ideal functionality can only be used once
+	- Actively corrupted parties are allowed to change their mind as long as the function was not evaluated
+	- The corrupted parties are given their output as soon as their are defined
+	- It is allowed that the adversary determines when the function is evaluated
+		- It is required that it waits until all parties that are not actively corrupted to have given their inputs 
+
+- It is required that all honest parties provide their inputs in the same round
+	- If this is not the case the ideal functionality does a complete breakdown
+	- Assuming that all parties that are not actively corrupted get their inputs in the same round is called *simultaneous input*
+
+- All parties that are not actively corrupted will receive their outputs in the same round
+	- Called *simultaneous output*
+	- This is very convenient in a synchronous environment
+		- Needed if used as a subroutine to ensure synchronous input in the rest of the protocol
+	- It is an important security property
+
+- If consensus broadcast if to be implemented using a secure protocol that only uses point-to-point communication, then it is possible to prove the following two claims
+	1. Any secure realization of consensus broadcast that can tolerate up to $t$ actively corrupted parties and that has simultaneous output uses at least $t+1$ communication rounds, even when no parties are corrupted
+	2. There exist a secure realization of consensus broadcast that can tolerate up to $t$ actively corrupted parties and that has nonsimultaneous output that uses only $\text{min}(t+1, f+2)$ communication rounds, where $f \in \{0, \dots, t\}$ is the number of parties who where actually corrupted during execution of the protocol
+
+- It is allowed that the environment specify the round in which the outputs are delivered
+	- Called *adversarially* chosen output round
+
+* Information-Theoretic Robust MPC Protocols
+** Model for Homomorphic Commitments and Some Auxiliary Protocols
+*** $\FCOM$ definition
+[[file:Information-Theoretic Robust MPC Protocols/screenshot_2020-04-21_11-07-13.png]]	
+[[file:Information-Theoretic Robust MPC Protocols/screenshot_2020-04-21_11-07-30.png]]
+
+- It is assumed that each player $\P_i$ can commit to a value $a \in \mathbb F$ while keeping the choice secret - Each player might choose to reveal $a$ later
+
+- Commitments are modelled by assuming an ideal functionality $\FCOM$
+	- To commit, one simply sends $a$ to $\FCOM$, which will keep $a$ until $\P_i$ asks to have it revealed
+		- Formally it is assumed that $\FCOM$ is equipped with commands ~commit~ and ~open~ as described in the box
+
+	- The implementation of $\FCOM$ requires that all honest players take part actively 
+		- It is required that all honest players in a given round send the same commands to $\FCOM$ in order for the command to be executed
+
+	- $\FCOM$ will do a complete breakdown if
+		- It is not used as intended by the honest parties
+		- An honest party commits under the same $cid$ twice
+		- An honest party use the same $cid_3$ twice in an addition or a multiplication command
+		- The honest parties use some $cid_1$ or $cid_2$ that has not been defined yet
+
+	- The following convention is used for specifying $\FCOM$
+		- When a command gives a particular output, then this output is not delivered immediately.
+			- It will be specified via $\mathtt{COM}.\mathtt{infl}$ in which round to deliver, and in that round, the output to all parties will be given
+		- If a party $\P_i$ is corrupted in between a command given to $\FCOM$ and the output delivery round, then it is allowed that the input of $\P_i$ to the command is changed via $\COM.\infl$ and the outputs will be recomputed accordingly
+		- When a command leaks a value, then the value is output on $\COM.\leak$ in the round where inputs to the commands are given, not in the delivery round
+
+	- The final part of the description of $\FCOM$ includes to *advanced manipulation* commands
+		a) The ~transfer~ command transfer a committed value $a$ from a party $\P_i$ to another $\P_j$
+			 - Equivalent to the $P_j$ having committed to $a$ where $\P_i$ knows the value of $a$
+		b) The ~multi~ command is used by a player to create, given the commitments to $a_1$ and $a_2$ a new commitment that is guaranteed to contain $a_1a_2$
+
+	- The symbol $\commit{\cdot}{i}$ denoted a variable in which $\FCOM$ keeps a committed value received from player $\P_i$
+		- $\commit{a}{i}$ means that player $\P_i$ have committed to $a$
+
+	- The following notation is used as a shorthand for commands
+		a) $\commit{a}{i} \leftarrow a$: the ~commit~ command is executed to let $\P_i$ commit to $a$
+		b) $\commit{a}{i} \Leftarrow a$: the ~pubcommit~ command is used to force $\P_i$ commit to $a$
+		c) $a \leftarrow \commit{a}{i}$: the ~open~ command is executed to let all parties learn $a$
+		d) $(\P_j)a \leftarrow \commit{a}{i}$: the designated ~open~ command is executed to let $\P_j$ learn $a$
+		e) $\commit{a}{j} \leftarrow \commit{a}{i}$: the ~transfer~ command from $\P_i$ to $\P_j$
+		f) $\commit{a_3}{i} \leftarrow \commit{a_1}{i}\commit{a_2}{i}$: the ~mult~ command
+		g) $\commit{a_3}{i} \leftarrow \commit{a_1}{i} + \commit{a_2}{i}$: the ~add~ command
+		h) $\commit{a_3}{i} \leftarrow \alpha\commit{a_2}{i}$: the ~mult~ command
+
+	- One can ask $\FCOM$ to manipulate committed values as long as the involved variables belong to the same party
+
+- The advanced manipulation commands can be implemented from the basic set of operations
+	- i.e. given a functionality $\F_{\COM-\mathtt{SIMPLE}}$ that has all the commands of $\FCOM$ except the advanced manipulation commands one can build protocols that will implement $\FCOM$ when given access to $\F_{\COM-\mathtt{SIMPLE}}$
+
+*** Implementations of the ~transfer~ commands
+[[file:Information-Theoretic Robust MPC Protocols/screenshot_2020-04-21_11-31-48.png]]
+	
+[[file:Information-Theoretic Robust MPC Protocols/screenshot_2020-04-21_11-32-01.png]]	
+
+- *Protocol Transfer* is only statistically secure for any $t < n$
+
+- *Protocol Perfect Transfer* is perfectly secure but requires $t < n/2$
+
+- The idea behind the protocols is that party $\P_i$ reveals to party $\P_j$ and $P_j$ commits to this. Then they prove to the other parties that what the have committed to are then same
+
+*** Implementations of the ~mult~ command
+[[file:Information-Theoretic Robust MPC Protocols/screenshot_2020-04-27_09-13-57.png]]
+
+[[file:Information-Theoretic Robust MPC Protocols/screenshot_2020-04-27_09-14-12.png]]	
+
+- *Protocol Commitment Multiplication* is secure for any $t < n$
+- *Protocol Perfect Commitment Multiplication* is secure for any $t < n/3$
+
+- The idea in Protocol Commitment Multiplication is that $\P_i$ commits to what he or she claims is the product $ab$ and the proves to each other player $\P_k$ that this was done correctly
+	- If $c = ab + \Delta$ for $\Delta \neq 0$ then for each $\P_k$ the proof fails except with probability $1/|\mathbb F|$
+
+- The idea in Protocol Perfect Commitment Multiplication is to have $\P_i$ commit to polynomials $f_a,f_b$ and to what it claims is the product $h=f_af_b$ of the polynomials
+	- The players check that $h(k) = f_a(k)f_b(k)$ in a number of points sufficient to guarantee that $h=f_af_b$
+
+- Let $\pi_{\mathtt{TRANSFER},\mathtt{MULT}}$ be the protocol that
+	- Implements the basic commands by simply relaying the commands to $\F_{\mathtt{COM-SIMPLE}}$
+	- Implements the transfer and multiplication commands by running Protocol Transfer and Protocol Commitment Multiplication on $\F_{\mathtt{COM-SIMPLE}}$
+
+- Let $\pi_{\mathtt{PTRANSFER},\mathtt{PMULT}}$ be the protocol that
+	- Implements the basic commands by simply relaying the commands to $\F_{\mathtt{COM-SIMPLE}}$
+	- Implements the transfer and multiplication commands by running Protocol Perfect Transfer and Protocol Perfect Commitment Multiplication on $\F_{\mathtt{COM-SIMPLE}}$
+
+- *Theorem 5.1* Let $\F_{\mathtt{COM-SIMPLE}}$ be a functionality that has all the commands of $\F_{\mathtt{COM}}$ except the advanced manipulation commands. Then $\pi_{\mathtt{TRANSFER}, \mathtt{MULT}} \diamond \F_{\mathtt{SC}} \diamond \F_{\mathtt{COM-SIMPLE}}$ implements $\FCOM$ in $\Env^{t,sync}$ with statistical security for all $t <n$. Moreover $\pi_{\mathtt{PTRANSFER}, \mathtt{PMULT}} \diamond \F_{\mathtt{SC}} \diamond \F_{\mathtt{COM-SIMPLE}}$ implements $\FCOM$ in $\Env^{t,sync}$ with perfect security for all $t < n/3$.
+
+** A Secure Function-Evaluation Protocol for Active Adversaries
+*** Secure Function Evaluation
+[[file:Information-Theoretic Robust MPC Protocols/screenshot_2020-05-03_10-24-36.png]]	
+- $\P_i$ distributes $\verf{a;f_a}{t}$ means the following
+	- $\P_i$ chooses a polynomial $f_a(X) = a + \alpha_1 X + \cdots + \alpha_t X^t$ with $\alpha_j \in \mathbb F$ at random
+	- Then $\P_i$ commits to the coefficients of $f_a$
+	- The addition and multiplication commands are used to compute a commitment to $f_a(k)$ owned by $\P_i$ for $k=1, \dots, n$
+	- This commitment is transferred to $P_k$
+	- Formally the following sequence of commands of $\FCOM$ is executed
+		1. $\commit{a}{i} \leftarrow a, \commit{\alpha_j}{i} \leftarrow \alpha_j, j=1,\dots,t$
+		2. $\commit{f_a(k)}{i} \leftarrow \commit{a}{i} + \sum_{j=1}^{t} k^j \commit{\alpha_j}{i}, k=1, \dots,n$
+		3. $\commit{f_a(k)}{k} \leftarrow \commit{f_a(k)}{i}, k=1, \dots,n$
+
+- One can do arithmetic on objects of the form $\verf{a;f_a}{t}$
+	- $\verf{a;f_a}{t} + \verf{b;f_b}{t}$ means that one executes $\commit{f_a(k) + f_b(k)}{k} \leftarrow \commit{f_a(k)}{k} + \commit{f_b(k)}{k}$, for $k=1, \dots, n$
+	- $\alpha \verf{a;f_a}{t}$ means that one executes $\commit{\alpha f_a(k)}{k} \leftarrow \alpha \commit{f_a(k)}{k}$, for $k=1, \dots, n$
+	- $\verf{a;f_a}{t} * \verf{b;f_b}{t}$ means that one executes $\commit{f_a(k)f_b(k)}{k} \leftarrow \commit{f_a(k)}{k} \commit{f_b(k)}{k}$, for $k = 1, \dots, n$
+
+- The following one writes to denote that one executes the command sequence on the right side to create the object on the left side
+\begin{align*}
+	\verf{a+b;f_a+f_b}{t} &= \verf{a;f_a}{t} + \verf{b;f_b}{t} \\	
+	\verf{\alpha a; \alpha f_a}{t} &= \alpha \verf{a;f_a}{t} \\	
+	\verf{ab;f_af_b}{2t} &= \verf{a;f_a}{t} * \verf{b;f_b}{t} 
+\end{align*}
+	
+- *Theorem 5.2* $\pi_{\mathtt{CEAS}}^f \diamond \F_{\mathtt{SC}} \diamond \F_{\mathtt{COM}}$ implements $\F^f_{\mathtt{SFE}}$ in $\Env^{t,\mathtt{sync}}$ with perfect security for any $f$ and for all $t < n/3$ 
+
+*** Reactive Functionality
+- Given the results seen about secure function evaluation it is easy to define a *reactive functionality* which keeps internal state and offer to repeatably do the following:
+	- Compute some function that depends on both the state and inputs from the players
+	- Update the state as well as deliver outputs to players
+
+- A secure implementation of such a functionality can easily be done using the way to represent data in $\pi_{\mathtt{CEAS}}$
+	- The state can be represented as a number of objects of form $\verf{a;f_a}$
+	- It is assumed that the inputs from the players are represented in the same form
+	- The function is evaluated using the subprotocols for addition and multiplication
+
+** Realization of Homomorphic Commitments
+*** Introduction
+- It is assumed
+	- That one are in the information-theoretic scenario with secure point-to-point channels and consensus broadcast
+	- Most of the time that $t < n/3$
+
+- The idea is that in order to have a player $D$ commit to $a$ is to ask him or her to secret share $a$
+	- This will hide $a$ from the adversary if $D$ is honest
+	- This ensures the homomorphic properties needed since one can add commitments by adding the share and multiply by a constant by multiplying the shares by a constant
+	- The problem is that if $D$ is corrupt he or she can distribute inconsistent shares and easily "open" a commitment in several ways
+		- To prevent these problem a mechanism must be used to ensure that the shares of all uncorrupted players after committing consistently determine a polynomial $f(X)$ of degree at most $t$ without harming privacy
+
+*** Minimal Distance Decoding
+- $n$ shares out of which at most $t$ are corrupted still uniquely determine the committed value $a$
+	- Even if we don't know which $t$ of them is corrupted
+
+- Let $f(X)$ be a polynomial of degree at most $t$ and define the shares
+\[
+	\mathbf{s}_f \stackrel{\text{def}}{=} (f(1), \dots, f(n))
+\]
+- and let $\mathbf{e} \in \mathbb F^n$ be an arbitrary "error vector" subject to
+\[
+	w_H(\mathbf{e}) \leq t
+\]	
+- where	$w_{H}$ denotes the Hamming weight of a vector (the number of its non-zero coordinates) and define
+\[
+	\mathbf{\tilde s}	\stackrel{\text{def}}{=} \mathbf{s} + \mathbf{e}
+\]
+
+- $a$ is uniquely defined by $\mathbf{\tilde s}$
+	
+*** Redundant Sharing Using Bivariate Polynomials
+- All needed to is a protocol ensuring that all honest parties end up holding consistent shares of some value while preserving privacy
+
+- To do a redundant sharing $\P_i$ chooses a polynomial in two variables i.e.
+\[
+	f_a(X,Y) = \sum_{\sigma, \tau=0}^t \alpha_{\sigma,\tau} X^\sigma Y^\tau
+\]
+- where $\alpha_{\sigma, \tau}$ are random subject to two constraints:
+	- $\alpha_{0,0} = a$ i.e. $f_a(0,0) = a$
+	- The polynomial is symmetric i.e. $\alpha_{\sigma, \tau} = \alpha_{\tau,\sigma}$
+
+- The committer will send a polynomial in one variable to each player $P_k$ i.e.
+\[
+	f_k(X) = f_a(X,k) = \sum_{\sigma=0}^t \left(\sigma_{\tau = 0}^t \alpha_{\sigma,\tau} k^\tau \right)	X^\sigma
+\]
+- i.e. simply sending its coefficients
+
+*** Interpretation in Terms of Standard Secret Sharing
+- Consider the polynomial 
+\[
+	g_a(X) = f_a(X,0) = \sum_{\sigma=0}^t \alpha_{\sigma,0} X^\sigma
+\]
+- which is a polynomial of degree at most $t$ such that $g_a(0) = a$
+	- Since $f_a$ is symmetric it follows that $g_a(k) = f_a(k,0) = f_a(0,k) = f_k(0)$
+	- By distributing the information described the committer has secret shared $a$ in the standard way using the polynomial $g_a(X)$ where the /k/'th share if $f_k(0)$
+
+*** Consistency Check
+- The key to checking consistency of the information $\P_i$ distributes is to observer that by symmetry of $f_a(X,Y)$ the following holds for any two players $\P_k,\P_j$ 
+\[
+	f_k(j) = f_a(j,k) = f_a(k,j) = f_j(k)
+\] 
+
+- The idea for the protocol is then the following
+	- After each player $\P_k$ has received $f_k(X)$ it will check with each other player $\P_j$ whether it is the case that $f_k(j) = f_j(k)$
+	- If all pairwise checks go though for a set of at least $t+1$ honest players, their information is sufficient to determine a polynomial of degree at most $t$ on which all the honest players eventually agree
+
+[[file:Information-Theoretic Robust MPC Protocols/screenshot_2020-05-03_13-39-12.png]]
+
+[[file:Information-Theoretic Robust MPC Protocols/screenshot_2020-05-03_13-39-31.png]]	
+
+- *Lemma 5.4* If $\P_i$ remains honest throughout Protocol Commit, the view of any $t$ corrupted players is independent of the committed value $a$, and all the players who are honest at the end of the protocol will output shares consistent with $a$ and the polynomial $g_a(X)$ that $\P_i$ distributed
+
+- *Lemma 5.5* If $t < n/3$, then no matter how corrupt players behave in Protocol Commit players who are honest at the end of the protocol will all output ~fail~ or will output a set of shares in some value $a'$ all consistent with a polynomial $g_{a'}(X)$ of degree at most $t$
+
+- *Theorem 5.6* $\pi_{\mathtt{PERFECT-COM-SIMPLE}} \diamond \F_{\mathtt{SC}}$ implements $\F_{\mathtt{COM-SIMPLE}}$ in $\Env^{\mathtt{t,sync}}$ with perfect security for all $t < n/3$
+
+*** Adaptive Corruption
+[[file:Information-Theoretic Robust MPC Protocols/screenshot_2020-05-03_16-35-22.png]]
+- To simulate for adaptive corruption $\mathcal S_{\mathtt{PERFECT-COM-SIMPLE}}$ is started in the state where all players are honest
+	- It works with virtual players $\bar \P_i$
+	- When we get to a point where a new player $\P$ is corrupted we corrupt $\P$ on $\F_{\mathtt{COM-SIMPLE}}$ and get the set of values it has committed to from its leakage port
+		- Using these data one then adjust the views of the virtual players so that they are consistent with the new values learned and everything the environment has seen so far
+		- This view of $\bar \P$ is given to the environment and continue the simulation following the algorithm of $\mathcal{S}_{\mathtt{PERFECT-COM-SIMPLE}}$
+
+- The procedure for adjusting views is as follows
+	- Every value committed by $\P$ will be given
+	- For every such value $a$, the state of $\mathcal{S}_{\mathtt{PERFECT-COM-SIMPLE}}$ contains a polynomial $f_{\bar a}(X,Y)$ that is part of its state for the virtual player $\bar \P$
+	- Replace $f_{\bar a}(X,Y)$ by $f_{\bar a}(X,Y) + (a- \bar a)h(X)h(Y)$, where $h(\cdot)$ is a polynomial that is $1$ in $0$ and $0$ in all points of players that were corrupted earlier
+	- The views of all virtual players adjusted accordingly
+	- By the invariant of $\mathcal S_{\mathtt{PERFECT-COM-SIMPLE}}$, $f_{\bar a}(X,Y)$ is a random polynomial consistent with $\bar a$ and the views of corrupt players
+		- This is maintained by the adjustment were $\bar a$ is replaced by $a$
+

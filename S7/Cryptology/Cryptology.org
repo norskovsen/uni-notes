@@ -1,0 +1,1141 @@
+* Symmetric Cryptosystems and Their History
+** General
+- A cryptosystem is a triple $(G,E,D)$ of algorithms for key generation, encryption and decryption
+	- $G$ *algorithm for generating keys*:
+		- A probabilitstic algorithm
+		- Takes no input and always outputs a key $K \in \mathcal K$
+		- It outputs a key space $\mathcal K$ 
+	- $E$ *algorithm for encryption*:
+		- Takes as input $K$ and $x \in \mathcal P$
+		- Produces output $E_K(x) \in \mathcal C$
+		- May be probabilistic
+	- $D$ *algorithm for decryption*:
+		- Takes as input $K$ and $y \in \mathcal C$
+		- Produces as output $D_K(y) \in \mathcal P$
+		- Allowed to be probabilistic but mostly deterministic
+
+- A symmetric cryptosystem is where the information you needed to encrypt is the same as what your trying to encrypt
+- For a symmetric system, there are 3 finite sets given:
+	- The key space $\mathcal K$
+	- The plaintext space $\mathcal P$
+	- The ciphertext space $\mathcal C$  
+
+- It is required for any cryptosystem that for any key output correct decryption is possible
+	- i.e. it holds that for any $x \in P, x = D_K(E_K(x))$
+
+- The following is the *Shift Cipher* (Caesar substitution), where $\mathcal K= \mathcal P= \mathcal C = \mathbb Z_n$ and works as follows:
+	- *Key Generation* Output $K$ chosen uniformly at random from $\mathcal K$ 
+	- *Encryption* Set $E_K(x) = (x + K) \text{ mod } n$
+	- *Decryption* Set $D_K(y) = y-K \text{ mod } n$
+
+** Attacks on Symmetric Cryptosystems
+- The adversary is thought of as a probabilistic algorithm $A$
+	- The data the adversary obtains is modeled as an oracle $O$
+	- At any time $A$ may call the oracle and obtain an answer
+
+- Different form of attacks can be modeled as below where $K$ is chosen from $G$ and is fixed:
+	- *Ciphertext Only Attack:*
+		- Some plaintext distribution $D$ is fixed and the algorithm $A$ may depend on $D$
+		- Each time $A$ calls the oracle it will return $E_K(x)$ where $x$ is chosen according to $D$
+	- *Known Plaintext Attack:*
+		- A plaintext distribution $D$ is fixed
+		- The algorithm might depend on $D$
+		- Each time $A$ calls the oracle it will return $x, E_K(x)$ where $x$ is chosen according to $D$
+		- Models cases where the adversary can guess with good probability what part of the plaintext is
+	- *Chosen Plaintext Attack:*
+		- $A$ can call the oracle giving it any input $x \in \mathcal P$ as input
+		- The oracle returns $E_K(x)$
+		- Models cases where the adversary can influence the sender into sending some message of the adversary's choice
+	- *Chosen Ciphertext Attacks:*
+		- $A$ can call the oracle giving it any $y \in \mathcal C$ as input
+		- The oracle returns $D_K(y)$
+		- Models cases where the adversary sends a ciphertext he constructed to the receiver and when monitoring the receiver's behavior he might get new information
+
+- When $A$ stops it outputs some result
+	- In the best case for the adversary it is the secret key
+	- Adversaries with much less ambitious goals might also be considered
+		- e.g. computing some partial information on an unknown plaintext
+
+- The shift cipher can be attacked using exhaustive key search or frequency analysis for a ciphertext only attack
+
+** More Historic Examples
+*** The Affine Cipher
+- It is a variant of the shift cipher (thought to be more secure but is not)
+- It has $\mathcal P = \mathcal C = \mathbb Z_n$ $\mathcal K = \mathbb Z_n^* \times \mathbbb Z_n$
+
+- It works as follows:
+	- *Key Generation* Output $K = (a,b)$ chosen uniformly at random from $\mathcal K$
+	- *Encryption* Set $E_K(x) = ax +b \text{ mod } n$
+	- *Decryption* Set $D_K(y) = a^{-1}(y-b) \text{ mod } n$
+
+- It is easy to break under ciphertext only attack
+	- Two letters should be found to break it and can be done using frequency analysis
+
+*** General Substitution
+- It is the most general attempt at a substitution cipher
+- It sets $\mathcal P = \mathcal C = \mathbb Z_n, \mathcal K = \Sigma_n$
+	- $\Sigma_n$ is the set of all permutation of $n$ items
+
+- The system works as follows
+	- *Key Generation* Output $K = \pi$ chosen uniformly at random from $\mathcal K$
+	- *Encryption* Set $E_K(x) = \pi(x) \text{ mod } n$
+	- *Decryption* Set $D_K(y) = \pi^{-1}(x) \text{ mod } n$
+
+- It is hard to guess under ciphertext-only attack but is possible through frequency analysis and assuming English plaintext
+
+- Exhaustive key search is infeasible
+	- Demonstrates that a large key space is necessary for security but is no guarantee
+
+*** The Vigenere Cipher
+- It sets $\mathcal P = \mathcal C = \mathcal K = \mathbb Z_n^t$
+	- where $t$ is a parameter called the *block size* which is secret
+
+- It works as follows:
+	- *Key Generation* Output $K=(k_1, \dots, k_t)$ chosen uniformly at random from $\mathcal K$
+	- *Encryption* Set $E_{k_1, \dots, k_t}(x_1, \dots, x_t) = (x_1 + k_1) \text{ mod } n, \dots, (x_t + k_t ) \text{ mod } n$
+	- *Decryption* Set $D_{k_1, \dots, k_t}(y_1, \dots, y_t) = (y_1 - k_1) \text{ mod } n, \dots, (y_t - k_t ) \text{ mod } n$
+
+- It will give a flat distribution
+
+- If one knows the blocks size it can be broken using frequency analysis
+- The block size can be found by trying a block sizes until one produces non flat distribution for all groups of texts
+	- This can be done in natural languages by looking for the spike for $e$
+	- There is also a measure of flatness called the Index of Coincidence (IC) which is defined from a probability distribution $p_0, \dots, p_{n-1}$ on the letters of the alphabet then it is defined as
+\begin{equation*}
+  IC(p_0, \dots, p_{n-1}) = \sum_{j=0}^{n-1} p_j^2
+\end{equation*}
+- The IC value is the probability that two letters drawn independently from the distribution are the same
+	- It can be used to check if the block size is close to the target one 
+
+*** Homophonic Substitution
+- $\mathcal P$ is the ordinary alphabet $\mathcal Z_{26}$
+- $\mathcal C$ is must larger than $\mathcal P$
+- The key consists of information that splits $\mathcal C$ into 26 subsets $A_0, A_1, \dots, A_{25}$
+	- It encrypts a letter of number $i$ by choosing a random element from $A_i$
+- The idea is to make the most common letters set larger such that the distribution of letters is flat
+	- i.e. make the size inversely proportional to the probability that letter $i$ occurs
+
+*** The Permutation Cipher
+- $\mathcal P = \mathcal C = \mathbb Z_n^t$
+	- $t$ is a parameter called block size which is sometimes but now always secret
+- $\mathcal K = \Sigma_n$
+- It works as follows:
+	- *Key Generation* Output $K = \pi$ chosen uniformly at random from $\mathcal K$
+	- *Encryption* Set $E_\pi (x_1, \dots, x_t) = x_{\pi(1)} , \dots , x_{\pi(n)}$
+	- *Decryption* Set $D_\pi (y_1, \dots, y_t) = y_{\pi^{-1}(1)} , \dots , y_{\pi^{-1}(n)}$
+
+- Can be by figuring out $t$ and finding the most common letters and using the knowledge known about the language
+	- $t$ can be found by figuring checking if a given $t$ has a flat distribution
+
+* Basic Number Theory and Algebra 
+** Finite Fields
+- *Definition 2.4* Consider a set $\mathbb F$ with two operations $+$ and $\cdot$. $(F, +, \cdot)$ is a field if
+	- $(\mathbb F, +)$ is a commutative group i.e. it is a group where the following property also holds $a+b = b+a$ for all $a,b \in \mathbb F$
+		- The neutral element of addition will be called $0$
+	- Let $F^* = F \backslash \{0\}$. $(F^*, \cdot)$ is commutative groups i.e. for all $a,b \in \mathbb F$: $a \cdot b = b \cdot a$
+		- The neutral element of multiplication will be called $1$
+	- Multiplication distributes over additon i.e. for any $a,b,c \in \mathbb F$ the following holds $a \dcot (b+c) ) a \cdot b + a \cdot c$
+
+- *Theorem 2.5* For any prime $p$, $\mathbb Z_p$ with addition and multiplication modulo $p$ as operation, is a field
+	- $\mathbb Z_p$ may be denoted $\mathbb F_p$
+
+- For any prime power $q=p^k$ there is a finite field $\mathbb F_q$ with $q$ elements
+	- It is called an *extension field*
+
+- *Theorem 2.6 (Polynomial Division)* Let $a(x)$, $b(x)$ be polynomials over a field $\mathbb F$. Then we can divide $a(x)$ by $b(x)$ to get a quotient and a remainder
+	- i.e. $q(x)$, $r(x)$ such that $a(x) = q(x) b(x) + r(x)$ where the degree of $r(x)$ is less than the degree of $b(x)$
+
+- *Theorem 2.7 (number of roots of a polynomial)* Let $f(x)$ be a polynomial over a field $\mathbb F$. A root of $f(x)$ is an element $\mu \in \mathbb F$ such that $f(\mu) = 0$. The number of distinct roots of $f$ is at most the degree of $f(x)$
+
+* Shannon's Theory
+** Introduction
+- *Computational security*
+	- It should not be possible to break in a given reasonable time previous
+	- Often defined for some large number
+- *Provable security*
+	- One should prove that break the cryptosystem is at hard as solving some other NP-complete problem
+	- Does not give the absolute proof of the computation difficulty of the problem
+- *Unconditional security*
+	- It is unconditionally secure if it cannot be solved even with unlimited computing power
+
+** Perfect secrecy
+- It is assumed that a cryptosystem is specified and a particular key $K \in \mathcal K$ is used for only one encryption
+- A distribution is given n the plaintext space $\mathcal P$ and defines a random variable $X$
+	- The probability that $x$ is chosen is $Pr[X=x]$
+
+- The key $k$ is chosen from a fixed probability (uniformly)
+	- The key also defines a random variable denoted $K$
+	- The probability that $k$ is chosen is $Pr[K=k]$
+
+- The key and plaintext are independent random variables
+- The two probability distribution on $X$ and $P$ induces a probability distribution on $\mathcal C$ called $Y$
+	- Therefore the probability that the ciphertext is $y$ is $Pr[Y=y]$
+
+- For a key $K \in \mathcal K$ define
+\begin{equation*}
+  C(K) = \{E_K(x) \mid x \in \mathcal P\}
+\end{equation*}
+- This means that $C(K)$ represents the set of possible ciphertexts if $K$ is the key.
+- For every $y \in \mathcal C$ we have that 
+\begin{equation*}
+  Pr[Y=y] = \sum_{\{K \mid y \in C (K)\}} Pr[K=k] Pr[X = D_K(y)]
+\end{equation*}
+
+- The condition probability $Pr[Y=y \mid X=x]$ i.e. the probability that $y$ is the ciphertext, given that $x$ is the plaintext to be
+\begin{equation*}
+	Pr[Y=y \mid X = x] = \sum_{K \mid x = d_K (y)} Pr[K=k]
+\end{equation*} 
+
+- Using Bayes's theorem the probability that $x$ is the plaintext can be computed:
+\begin{equation*}
+	Pr[X=x \mid Y = y] = \frac{Pr[X=x] \cdot \sum_{K \mid x = d_K (y)} Pr[K=k]}{\sum_{\{K \mid y \in C (K)\}} Pr[K=k] Pr[X = D_K(y)]} 
+\end{equation*}
+
+- *Definition* A cryptosystem has perfect secrecy if $Pr[x \mid y] = Pr [x]$ for all $x \in \mathcal P, y \in \mathcal C$
+- *Theorem* If the 26 keys in the shift cipher are used with equal probability. Then for any plaintext distribution the Shift Cipher has perfect secrecy
+	- This means that the Shift Cipher is unbreakable given that a new random key is used to encrypt every plaintext character
+- *Theorem* Given a cryptosystem where $|\mathcal K| = | \mathcal C| = |\mathcal P|$. The cryptosystem provides perfect secrecy if and only if every key is used with equal probability $1/|\mathcal K$ and every $x \in \mathcal P$ and every $y \in \mathcal C$ there is a unique key such that $E_K(x) = y$
+[[file:Shannon's Theory/screenshot_2019-08-28_16-50-47.png]]
+
+** Entropy
+- *Definition 2.4.* Suppose $X$ is a discrete random variables which takes values from a finite set $S$. Then the *entropy* of the random variable $X$ is defined to be the quantity
+\begin{equation*}
+  H(X) = -\sum_{x \in S} Pr [x] \log_2 Pr[x]
+\end{equation*}
+
+- If $|S| =n$ and $Pr[x] = \frac{1}{n}$ for all $x \in S$ then $H(X) = \log_2 n$
+	- $H(X) \geq 0$ for any random variable $X$
+	- $H(X)=0$ if and only if $Pr[x_0]= 1$ for some $x_0$ and $Pr[x] = 0$ for all $x \neq x_0$
+
+- One can compute the entropy of random variables $K$ for the keyspace $\mathcal K$, $P$ for the plaintext space $\mathcal P$ and $C$ for the ciphertext space $\mathcal C$
+
+** Properties of entropy
+[[file:Shannon's Theory/screenshot_2019-08-28_21-53-51.png]]	
+
+[[file:Shannon's Theory/screenshot_2019-08-28_21-55-20.png]]
+
+[[file:Shannon's Theory/screenshot_2019-08-28_21-58-44.png]]
+
+- *Theorem 2.7* $H(X,Y) \leq H(X) + H(Y)$ with equality if and only if $X$ and $Y$ are independent variables
+
+[[file:Shannon's Theory/screenshot_2019-08-28_22-02-33.png]]
+
+
+[[file:Shannon's Theory/screenshot_2019-08-28_22-03-22.png]]
+
+** Spurious Keys and Unicity Distance
+- The conditional entropy $H(K \mid C)$ is called the key equivocation
+	- A measure of the amount of uncertainty of the key remaining when the ciphertext is known
+
+- *Theorem 2.10* Let $(\mathcal P, \mathcal C, \mathcal K, \mathcal E, \mathcal D)$ be a cryptosystem. Then
+\begin{equation*}
+  H(K \mid C) = H(K) + H(P) - H(C)
+\end{equation*} 
+
+- Suppose $(\mathcal P, \mathcal C, \mathcal K, \mathcal E, \mathcal D)$ is the cryptosystem being used and the string of plaintext
+\begin{equation*}
+  x_1x_2 \cdots x_n
+\end{equation*}
+is encrypted with one key, produced a string of ciphertext	
+\begin{equation*}
+  y_1y_2 \cdots y_n
+\end{equation*}	
+
+- $P^n$ is the random variable that has as its probability distribution of all $n$ grams of plaintext
+[[file:Shannon's Theory/screenshot_2019-08-29_10-31-14.png]]
+- $H_L$ measures the entropy per letter of the language $L$
+	- A random language would have entropy $\log_2 |\mathcal P|$
+	- The quantity $R_L$ measures the fraction of "excess characters" which we think of as redundancy
+
+- $C^n$ is defined to be a random variable representing an $n$ gram of ciphertext
+- Given $y \in C^n$ define
+\begin{equation*}
+  K(y) = \{K \in \mathcal K \mid \exists x \in \mathcal P^n \text{ such that } Pr[x] > 0 \text{ and } E_K(x) = y\}
+\end{equation*}
+- This means that $K(y)$ is the set of keys $K$ for which $y$ is the encryption of a meaningful string of plaintext of length n
+	- If $y$ is the observed string of ciphertext then the number of spurious keys is $|K(y)| -1$
+- The average number of spurious keys of length $n$ is denoted by $\bar {s_n}$ and can be computed as
+\begin{equation*}
+  \bar s_n = \sum_{y \in \mathcal C^n} Pr[y]|K(y)| -1
+\end{equation*}
+
+[[file:Shannon's Theory/screenshot_2019-08-29_10-55-37.png]]
+- The quantity approaches 0 exponentially quickly as $n$ increases
+	- It may not be a good estimate for small values of $n$
+
+[[file:Shannon's Theory/screenshot_2019-08-29_10-58-31.png]]
+- The following is an estimate for the unicity distance
+\begin{equation*}
+  n_0 \approx \frac{\log_2 |\mathcal K|}{R_L \log_2 | \mathcal P|}
+\end{equation*}
+
+** Product Cryptosystems
+- Cryptosystem for which $\mathcal C = \mathcal P$ is used
+	- This is called an *endomorphic cryptosystem*
+
+- Given $S_1 = (\mathcal P, \mathcal P, \mathcal K_1, \mathcal E_1, \mathcal D_1)$ and $S_2 = (\mathcal P, \mathcal P, \mathcal K_1, \mathcal E_1, \mathcal D_1)$ of endomorphic cryptosystems, then the *product cryptosystem* of $S_1 \times S_2$ is defined to be the cryptosystem
+\begin{equation*}
+	(\mathcal P, \mathcal P, \mathcal K_1 \times \mathcal K_2, \mathcal E_1, \mathcal D_1)
+\end{equation*}
+- The key of the product cryptosystem has the form $K=(K_1, K_2)$ where $K_1 \in \mathcal K_1$ and $K_2 \in \mathcal K_2$
+- The encryption and decryption of the resulting cryptosystem are defined as follows
+\begin{equation*}
+  E_{(K_1, K_2)}(x) = = E_{K_2}(E_{K_1}(x))
+\end{equation*}
+- The decryption rule is defined by the formula
+\begin{equation*}
+  D_{(K_1,K_2)}(y) = D_{K_1}(D_{K_2}(y))
+\end{equation*} 
+
+[[file:Shannon's Theory/screenshot_2019-08-29_12-06-57.png]]	
+
+- The probability distribution of the keyspace $\mathcal K$ of the product cryptosystem is defined in the following way:
+\begin{equation*}
+  Pr[(K_1, K_2)] = Pr[K_1] \cdot Pr[K_2]
+\end{equation*}
+
+- The product operation is always associative i.e. $(S_1 \times S_2) \times S_3 = S_1 \times (S_2 \times S_3)$
+- If we take the product of an (endomorphic) cryptosystem $S$ with itself we obtain $S^2$
+	- An $n$ fold product is denoted $S^n$
+
+- A cryptosystem is idempotent if $S^2 = S$
+	- e.g. Shift, Substitution, Affine, Hill Vigenere and Permutation ciphers
+	- When this is the case the resulting system does not provide additional security
+
+- If a cryptosystem it is not idempotent, then there is a potential for rise in security by iterating several times
+	- This is used in the Data Encryption Standard which consists of 16 iterations
+
+* Modern Symmetric Cryptosystems
+** The DES Blockcipher
+[[file:Modern Symmetric Cryptosystems/screenshot_2019-09-14_12-43-31.png]]
+	
+- DES is a Feistel cipher
+	- It is a block cipher and therefore the key is of fixed length and key generation chooses an uniform key
+	- It takes as input a bitstring of fixed length and outputs a ciphertext of the same length
+
+- In a Feistel cipher encryption consists of repeating some computation a number of times
+	- One such computation is called a round and the number of rounds is denoted $n$
+	- There is an algorithm called the *key Schedule* that takes the key as input and outputs the rounds keys $K_1, \dots, K_n$ where each round uses its own round key
+	- Each round does the following
+		- The input is a bitstring $P$ that is split in two halves called $L_0$ and $R_0$
+		- For $i=1, \dots n-1$ one defines for function $f$: $L_i = R_{i-1}$, $R_i = L_{i-1} \oplus f(R_{i-1}, K_i)$
+		- For the last round $n$ one sets $R_n = R_{n-1}$, $L_n = L_{n-1} \oplus f(R_{n-1}, K_n)$
+		- The output ciphertext $C$ is defined to be $C=(L_n, R_n)$
+
+[[file:Modern Symmetric Cryptosystems/screenshot_2019-09-22_15-40-24.png]]	
+	
+- For DES the size of the input and output is 64 bits and there are 16 rounds
+- The function $f$ for DES does the following on an input of a 32-bit data block $R$ and a round key $K$
+\begin{equation*}
+  f(R,K) = P(S(K \oplus E(R)))
+\end{equation*}
+- For functions $E$, $S$, $P$:
+	- $E(R)$ is 48 bits long and contains the 32 bits of $R$ in a permuted order specified in the standard and 16 of the bits appear twice in the output
+	- $S()$ takes as input 48 bits and returns 32 bits
+		- It splits its input in 8 blocks $X_1, \dots X_8$ of 6 bits each
+		- Then it computes $S_i(X_i)$ for $i=1, \dots,8$
+		- Each $S_i$ is a function that takes 6 bits to 4 bits
+		- The functions $S_i$ are known as substitution boxes or S-boxes
+		- The functions are specified by tables that list for each input what the output should be
+		- The output is $S(X) = S_1(X_1) \mid \mid \dots \mid \mid S_8(X_8)$
+	- $P()$ is a permutation that takes 32 bits as input and returns 32 bits
+		- It outputs the input bits in a permuted order that is fixed in the standard
+
+- S boxes are the heart of the security of DES
+	- This is due to them being non-linear function
+	- They have been chosen such that if one bit is flipped of the 6 inputs then at least 2 of the 4 output bits will change
+		- This means similar strings $M$ and $M'$ will look random and unrelated
+
+- The reason the function $E$ expands from 32 to 48 bits is to make it harder for an adversary to make a change such that only 1 S-box is affected
+
+** The AES Blockcipher
+*** Specification of AES
+- AES uses the field $\mathbb F_{2^8}$, which can be constructed using an irreducible polynomial over $\mathbb F_2$ of degree $8$
+\begin{equation*}
+  F(x) = x^8 + x^4 + x^3 + x + 1
+\end{equation*}
+- It has a block length of 128 bits
+- It is an iterated cipher with round, each of which consumes a round key
+- It is not a Feistel cipher
+- When the key length is 128 bits the number of rounds $N$ is $10$
+	- For 192 bit key $N=12$
+	- For 256 bit keys $N=14$
+- The Key Schedule algorithms takes the key as input and outputs $N+1$ rounds keys $K_0, \dots, K_N$
+
+- The plaintext block $X$ is parsed as 16 bytes, which are put into a variable ~State~ which is a 4 by 4 matrix with bytes as entries
+	- The algorithm puts ~State~ through a series of invertible operations
+	- The final value of ~State~ is the ciphertext
+	- Underway the operations ~SubBytes~, ~ShiftRows~, ~MixColumns~ and ~AddRoundKey~ are used
+	- The algorithm is as follows
+		1. Given plaintext $X$, set $\text{State} = X$ and set $\text{State} = \text{AddRoundkey}(\text{State}, K_0) = \text{State} \oplus K_0$
+		2. For $i=1$ to $N-1$, do:
+			 a. $\text{State} = \text{SubBytes}(\text{State})$
+			 b. $\text{State} = \text{ShiftRows}(\text{State})$
+			 c. $\text{State} = \text{MixColumns}(\text{State})$
+			 d. $\text{State} = \text{AddRoundkey}(\text{State},K_i) = State \oplus K_i$
+		3. In the final round do:
+			 a. $\text{State} = \text{SubBytes}(\text{State})$
+			 b. $\text{State} = \text{ShiftRows}(\text{State})$
+			 c. $\text{State} = \text{AddRoundkey}(\text{State},K_N) = State \oplus K_N$
+		4. Output the content of ~State~ as the ciphertext
+
+- The operations does the following:
+	- ~SubBytes~. Applies the same (invertible) function ~Sbox~ to each of the bytes in ~State~. On input a byte $B$, $B$ is interpreted as an element in the finite field $\mathbb F_{2^8}$ and compute a new byte $A$
+		- If $B=00000000$ $A=B$
+		- Otherwise $A=B^{-1}$
+		- The final step is to do an affine transformation where $A$ is multiplied by a fixed binary and invertible matrix and add a constant string $C=c_7,\dots,c_0 = 01100011$
+		- The result $r_7,\dots,r_0$ is computed as $r_i = a_i \oplus a_{i+4} \oplus a_{i+5} \oplus a_{i+6} \oplus a_{i+7} \oplus c_i$ where all indices are reduced modulo 8
+	- ~ShiftRows~ Does a cyclic shift to the left on each of the rows in ~State~
+		- The number of position shifted depends on the row
+		- Row number 1 is shift by 0 positions, row 2 by 1 position, row 3 by 2 positions and row 4 by 3 positions
+	- ~MixColumns~ Applies the same linear mapping to each of the columns in ~State~
+		- Let ~Col~ be one of the columns and interpret it as a column vector with 4 entries $t_0$, $t_1$, $t_2$, $t_3$ in the field $F_ 2^8$. The multiply Col by a fixed 4 by 4 matrix $M$ 
+\begin{equation*}
+  M \cdot Col = 
+  \begin{pmatrix} 
+    x   & x+1 &  1  &  1  \\
+    1   &  x  & x+1 &  1  \\
+    1   &  1  &  x  & x+1 \\
+    x+1 &  1  &  1  &  x
+  \end{pmatrix}
+  \cdot
+  \begin{pmatrix} 
+    t_0 \\ t_1 \\ t_2 \\ t_3
+  \end{pmatrix}
+\end{equation*}
+
+- One can modify the round keys in such as way that the code for encryption can be used for decryption
+*** The AES key Schedule
+- The key schedule algorithm for 128-bit AES
+	- The algorithm works with the concept of a word, which is an array with 4 bytes as entries
+	- It has a sequence words called $R_i$ on the form $R_i=[r_i,0,0,0]$
+		- $r_i$ is defined by considering it as $\mathbb F_{2^8}$ defining it as $r_i ^ x^i$
+	- The following operations is used
+\begin{equation*}
+  \text{SubWord}(w_0,w_1,w_2,w_3) = (\text{Sbox}(w_0),\text{Sbox}(w_1),\text{Sbox}(w_2),\text{Sbox}(w_3))
+\end{equation*}
+\begin{equation*}
+  \text{RotWord}(w_0,w_1,w_2,w_3)
+\end{equation*}	
+- The sequence of words $W_0,W_1,\dots$ is defined as follows:
+	- Parse $k$ as 4 words $K_0, \dots, $K_3$ and set $W_i = K_1$ for $i=0,1,2,3$
+	- The rest of the sequence is defined recursively as follows
+\begin{equation*}
+  W_i = 
+  \begin{cases}
+    \mbox{$W_{i-4} \oplus \text{SubWord}(\text{RotWord}(W_{i-1})) \oplus R_{i/4}$} & \mbox{if $i \equiv 0 \text{ mod } 4$} \\
+		\mbox{$W_{i-1} \oplus W_{i-1}$} & \mbox{otherwise}
+  \end{cases}
+\end{equation*}
+- $K_0$ is defined to be $(W_4, \dots, W_7)$, $K_1$ to be $(W_8, \dots, W_{11})$ and so on
+
+** Defining Security of Symmetric Encryption
+- Consider a family of functions $\{f_K \mid K \in \{0,1\}^K\}$ where each $f_k$ is a function $f_k : \{0,1\}^n \to \{0,1\}^m$
+- A probabilistic algorithm $A$ (the adversary) is considered. It is placed in one of the following two scenarios and is asked which one it is in:
+	- *The ideal world:* $A$ gets access to an oracle $O_{\text{Ideal}}$
+		- Initially it chooses a random mapping $R$ from $\{0,1\}^n$ to $\{0,1\}^m$ uniformly
+		- On input $x$, it answers with $R(x)$
+	- *The real world:* The adversary gets access to an oracle $O_\text{Real}$
+		- Initially chooses $K$ at random from $\{0,1\}^k$
+		- Fixes $K$ for the duration of the game
+		- On input $x$ it answers with $f_K(x)$
+
+- Consider a probabilistic algorithm $A$ that runs with access to either oracle $O_0$ or $O_1$ in the end $A$ should output a bit which the guess of which oracle he is talking to
+	- Let $p(A,0)$ be the probability that $A$ outputs $1$ when talking to $O_o$
+	- Let $p(A,1)$ be the probability that $A$ outputs $1$ when talking to $O_1$
+	- The *advantage* of $A$ in distinguishing $O_0$ from $O_1$ is defined to be
+\begin{equation*}
+  \text{Adv}_A(O_0,O_1) = |p(A,0) - p(A-1)|
+\end{equation*}
+- If the advantage is small $\approx 0$ it implies that $A$ has no idea which case he is in
+- If the advantage is large $\approx 1$ it implies that $A$ from $A's$ answers one can almost infer which case he was in
+
+- *Definition 5.1 (PRF security)* $\{f_K \mid K \in \{0,1\}^k\}$ is a $(t,q, \epsilon)$ secure *psudorandom function family* (PRF), if any adversary $A$ that runs in time at most $t$ and makes at most $q$ calls to the oracle, satisfies $\text{Adv}_A(O_\text{Real}, O_\text{Ideal}) \leq \epsilon$
+
+- To model security an encryption scheme using random encryption, a cryptosystem $(G,E,D)$ and an adversary $A$ is considered and placed in one of the following two scenarios where he has to guess which scenario he is in:
+	- *The ideal world:* $A$ gets access to an oracle $O_\text{Ideal}$ which on input $x$ answers with $E_K(r)$
+		- Where $r$ is a randomly chosen message where $|x| = |r|$
+		- The $K$ is produced by $G$ but fixed in the entire attack
+	- *The real world:* $A$ gets access to normal chosen message attack
+
+- *Definition 5.2 (Chosen-Plaintext Attack(CPA)-security)* The cryptosystem $(G,E,D)$ is $(t,q, \mu, \epsilon)$ secure, if any adversary $A$ that runs in $t$ time mes at most $q$ calls to the oracle, with plaintexts consisting of total of $\mu$ bits, it holds that $\text{Adv}_A(O_\text{Real}, O_\text{Ideal}) \leq \epsilon$
+	
+** Good Symmetric Encryption from Psudorandom Functions
+*** CBC Encryption
+- Let a block cipher be given $(G',E',D')$ where $\mathcal P = \mathcal C = \{0,1\}^n$ for some $n$
+- CBC encryption is a way to make a cryptosystem $(G,E,D)$ from the PRF defined by the block cipher $(G',E',D')$
+	- It sets $G' = G$
+	- The plaintext set for the new system will be all strings of length divisible by $n$
+	- Encryption is done by
+		- Choosing a random $n$ bit string $y_0$
+		- Split the input $x$ into $n$ bit strings $x_1,\dots,x_t$
+		- Define for $i>0$ that $y_i = E_K(y_{i-1} \oplus x_i)$
+		- The output ciphertext is $y_0,y_1,\dots,y_t$
+		- Decryption is straightforward
+
+- *Theorem 5.3* Suppose $(G',E',D')$ is a $(t',q', \epsilon')$ secure PRF. Then CBC encryption based on this system is CPA $(t,q,\mu,\epsilon)$ secure for any $q$, and for
+\begin{equation*}
+	\epsilon = \epsilon + \bigg(\frac{\mu}n\bigg)^2 \cdot \frac1{2^n}
+\end{equation*}
+- provided that
+\begin{equation*}
+  t \leq t', \quad \frac\mu{n} \leq q'
+\end{equation*}
+
+*** Counter (CTR) Mode
+- The construction is the same form as CBC encryption, the only difference is the encryption algorithm is as follows:
+	- Chooses a random $n$ bit string $y_0$
+	- Split $x$ into $n$ bit strings $x_1, \dots, x_t$
+	- Define for $i>0$ that $y_i = E_k(y_0+i) \oplus x_i$
+	- Here $y_0 +i$ means that $i$ is written in binary and addition is done modulo $2^n$
+
+- *Theorem 5.4* Suppose $(G',E',D')$ is $(t',q',\epsilon')$ secure PRF. Then Counter mode based on this system is CPA $(t,q,\mu,\epsilon)$ secure for any $q$ and where
+\begin{equation*}
+  t \leq t' \quad \frac{mu}{n} \leq q' \quad \epsilon = \epsilon' + \bigg(\frac{\mu}{n}\bigg)^n \cdot \frac1{2^n}
+\end{equation*}
+
+* The RSA 1-way trapdoor function
+** Introduction
+- A trapdoor oneway function is an injective $f: X \to Y$ where are $X,Y$ are finite sets is a function such that
+	- Computing $f(x)$ from input $x$ is easy
+	- Computing $x$ from $f(x)$ for a random $x \in X$ is infeasible
+	- $f$ might come with a trapdoor $t_f$ such that given this extra information it would be easy to compute $x$ from $f(x)$
+
+- Pairs $(f,t_f)$ of function and trapdoor could be a public key encryption system
+	- $f$ could serve as the public key
+	- Anyone could encrypt $x \in X$ to ciphertext $y = f(x)$
+	- Only the party who knows $t_f$ is able to recover $x$ from $y$
+
+- *Definition 6.1* A public-key cryptosystem consists of 3 algorithms $(G,E,D)$, satisfying the following:
+	- $G$, algorithm for generating keys:
+		- It is probabilistic
+		- Takes security parameter $k$ as input
+		- Always outputs a pair of keys $(pk,sk)$
+			- The public and the secret keys
+		- It is assumed that the public key contains a description of
+			- $\mathcal P$, the set of plaintexts
+			- $\mathcal C$, the set of ciphertexts
+		- $\mathcal P$ and $\mathcal C$ does not have to be the same for every key
+	- $E$, an algorithm for encryption
+		- It takes as input $pk$ and $x in \mathcal P$
+		- It produces as output $E_{pk}(x) \in \mathcal C$
+		- It may be probabilistic
+			- i.e. the ciphertext will have a probability distribution that is determined from $x$ and $K$
+	- $D$, algorithm for decryption
+		- It takes as input $sk, y \in \mathcal C$ and produces as output $D_{sk}(y) \in \mathcal P$
+		- It is allowed to be probabilistic but is in most cases deterministic
+	- It is required for any $x \in \mathcal P$ that $x = D_{sk}(E_{pk}(x))$
+
+** RSA
+- RSA works as follows on a high level
+	1. On input (even) security parameter $k$, choose random $k/2$ bit primes $p$, $q$ and set $n = pq$
+	2. Select a number $e \in \mathbb Z^*_{(p-1)(q-1)}$ and $d = e^{-1} \text{ mod } (p-1)(q-1)$
+	3. Output public key $pk = (n,e)$ and secret key $sk = (n,d)$
+		 - For RSA it is always the case that $\mathcal P = \mathcal C = \mathbb Z_n$
+
+- Encryption and decryption works as follows:
+\begin{equation*}
+  E_{(n,e)}(x) = x^e \text{ mod } n \quad D_{(n,d)}(y) = y^d \text{ mod } n
+\end{equation*}
+
+** Implementation of RSA
+*** Modular Exponentiation
+- Modular Exponentiation $x^d \text{ mod } n$ is done in the following way
+	- Write $d$ in binary notation
+		- i.e. $d = \sum_{i=1}^k d_i 2^i$ where $d_0,d_1, \dots$ are the bits in the binary expansion of $d$
+	- It can be computed following way:
+\begin{equation*}
+  x^d \text{ mod } n = x^{\sum_{i=0}^k d_i 2^i} = \prod_{i=0}^k \left(x^{2^i}\right)^{d_i} \text{ mod } n
+\end{equation*}
+
+- The total time is $O(k^3)$ using the standard algorithm for multiplication
+
+*** Multiplicative Inverses
+- The multiplicative inverses can be computed using the *Extended Euclidian algorithm*
+	- It runs in time $O(k ^2)$
+
+*** Generating random prime numbers
+- To generate a $k$ bit prime the following can be done
+	1. On input $k$ select a uniformly random $k$ bit number $x$
+		 - i.e. choose $x$ at random such $2^k \leq x < 2^{k+1}$
+	2. Test if $x$ is prime
+		 - If yes output $x$ and stop
+		 - Else go to Step 1.
+
+- *Theorem 6.2 (The Prime Number Theorem)* Let $\pi_N$ be the number of primes less than $N$, and $\ln$ be the natural logarithm. Then
+\begin{equation*}
+  lim_{n \to \infty} \left(\frac{\pi_N}{N/\ln(n)}\right)
+\end{equation*}
+
+- This means that the expected number of iterations needed until success is $1/p_k$
+	- i.e. $O(k)$
+
+- The Miller-Rabin test is an efficient algorithm to check if something is prime
+	- It may sometimes make mistakes
+	- It will always accept a prime
+	- It will in rare cases accept a composite even though it should not
+
+- *Miller-Rabin Primality Test*
+	1. On input an odd $x$, compute $a,b$ such that $x-1 = 2^a b½ where $b$ is odd
+		 - i.e. divide $x-1$ by $2$ as many times as possible
+	2. Choose a non-zero $w \in \mathbb Z_x$ at random and compute $d=gcd(w,x)$
+		 1. If $d$ is not $1$ reject $x$ and stop
+	3. Her we know that $w \in \mathbb Z^x^*$. Compute the following list of numbers
+\begin{equation*}
+  w^b \text{ mod } x, w^{2b} \text{ mod } x, w^{2^2b} \text{ mod } x, \dots, w^{2^{a-1}b} \text{ mod } x
+\end{equation*}
+- If any number on the list is $-1$ modulo $x$ is $-1$ modulo $x$ or if $w^b \text{ mod } x = 1$, then accept $x$ else reject 
+
+- *Lemma 6.3* Let $x$ be prime and let $y \in \mathbb Z_x^*$ be such that $y^2 \text{ mod } x = 1$. Then $y \equiv 1 \text{ mod } x$ or $y \equiv -1 \text{ mod } x$
+
+- *Lemma 6.4* The Miller-Rabin test always accepts a prime
+
+- *Lemma 6.5* The Miller-Rabin test (MR) accepts a composite with probability at most $1/4$ i.e. for all odd composite $x$ it holds that 
+\begin{equation*}
+  P[PR(x) = accept  \mid x \text{ is composite}] \leq 1/4
+\end{equation*}
+
+- The test is repeated multiple times to get a better error rate
+	- If $MR^t$ is $t$ independent iterations of the test, then
+\begin{equation*}
+  P[MR^t(x) = accept \mid x \text{ is composite}] \leq 4^{-t}
+\end{equation*}
+- This suggests the following more concrete version of the random prime generation algorithm:
+	1. On input $k$, select a uniformly random $k$ bit number $x$ 
+		 - i.e. choose $x$ at random such $2^k \leq x < 2^{k+1}$
+	2. If $MR^t(x) = accept$ then output $x$ and stop, else go to Step 1.
+
+[[file:The RSA 1-way trapdoor function/screenshot_2019-09-30_17-23-07.png]]
+[[file:The RSA 1-way trapdoor function/screenshot_2019-09-30_17-23-16.png]]	
+	
+** Optimizations of RSA
+- A easy way to speed RSA is to choose a small public exponent $e$
+	- $e$ should be fixed before generating $n$
+	- One should only consider candidates for the primes $p$ (or $q$) such that $\gcd(e, p-1) = 1$
+	- The smallest value that will work is $e=3$
+		- $e = 2^{16+1}$ is also a popular time
+
+- It is possible to speed up RSA decryption using the Chine Remainder Theorem for secret key $(n,d)$ 
+	- Let
+		- $d_p = d \text{ mod } (p-1)$
+		- $d_q = d \text{ mod } (q-1)$
+	- Set
+		- $a_q = p \cdot (p^{-1} \text{ mod } q)$
+		- $a_p = q \cdot (q^{-1}\text{ mod } p)$
+	- On input a ciphertext $y$ compute
+		- $x_p = y^{d_p} \text{ mod } p$
+		- $x_q = y^{d_q} \text{ mod } q$
+	- and then
+		- $x = (x_pa_p + x_qa_q) \text{ mod } n$
+- This way is $4$ times faster than computing $x^d \text{ mod } n$ directly
+
+** Security of RSA
+- *Lemma 6.7* Let $n,x,y$ be such that $x^2 \equiv y ^2 (\text{mod } n)$ and furthermore $x \not \equiv \pm y (\text{mod } n)$. Then from $n,x,y$ one can compute a non-trivial factor in $n$ in polynomial time
+	- i.e. a number that divides $n$ but is not $1$ or $n$
+
+- *Theorem 6.8* Assume that an algorithm $A$ exists that given an RSA public key $(n,e)$ will output the corresponding secret exponent $d$. From any such algorithm a new algorithm $B$ that on input $(n,e)$ factors $n$ with probability at least $1/2$ using one invocation of $A$ and polynomial time computation. 
+
+* The Theory of Secure Public-Key Encryption
+** Deterministic Public-key Systems
+- Secure deterministic public key cryptoystems are also called *families of trapdoor one-way functions*
+- *Definition 7.1* A probability $\epsilon(k)$ the depends on natural number $k$ is said to be *negligible* if it holds that for any polynomial $p$, we have $\epsilon(k) \leq 1/p(k)$ for large enough $k$
+	- i.e. it vanishes to zero very quickly
+
+- *Definition 7.2* A system $(G,E,D)$ forms a *family of trapdoor one-way functions* if the following is satisfied:
+	- The algorithms $(G,E,D)$ define a public-key cryptosystem according to definition 7.1.
+		- They all run in time polynomial in the security parameter $k$
+		- They algorithm $E$ is deterministic
+	- Let any probabilistic polynomial time algorithm $A$ be given. Consider the following experiment:
+		- Run $G$ on input $k$ where $(pk,sk)$ is the output
+		- Select $x$ at random in the set of plaintext $\mathcal P$
+		- Run $A$ on input $pk, E_{pk}(x)$
+		- Let $p(A,k)$ be the probability that $A$ outputs $x$
+		- $p(A,k)$ should be negligible in $k$ for any $A$
+
+- *RSA assumption:* the basic RSA algorithm defines a family of trapdoor one-way functions
+
+** Security of Probabilistic Systems: CPA (Semantic) Security 
+- *Definition 7.3* $(G,E,D)$ is CPA (semantically) secure if for all probabilistic polynomial time adversaries $A$, it holds that $Adv_A(O_{real}, O_{ideal})$ is negible in $k$ for the following two cases
+	- *The ideal world:*
+		- Input to both the adversary $A$ and oracle $O_{Ideal}$ is the security parameter $k$
+		- The oracle runs $G(k)$ to get $(pk,sk)$ and gives $pk$ to $A$
+		- $A$ computes a plaintext $x \in \mathcal P$ and gives it to $O$
+		- The oracle responds with $E_{pk}(r)$ where $r$ in randomly chosen in $\mathcal P$ of the same length as $x$
+		- $A$ output a bit $b$
+	- *The real world:*
+		- Input to both the adversary $A$ and oracle $O_{Real}$ is the security parameter $k$
+		- The oracle runs $G(k)$ to get $(pk,sk)$ and gives $pk$ to $A$
+		- $A$ computes a plaintext $x \in \mathcal P$ and gives it to $O$
+		- The oracle responds with $E_{pk}(x)$ 
+		- $A$ output a bit $b$
+
+- *Probabilistic cryptosystem based on RSA (PCRSA)*
+	- *Key Generation* Generates a pair of RSA keys $(n,e), (n,d)$ in the useal way
+		- The set of messages is just $\{0,1\}$ where
+		- The set of ciphertext is $\mathcal Z_n^*$
+	- *Encryption* A bit $b$ is encrypted by choosing a random number $x_b \in \mathbb Z_n^*$ such that the lease significant bit of $x_b$ is $b$
+		- The ciphertext is now $c = x_b^e \text{ mod } n$
+	- *Decryption* Compute $x_b = c^d \text{ mod } n$ and extract the lease significant bit
+
+- PCRSA could be extend to encrypt $O(log k)$ bits at once and still be secure
+
+- *Theorem 7.4* Under the RSA assumption, PCRSA is CPA secure
+
+- *Theorem 7.5* Given an algorithm that computes the function $P$ correctly on every input, there exists an algorithm that on input $n,e,y$ computes $x$ such that $x^e \text{ mod } n = y$ in polynoiam time, using $O(k)$ calls to $P$, where $k$ is the bit length of $n$
+\begin{equation*}
+  P(y) = P(x^e \text{ mod } n ) = lsb(x)
+\end{equation*}
+
+- *Theorem 7.6* If a family of one-way trapdoor permutations exists, then there exists a CPA-secure public key system
+
+** Chosen Ciphertext Security
+- *Definition 7.7* $(G,E,D)$ is chosen ciphertext CCA-secure, if for all probabilistic polynomial time adversaries $A$, it holds that $Adv_A(O_{Real},O_{Ideal})$ is negligible in $k$ for the following two cases
+	- *The ideal world:* Input to both adversary $A$ and oracle $O_{Ideal}$ is security parameter $k$.
+		1. The oracle runs $G(k)$ to get $(pk,sk)$ and gives $pk$ to $A$
+		2. $A$ may submit an input string $y$ to $O_{Ideal}$ and $O_{Ideal}$ will return $D_{sk}(y)$ to $A$
+			 - This is repeated as many times as $A$ wants
+		3. $A$ computes a plain $x \in \mathcal P$ and give it to $O$
+			 - The oracle responds with $y_0 = E_{pk}(r)$, where $r$ is randomly chosen in $\mathcal P$ of the same length as $x$
+		4. $A$ may submit an input string $y$ for $y \neq y_0$ to $O_{Ideal}$ and $O_{Ideal}$ will return $D_{sk}(y)$ to $A$
+			 - This is repeated as many times as $A$ wants
+		5. $A$ outputs a bit $b$
+	- *The real world:* Input to both adversary $A$ and oracle $O_{Ideal}$ is security parameter $k$.
+		1. The oracle runs $G(k)$ to get $(pk,sk)$ and gives $pk$ to $A$
+		2. $A$ may submit an input string $y$ to $O_{Real}$ and $O_{Real}$ will return $D_{sk}(y)$ to $A$
+			 - This is repeated as many times as $A$ wants
+		3. $A$ computes a plain $x \in \mathcal P$ and give it to $O$
+			 - The oracle responds with $y_0 = E_{pk}(x)$
+		4. $A$ may submit an input string $y$ for $y \neq y_0$ to $O_{Real}$ and $O_{Real}$ will return $D_{sk}(y)$ to $A$
+			 - This is repeated as many times as $A$ wants
+		5. $A$ outputs a bit $b$
+
+- *Theorem 7.8* If there exists a family of trapdoor one-way permutation, then there exists a chosen ciphertext secure probabilistic public-key system
+
+- To construct a chosen ciphertext CCA-secure system one typically restricts the area of legal ciphertexts	
+
+[[file:The Theory of Secure Public-Key Encryption/screenshot_2019-11-01_11-46-49.png]]
+
+- OAEP-based encryption is ciphertext CCA-secure in the random oracle model	
+
+* Public-Key Encryption Based on Discrete Logarithms
+** Three computational problems
+*** Definitions
+- *The discrete log (DL) problem* Given a group $G$, generator $\alpha$ and $\beta in G$ ind an integer such that $\alpha^a = \beta$
+	- It is in many groups hard e.g. $\mathbb Z_p^*$
+- *The Diffie-Hellman (DH) problem*
+	- Given a group $G$, generator $\alpha$, and $\alpha^a$, $\alpha^b$ where $a,b$ are randomly and independently chosen from $Z_t$ compute $\alpha^{ab}$
+- *Lemma 8.1* The DH problem is no harder than the DL problem
+
+- *The Decisional Diffie-Hellman (DDH) problem* Given a group $G$, generator $\alpha$ and $\alpha^a, \alpha^b, \alpha^c$ where $a,b$ are randomly and independently chosen from $Z_t$ guess whether which of the following cases you are in
+	- $c$ is chosen as $c=ab$
+	- $c$ is chosen uniformly at random from $Z_t$
+- *Lemma 8.2* The DDH problem is no harder than the DH problem
+
+*** Hardness of the problems
+- A *group generator* /GGen/ is a efficient probabilistic algorithm which takes as input an integer $k$ and outputs a group $G$ and an element $\alpha \in G$ that generates $G$
+	- $k$ controls the size of the group generated
+
+- *Definition 8.3* Consider the following experiment with an algorithm $A$:
+	- Run /GGen/ on input $k$ to get $G$ and $\alpha$
+	- Choose $a$ at random in $Z_t$ and give $A$ input $G, \alpha, \alpha^a$
+	- The DL problem is said to be hard (with respect to /GGen/) if for any polynomial time in $k$ algorithm $A$, the probability that $A$ outputs $a$ is negligible in $k$
+
+- *Definition 8.4* Consider the following experiment with an algorithm $A$:
+	- Run /GGen/ on input $k$ to get $G$ and $\alpha$
+	- Choose $a,b$ at random in $Z_t$ and give $A$ input specification of $G, \alpha, \alpha^a, \alpha^b$
+	- The DH problem is said to be hard (with respect to /GGen/) if for any polynomial time in $k$ algorithm $A$, the probability that $A$ outputs $\alpha^{ab}$ is negligible in $k$
+
+- *Definition 8.5* Consider the following experiment with an algorithm $A$:
+	- Run /GGen/ on input $k$ to get $G$ and $\alpha$
+	- Choose $a,b$ at random in $Z_t$
+	- One can be in one of the following two cases:
+		a) In the "real" case, set $c=ab$
+		b) In the "ideal" case choose $c$ at random from $Z_t$
+	- Give $A$ input specification of $G,\alpha, \alpha^a, \alpha^b, \alpha^c$.
+	- $A$ outputs one bit i.e. a guess at whether one in the real or the ideal case
+	- Let $p_{A,0}(k)$ be the probability that $A$ outputs $1$ in the real case
+	- Let $p_{A,1}(k)$ be the probability that $A$ outputs $1$ in the real case
+	- The advantage of $A$ is defined to be $Adv_A(k) = |p_{A,0}(k) - p_{A,1}(k)|$
+	- The DH problem is said to be hard (with respect to /GGen/) if for any polynomial time in $k$ algorithm $A$, $Adv_A(k)$ is negligible in $k$
+
+** The El Gamal Cryptosystem
+- Given to parties $A$ and $B$ that want to exchange a secret given an already agreed (in public) group $G$ and a generator $\alpha$:
+	1. $A$ chooses $s_A$ at random in $Z_t$ and $B$ chooses $s_B$ at random in $Z_t$
+	2. $A$ sends $y_A = \alpha^{s_A}$ to $B$ and $B$ sends $y_B = \alpha^{S_B}$ to $A$
+	3. $A$ computes $y_B^{s_A}$ and $B$ computes $y_A^{S_B}$
+
+- *El Gamal cryptosystem (general version)*
+	- *Key generation* On input security parameter $k$
+		- Run /GGen/ on input $k$ to obtain specification of a group $G$ and generator $\alpha$
+		- Choose $a$ at random from $Z_t$
+		- The public key is the specification of $G$ and $\beta = \alpha^a$
+		- The secret key is $a$
+		- The plaintext space is $G$ and the ciphertext space is $G \times G$
+	- *Encryption* To encrypt $m \in G$ choose $r$ at random in $Z_t$, the ciphertext is $(\alpha^r, \beta^rm)$
+	- *Decryption* To decrypt ciphertext $(c,d)$ compute $c^{-a}d$
+
+- *Lemma 8.6* The problem of decrypting an El Gamal ciphertext (without the secret key) is equivalent to solving the DH problem
+
+- *Theorem 8.7* If the DDH problem is hard (w.r.t /GGen)/, then the El Gamal cryptosystem is CPA 
+
+** Some Example groups
+*** $\mathbb Z_p^*$
+- *Lemma 8.8* $\alpha \in \mathbb Z_p^*$ is a generator if and only if $\alpha^{(p-1)/q} \neq 1$ for every prime $q$ that divides $p-1$
+- To generate a prime $p$ where the factorisation of $p-1$ is known one can do the following
+	- Choose a random prime $q$ set $p=2q + 1$ and test whether $p$ is a prime
+	- If not choose a new $q$
+	- When this succeeds the factor of $p-1$ is known i.e. $2$ and $q$
+	- It is expected to generate $O(k)$ values of $q$ before $p$ happens to be prime
+	- A prime $p$ generated in this way is sometimes called a safe prime
+
+- If $G= \mathbb Z_p^*$ in El Gamal one will never get a CPA-secure cryptosystem
+
+- *Lemma 8.9* Let $\alpha$ be a generator of $\mathbb Z^*_p$. Then $(\alpha^i)^{(p-1)/2} \text{ mod } p = 1$ if and only if $i$ is even and is $-1$ otherwise
+
+- *Lemma 8.10* In the group $\mathbb Z_p^*$, the DDH problem is not hard
+
+*** Prime Order Subgroups of $\mathbb Z_p^*$
+- To get CPA-security one needs to use, instead of $\mathbb Z_p^*$ a subgroup of large prime order
+	- This can be done using safe primes
+- For every prime $q$ that divides $p-1$ for prime $p$ there is exactly one subgroup $G$ of order $q$
+	- For a safe prime if $\alpha_0$ generates all of $\mathbb Z_p^*$ then $\alpha = \alpha_0^2$ generates this subgroup
+
+- Algorithm for generating $G$ and $\alpha$:
+	1. On input $k$ generate a $k$ bit prime $p$ where $p = 2q +1$ and generator $\alpha _0$ of $\mathbb Z _ p^*$
+	2. Let $G$ be the subgroup of order $q$, and set $\alpha = \alpha_0^2$. Output $p,q,\alpha$
+
+- To be able to encrypt and decrypt any number in $Z_q$ one does the following
+	- *Encryption* On input $x \in Z_q$ set $y=x+1$ and compute $y^{(p-1)/2} \text{ mod } p$
+		- If this is $1$ output $y$ else output $-y \text{ mod } p$
+	- *Decryption* On input $g \in G \subset \mathbb Z_p^*$ test if $g \leq q$.
+		- If so set $y=g$ else set $y = -g \text{ mod } p$.
+		- Output $y-1$
+
+** Algorithms for solving discrete log
+*** The generic algorithm
+- It work in any group and uses no special properties of the group in question
+- Given $G$, $\alpha$ and $\beta$ and one wants to find the discrete log of $\beta$ base $\alpha$
+	- Let $x$ be the solution and set $t=\lceil\sqrt{|G|}\rceil$
+
+- Given that $x=qt + r$ the following holds $\beta=\alpha^{x}=\alpha^{q t+r}$ the generic algorithm does the following:
+	1. Compile a table $T$ with entries of the form $\left(r, \beta \alpha^{-r}\right)$ for $r=0,1, \ldots t$ and sort according to the last component.
+	2. For $q=1$ to $t$, compute $\left(\alpha^{t}\right)^{q}$ test if this value is in $T$ If yes, exit the loop and record the corresponding values of $r, q$. 
+	3. Return $x=q t+$
+
+- This algorithm run in time $O(\sqrt{|G|})$.
+	- It is optimal for generic groups i.e. it cannot be done faster
+	
+*** Index Calculus
+- The Index Calculus algorithm is specifically target against the group $Z_p^*$
+- The algorithm first does a preprocessing stage
+	- It takes as input $p$ and the base element $\alpha$
+	- $\alpha$ is assumed to be a generator i.e. it has order $p-¡4
+	- The goal of this step is to find the discrete log of all the primes in $F$ as follows
+		1. Choose $r \in \mathbb Z_{p-1}$ at random and compute $y = \alpha ^r \text{ mod } p$
+		2. If $y$ does not factor over $F$ of the first small prime, go to step 1.
+			 - Else write $y$ as $y \prod^B_{i=1} p_i^{t_i}$ and save $(r,t_1,\dots, t_b)$ in a table $T$
+		3. If $T$ has more than $B$ entries go to step 4 else go to step $1$
+		4. Let $x_i$ be the discrete log of $p_i$ base $\alpha$ so $p_i = \alpha^{x_i} \text{ mod } p$
+			 - Each entry in $T$ defines a linear equation in the $x_i$'s as follows
+	\begin{equation}
+\alpha^{r} \equiv y=\prod_{i=1}^{B} p_{i}^{t_{i}} \equiv \alpha^{\sum_{i=1}^{B} t_{i} x_{i}} \bmod p
+\end{equation}
+- If one arrives as this stage there are more than $B$ equation in $B$ unknown so one can solve the linear equation system to get the $x_i$ s
+
+- In the final stage one are given $\beta = \alpha^x \text{ mod } p$ for which one want to solve the discrete log for base $\alpha$.
+	1. Choose $s \in \mathbb Z_{p-1}$ at random and compute $z=\alpha^{s} \beta \bmod p$
+	2. 2. If $z$ does not factor over $F$ go to Step 1 Otherwise, let $z=\prod_{j=1}^{B} p_{i}^{s_{i}}$ Substituting $\alpha^{x_{i}}$ for $p_{i},$ we see that this equation is equivalent to
+$$
+x+s \equiv \sum_{j=1}^{B} s_{i} x_{i} \bmod (p-1)
+$$
+so we output $\sum_{j=1}^{B} s_{i} x_{i}-s \bmod (p-1)$
+	
+* Public-Key Encryption Based on LWE
+- Learning with errors (LWE) problem is defined over a finite field $F_q$ for a prime $q$
+	- All computations are done modulo $q$
+	- A secret vector $\mathbf{s} \in F_q^n$ are involved
+	- The problem is: Given random $\left\{\mathbf{a}_{i} \in F_{q}^{n}\right\}_{i=1}^{m}$ and $\left\{\mathbf{a}_{i} \cdot \mathbf{s}+e_{i}\right\}_{i=1}^{m}$ where the $e_i$'s are random by numerical small. The goal is to find $\mathbf s$
+	- $e_i$'s being random and numerical small always means that they are much smaller than $q$
+		- $e_i$ can be e.g. uniformly chosen in the interval $[-\sqrt{q}, \sqrt{q}]$
+	- It is assumed that the $e_i$'s are chosen with a distribution $D_e$ with the following property: /even if one sample $m$ values distributed according to $D_$ take numeric value ad sum them, the result will be smaller than $q/4$ with overwhelming probability/
+
+- Decision version of LWE
+	- One are given random $\left\{\mathbf{a}_{i} \in F_{q}^{n}\right\}_{i=1}^{m}$ and either $\left\{\mathbf{a}_{i} \cdot \mathbf{s}+e_{i}\right\}_{i=1}^{m}$ or $\left\{u_{i}\right\}_{i=1}^{m}$ where the $u_{i}$ are uniformly random
+	- The goal is to decide which case you are in
+	- The decision LWE is hard if any PPT algorithm can only distinguish the two cases with negligible advantage in $n$
+
+- Secret key based on LWE
+	- The secret key is $\mathbf{s}$
+	- To encrypt a bit $w \in \{0,1\}$ one will send the ciphertext: $(\mathbf{a}, \mathbf{a} \cdot \mathbf{s}+e+\lceil q / 2\rceil w)$
+	- To decrypt the cipher text $(\mathbf{u},v)$ the receiver can compute $v-\mathbf{u} \cdot \mathbf{s}$
+		- If Clearly, if $e<<q$ then this value will be close to 0 if $w=0$ and close to $|q / 2|$
+if $w=1$
+
+- Public key based on LWE
+	- *Key Generation* Secret key: random vector s $\in F_{q}^{n}$ Public key: $\left\{c_{i}\right\}_{i=1}^{m}$ where $c_{i}=\left(\mathbf{a}_{i}, \mathbf{a}_{i} \cdot \mathbf{s}+e_{i}\right)$ where $\mathbf{a}_{i}$ are uniformly random and the $e_{i}$ are chosen according to $D_{e}$
+	- *Encryption* Message is a bit $w$. Choose random bits $b_{1}, \ldots, b_{m}$ and then the ciphertext is $\sum_{i=1}^{m} b_{i} c_{i}+(0,\lceil q / 2\rceil w)$
+	- *Decryption* To decrypt $(\mathbf{u}, v)$ compute $v-\mathbf{s} \cdot \mathbf{u}$ and output 0 if this value is closer to 0 than it is to $\lceil q / 2\rceil$, Output 1 otherwise.
+
+- Lemma 9.1 If $m \geq n+(n+1) \log _{2}(q)$, then the following two distributions can be distinguished with only negligible in $n$ advantage (even by an unbounded
+adversary):
+\begin{array}{l}{\left\{\left(\mathbf{a}_{i}, u_{i}\right)\right\}_{i=1}^{m}, \sum_{i=1}^{m} b_{i}\left(\mathbf{a}_{i}, u_{i}\right)} \\ {\qquad\left\{\left(\mathbf{a}_{i}, u_{i}\right)\right\}_{i=1}^{m}, \mathbf{r}} \\ {\text { where } \mathbf{r} \in F_{q}^{n+1} \text { is chosen unformly and independently of anything else. }}\end{array}
+
+* Symmetric Authentication Systems
+** Introduction
+- The authentication systems are used to make sure that the received message is what the sender intended
+	- The Adversary can only change the message
+	- Adversary can both change the message and authenticator
+	
+** Hash Functions
+*** Definition
+- A hash function is defined by a *generator* $\mathcal H$, which on input a security parameter $k$ outputs the description of a function $h : \{0,1\}^* \to \{0,1\}^k$
+
+- *Definition 10.1* The game where one runs $\mathcal H$ on input $k$ to get function $h$. If $A$ is given to adversary algorithm $A$ who outputs 2 strings $m,m'$ $A$ has success if $m \neq m'$ and $h(m) = h(m')$ $\mathcal H$ is collision intractable if any polynomial time $A$ has success with negligible probability as a function of $k$
+
+*** Hash functions based on factoring and discrete log 
+- Collision-intractable hash functions exist under well-known intractability assumptions
+- $\mathcal H$ is defined as follows:
+	- Choose a prime $\alpha$, $\beta$ of order $q$ in $\mathbb Z_p^*$
+	- Define a function $h : Z_q \times Z_q \to Z_p$ as follows $h(m_1, m_2) = \alpha^{m_1} \beta^{m_2} \text{ mod } p$
+	- This is a discrete log hard problem in $\mathbb Z_p^*$ and this family of functions is collision intractable
+
+*** Collisions-intractable hash functions are one-way
+- *Lemma 10.2* Given function $h : \{0,1\}^{k+1} \to \{0,1\}^k$, and assume a algorithm $A$ are given running in time $t$ that, when given $h(m)$ for uniform $m$. return a preimage of $h(m)$ with probability $\epsilon$. Then a collision for $h$ can be found in time $t$ plus one evaluation of $h$ and with probability at least $\epsilon/4$
+
+*** Domain extension for hash functions
+- *Theorem 10.3* If there exists a collision-intractable has function generator $\mathcal H'$ producing functions with finite input length $m >k$, then there exists a collision-intractable generator $\mathcal H$ that produces functions taking arbitrary length input. 
+
+*** Hash Functions in Practice
+- *Theorem 10.4* Given function $h$, and assume that it is possible to sample input values to $h$ causing the outputs to be uniformly random in $\{0,1\}^k$. Then a collision for $h$ can be found with constant probability in time corresponding to $2^{k/2}$
+	- This implies with current state of the art that $k$ should be at least 160
+
+*** The random oracle model
+- In the Random Oracle Model the idea is formalized that the output values "might as well" be random
+	- The idea is that the hash function is replaced with a random oracle
+	- A *random oracle* is a oracle that will receive any string $m$ as input and will return a randomly chosen $R(m)$
+		- If it later receives the $m$ as input, the same string $R(m)$ will be returned
+	- Every time a new string $m'$ is given as input a fresh random string $R(m')$ is returned chosen independently
+	- Every including the adversary has acces to such an oracle and it is the same oracle for everyone
+
+- In the real life one does not have access to some random oracle but one can hope that the adversary can only do as good as in the random oracle case
+
+- If an application of an hash function has been proven secure in the random oracle model, this means that for the real life application is that any attack that considers the has function $h$ as a "random black-box" and does not use any special properties of $h$ is doomed to failure
+
+** Definition of Message Authentication Codes (MACs)
+*** Definition
+- A *secret-key authentication system* consists of three probabilistic algorithms $(G,A,V)$
+	- $G$ which outputs a key $K$
+		- One usually works by simply choosing $K$ as a random bit string of a certain length
+	- $A$ gets input a message $m$ and the key $K$ and outputs an authenticator value $s = A_K(m)$
+	- $V$ gets as input an input $s$, a message $m$ and key $K$ and outputs $V_K(s,m)$ which is equal to /accept/ or /reject/
+		- It is required that the following always hold $V_K(A_K(m),m) = accept$
+
+- A secret-key authentication system is called a MAC scheme
+	- MAC stands for message authentication codes (MACs)
+	- MAC is also the name for the authenticator value $$
+
+*** Security of Secret-Key Systems (MAC's)
+- *Definition 10.5 (CMA Security of MACs)* A MAC scheme is $(t,q,\epsilon, \mu)$ CMA-secure if any adversary that runs in time at most $t$ and asks at most $q$ queries, on messages of total length $\mu$ bits, wins the followig game with probability at most $\epsilon$
+	- Given some system $(G,A,V)$, the adversary $E$ gets access to an oracle
+		- Which initially runs $G$ to get $K$
+	- $E$ may as many times as it wants send some message $m$ to the oracle who will return to $E$ the MAC $A_K(m)$
+		- i.e. $E$ gets to do a chosen message attack (CMA)
+	- At the end of the game, $E$ outputs a message $m_0$ and an authenticator $s_0$
+	- $E$ wins the game if $m_0$ is not one of the message the oracle was asked to authenticate and $V_K(a_0,m_0) = accept$
+
+** Existence of good MAC Schemes
+*** MACs from block ciphers
+- The most well-known scheme for MAC's is called CBC-MAC and is based on block ciphers
+	- Given a block cipher system one encrypts the input mesage in CBC mode using $IV = 0$ and define the MAC to be the final block of the ciphertext
+	- Therefore the MAC has fixed length no matter how long the message is
+
+- EMAC is the following scheme which solves the problem of blocks having to be divisible by $k$
+	- Define a new MAC scheme using 2 keys $K_1$, $K_2$
+	- Compute the CBC-MAC on the message using $K_1$
+	- This MAC is encrypted under $K_2$ and the output is the result of this
+	- It is formally defined as
+\begin{equation}
+	E M A C_{K_{1}, K_{2}}(m)=E_{K_{2}}\left(C B C-M A C_{K_{1}}(m)\right)
+\end{equation}
+
+- *Theorem 10.6* Suppose the block cipher $(G,E,D)$ is a $(t',q',\epsilon')$ secure PRF and has block length $k$. Then EMACS based on this block-cipher is a $(t,q,\epsilon, \mu)$ CMA-secure MAC scheme, where
+\begin{equation}
+	t \leq t^{\prime}, \quad \mu / k \leq q^{\prime}, \quad \epsilon=2 \epsilon^{\prime}+\frac{2(\mu / k)^{2}+1}{2^{k}}
+\end{equation}
+
+*** MACs from hash functions
+- HMAC is a MAC scheme based on any collision intractable hash function
+
+- The following is a HMAC based on SHA-1
+	- The key is a random 512-bit string $K$
+	- The scheme uses two 512 bit constant $ipad = 3636 \dots 36$, $opad = 5C5C \dots 5C$ in HEX notation
+	- The function is defined as follows:
+\begin{equation}
+	HMAC_{K}(m)=S H A 1((K \oplus opad)\|S H A 1((K \oplus ipad) \| m))
+\end{equation}
+- It can be proved secure in the random oracle model
+
+- HMAC is secure if the hash function is collision resistant and if the and if the basic compression function is secure in a weak sense when used as MAC
+
+* Digital Signatures
+** Definition of Digital Signature Schemes
+- An *Digital Signature System* $(G,S,V)$ is defined by
+	- A probabilistic key generation algorithm $G$
+		- Gets a security parameter $k$ as input
+		- Produces as output a pair of keys $(pk, sk)$
+	- Algorithm $A$
+		- Gets as input a message $m$ and the secret key $sk$
+		- Produces a signature $S_{sk}(m)$
+	- Algorithm $V$
+		- Gets as input a signature $s$, a message $m$ and public key $pk$
+		- Outputs $V_{pk}(s,m)$ which is equal to *accept* or *reject*
+		- It must be the case that $V_{pk}(A_{sk}(m),m) = accept$
+
+- The security parameter can be thought of as a measures of the amount of security we are after
+	- i.e. the larger $k$ the more secure the keys are
+	- All algorithms should be efficient i.e. polynomial time in $k$
+
+** Security of Signature Schemes
+- *Definition 11.1 (Security for Signature Schemes)* A signature scheme is CMA-secure if for any probabilistic polynomial time adversary $E$, $Adv_{E}(k)$ negligible as a function of $k$ where $Adv_{E}(k)$ is defined for the following game:
+	- The oracle runs $G$ on input $k$ to get $sk,pk$
+	- $pk$ is given to the adversary $E$ and $sk$ is kept inside the oracle
+	- The adversary can submit as many messages as he wants and for each message $m$ he will get $S_{sk}(m)$ back
+	- The adversary wins the game if he produces $m_0,s_0$ such that
+		- $m_0$ is not one of the messages the oracle was asked to sign
+		- $V_{pk}(s_0,m_0) = accept$
+	- The probability that $E$ wins is a function of the security parameter $k$ as is called $Adv_{E}(k)$
+
+** Signature schemes based on RSA
+- Given a hash function generator $\mathcal H$ and RSA a signature scheme can be defined as follows:
+	- *Key generation*:
+		- Run standard RSA key generation on input $k$ to get $((n,e),(n,d))$
+		- Run $\mathcal H(k)$ to get a hash function $h$
+		- It is assumed that one can generate $h$ such that $Im(h) = \mathbb Z_n$
+			- called a full domain hash
+		- Output $(pk,sk) = ((n,e,h),(n,d,h))$
+		- The message space is $\{0,1\}^*$
+	- *Signing* The signature on message $m$ is $S_{sk}(m)=(h(m))^d \text{ mod } n$
+	- *Verification* Given message and signature $(m,s)$ check that $s^e \text{ mod } n = h(m)$
+
+- *Theorem 11.2 (Security of Full Domain Hash)* If the hash function used in Full Domain Hash is modelled as a random oracle, then under the RSA assumption, Full Domain Hash is CMA secure
+
+** Signature schemes based on discrete logarithms
+*** The Schnorr signature scheme
+- The signature scheme
+	- *Key generation*
+		- An algorithm $\mathcal K$ is assumed that on input $k$ will output a prime $p$, a $k$ prime $q$ such that $q \mid (p-1)$ and $\alpha \in \mathbb Z_p^*$ of order $q$
+		- Run hash function generation $\mathcal H(k)$ to get hash function $h$ that maps to $\mathbb Z_q$
+		- Choose $a \in \mathbb Z_q$ at random
+		- Output $pk = (p,q, \alpha, \beta = \alpha^a \text{ mod } p)$ and $sk = a$
+	- *Signing* On input message $m$ and $pk,sk$
+		- Choose $r \in \mathbb Z_q$ at random
+		- Set $c = \alpha^r \text{ mod } p$
+		- Output the signature $(e,z) = h(m), (r + ea) \text{ mod } q)$
+	- *Verification* On input message $m$, signature $(e,z)$ and $pk$
+		- Set $c = \alpha^z \beta^{-e} \text{ mod } p$
+		- Check that $e = h(c,m)$
+			- Accept if this is the case
+			- Reject otherwise
+
+- The algorithm $\mathcal K$ will choose the prime $q$ first and repeat choosing $s$ at random until $p = 2sq + 1$ is prime
+	- $s$ needs to be large enough so that $p$ has the right size
+	- Choose $\alpha_0$ to be a generator of $\mathbb Z_p^*$ and set $\alpha = a_0^{(p-1/q)} \text{ mod } p$
+	- $p$ should be at least around 2000 bits while $q$ can be about 300 bits
+
+- *Lemma 11.3* If $h$ is modelled as a random oracle, then given a probabilistic polynomial time algorithm that breaks CMA security of the Schnoor signature scheme, one can build a probabilistic polynomial time algorithm that computes $a$ from $\alpha ^a \text{ mod } p$
+
+*** The ECDSA signature scheme
+- The scheme is based on an elliptic curve $E_{pk,a,b}$
+	- The curve is constructed such that the order is a prime $q$
+	- $p$ and $q$ are extremely close to each other
+	- Let $\alpha$ be a generator of the group
+
+- The scheme uses standard multiplicative notation for the group operation
+
+- The signature schemes
+	- *Key generation*
+		- Choose an elliptic curve $E_{p,a,b}$ of order a $k$ bit prime $q$
+		- Run hash function generator $\mathcal H(k)$ to get hash function $h$ that maps to $\mathbb Z_q$
+		- Choose $\alpha \in \mathbb Z_q$ at random
+		- Output $pk = (E_{p,a,b}, \beta = \alpha ^a \text{ mod } q)$ and $sk = a$
+	- *Signing* On input message $m$ and $p k, s k$
+		- Choose $r \in \mathbb{Z}_{q}$ at random, set $c = \alpha^r \text{ mod } p$
+			- $c$ are a point on the curve so $c= (c_x,c_y) \in \mathbb Z_p \times \mathbb Z_p$
+		- Set $z$ to be the leftmost $k$ bits of $h(m)$
+		- Set $s=r^{-1} \left(z+c_{x} \cdot a\right) \bmod q$
+		- Output the signature $(c_x, s)$
+	- *Verification* On input message $m$, signature $(c_x,s)$ and $pk$ compute the point
+\begin{equation}
+	d=\alpha^{z s^{-1} \bmod q} \beta^{c_{x} s^{-1} \bmod q}
+\end{equation}
+- where $x$ is as in the signing procedure. Let $d_x$ be its $x$ coordinate and check that $d_x = c_x$
+	- Accept if this is the case
+	- Otherwise reject
+
+- There is no security proof known for ECDSA	
+
+** Combining Signatures and Hashing in general
+- Given signature scheme $\Sigma$ and hash function generator $\mathcal H$ a new scheme $\Sigma'$ can be defined as follows:
+	- To generate keys
+		a) Make keys for $\Sigma$ by running $G$
+		b) Run $\mathcal H$ to get $h$ where it is assumed that $h$ maps to the plaintext space defined by $\Sigma$
+		c) $h$ is included in the public key of $\Sigma '$
+	- One can sign any bit string $m$ in the combined scheme $\sigma'$ by first computing $h(m)$ and then the signature $A_{s k}(h(m))$
+
+- *Theorem 11.4* If $\mathcal H$ is collision intractable and $\Sigma$ is secure, then $\Sigma'$ is secure
+	- It is essential the $h$ and $(sk,pk)$ are chosen independently at random
+
+** Existence of good Signature Schemes
+- *Theorem 11.5* One-way function exist if and only if secure signature scheme exist
+
+- The following is known as the Lamport-Diffie (LD) one-time signature scheme:
+	- To generate keys:
+		- Run $\mathcal H$ on input $k$ to get hash function $f$
+		- Choose $t$ pairs on of inputs
+\begin{equation}
+	\left(x_{0}^{1}, x_{1}^{1}\right),\left(x_{0}^{2}, x_{1}^{2}\right), \ldots,\left(x_{0}^{t}, x_{1}^{t}\right)
+\end{equation}
+- at random from $\{0,1\}^{k+1}$. The public key is know
+\begin{equation}
+	f,\left(y_{0}^{1}=f\left(x_{0}^{1}\right), y_{1}^{1}=f\left(x_{1}^{1}\right)\right), \ldots,\left(y_{0}^{t}=f\left(x_{0}^{t}\right), y_{1}^{t}=f\left(x_{1}^{t}\right)\right)
+\end{equation}
+- the secret key is the pairs of $$ values
+- The mesage space is $\{0,1}^t$
+- The signature on a bit string $b_1, \dots, b_t$ is $x_{b_{1}}^{1}, \ldots, x_{b_{t}}^{t}$
+- The signature verification is as follows
+	- One just evaluates $f$ on the $x$ values in the signature and verifies if the result matches the corresponding $y$ values in the public key
+- The scheme will be secure if it is used to sign at most ONE message
+
+- The following is a signature scheme based on LSD which is secure
+	- *Key generation*
+		- Construct a key pair $pk_0, sk_0$ for the LD scheme allowing to sign $t$ bit messages for even $t$
+		- Choose a hash function $h : \{0,1\}^* \to \{0,1\}^{t/2}$
+		- The public is $pk_0, h$
+		- The secret key is $sk_0$
+		- Initialize a list $L$ containing for each previously signed message:
+			- An LD key pair
+			- An LD signature
+			- A hash value (on a previously signed message)
+		- $L$ has initially only one element $((pk_0.sk_0), -, -)$ where the last two entries are empty
+	- *Signing a message* Assume that the message $m_i$ should be signed where it is the /i/'th message
+		- The last entry in $L$ is the key pair $p k_{i-1}, s k_{i-1}$, a signature $_{i-1}$ and a hash value $h(m_{i-1})$
+		- Generate an $LD key pair $pk_i,sk_i$ with parameters as above
+		- Compute $h\left(p k_{i}\right), h\left(m_{i}\right)$ and the signature $s_i$ on the concatenation of these two strings under the key pair $p k_{i-1}, s k_{i-1}$
+		- Return as signature on $m_{i}$ the sequence $\quad\left(s_{i}, p k_{i}, h\left(m_{i}\right)\right),\left(s_{i-1}, p k_{i-1}, h\left(m_{i-1}\right)\right), \ldots,\left(s_{1}, p k_{1}, h\left(m_{1}\right)\right)$
+		- Append $\left(\left(p k_{i}, s k_{i}\right), s_{i}, h\left(m_{i}\right)\right)$ to $L$
+	- *Verifying a signature* Given message $m$, public key $h, pk_0$ and signature $\left(s_{i}, p k_{i}, h\left(m_{i}\right)\right),\left(s_{i-1}, p k_{i-1}, h\left(m_{i-1}\right), \ldots,\left(s_{1}, p k_{1}, h\left(m_{1}\right)\right)\right$
+		a) Verify that $h(m)$ matches the hash value in the first triple in the signature
+		b) For $j = i$ down to $1$ verify that $s_j$ is a valid LD signature on $h\left(p k_{j}\right) \| h\left(m_{j}\right)$ under public key $pk_{k-1}$
+
+** Dealing with replay attacks
+- A simple way to deal with replay attacks is to make sure that the sender never sends the same message twice e.g. by appending a sequence number to what should be authenticated
+	- It is hardly a practical solution since the sequence number quickly gets to large
+	- To deal with lost message one can check that the sequence number is $\geq n$ message
+
+- One can also append a timestamp to message
+	- The receiver should check the time stamp to ensure that it is not too far from his own time
+
+- One may use interaction
+	a) The receiver first send a number $R$ to the sender
+		 - This number can be chosen at random or be a sequence number
+	b) The sender sends the message plus a MAC computed over the message and $R$ which will prevent replay

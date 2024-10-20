@@ -1,0 +1,1334 @@
+* Writing Academic Paper
+- Der skal både være en dansk og engelsk titel
+- 30 minutters eksamen
+- Krav til rapporten?
+- Skriv ting ned undervejs
+- Plan mindst 90 timer til at færdigøre rapporten
+- Appendiks er for den interessere læser
+	- Man skal kunne læse rapporten uden at kigge i appendiksen
+	- Censor vil typisk ikke læse dette
+- Man vil typisk arbejde på hoveddelen først
+- Det er vigtigt at tingene kan læses uafhængig af hinanden
+	- Præsenterer de ting hurtigt der er gode
+	- Giv en indikation af hvad har opnået i abstraktet
+- Forside
+	- Dansk + engelsk titel
+	- Navn + studienumre
+	- Vejledere
+	- Skriv Hvad det er hvor det er og hvornår
+- Titel
+	- Skal sige så meget som muligt
+	- 1 - 1.5 linje
+	- Brug tid på denne
+	- Engelsk, dansk titel skal være direkte oversættelse
+- Abstrakt
+	- To eller tre af de vigtigste resultater
+	- Ingen referencer
+	- Læses helt alene
+- Beskrive klart hvornår det er noget vi har lavet og hvornår det er noget andre har lavet (slide 15)
+- Sæt sig ned og find ud af hvad de vigtigste 2-5 ting vi har lavet
+	- Bruges i abstraktet og til præsentationen
+	Sprog og grammatik
+	- Når man introducerer et begreb, skal man bruge det begreb til at beskrive dette konsekvent
+	- Brug korte sætninger
+	- Simplificere sproget og strukturen
+	- Små grammatiske fejl er okay
+	- Husk konkatenering af ord gør man typisk ikke på engelsk
+	- Engelsk eller amerikansk engelsk
+- Kig teksten igennem, før man sender til vejleder
+
+* Secure Multiparty Computation and Secret Sharing
+** Private Information, Uses and Misuses
+	 - In a modern society the information that is a main concern here is the information closer to the "primary business" of an individual or a company
+		 - e.g. income, loads etc for an individual and customer database, information about how the company is running etc for a company
+		 - Security in the modern society are much more complicated than they used to be
+		 - Computations are needed between parties whom never made and maybe with conflicting interest
+		 - It is important to have ways of controlling leakage of confidential data while the data is store, communicated or computed on
+
+*** Auctions  
+		- When doing online auctions it is important that ones maximum bid is a secret
+			- Such that a potential seller can make you pay your maximum
+
+*** Procurement
+		- It is an inverted auction where some party ask companies to bid for a contract
+			- The lowest bid wins
+			- The result of the process can in principle be computed given all the true values of the bids
+
+*** Benchmarking
+		- One wants to compare themselves to other companies
+			- Each company wants its data to be private and not leak to competitors
+
+*** Data Mining
+		- One wants to get some statistics for many different kinds of private information
+			- This should be done without knowing the individual persons identity 
+
+** Do We Have to Trust Someone?
+	 - We have a number of parties that each possess some private data
+		 - We want to do some computation that needs all the private data as input
+		 - The parties are interested in learning the result or part of it, but still keep their private data as confidential as possible
+		 - A solution to this problem have a potential large number of application which would benefit
+
+	 - A trivial solution would be to find some party $T$ that everyone is willing to trust
+		 1. All the parties can give their input to $T$
+		 2. $T$ does the required computation
+		 3. He announces the results to the parties
+		 4. Forgets about the private data he has seen
+
+	 - Problems with the trivial solution
+		 - It has a single point of attack where all the private data can potentially be stolen
+		 - The parties must all completely trust $T$
+			 - Both with respects to privacy and correctness of the results
+		 - The reason there is privacy concerns is that the parties does not truest each other in the first place
+			 - Then why should they believe that they can find a new party that they trust
+		 - Parties might be satisfied if the amount paid is thought to be larger than what $T$ could gain from cheating
+			 - This is a very expensive solution
+
+** Multiparty Computation
+	 - The parties or players that participate are called $\mathsf{P}_1, \dots, \mathsf{P}_n$
+		 - Each player $\mathsf{P}_i$ holds a secret input $x_i$
+		 - The players agree on some function $f$ that takes $n$ inputs
+		 - The goal is to compute $y=f(x_1, \dots, x_n)$ while making sure that the two following conditions are satisfied
+			 - *Correctness:* the correct value of $y$ is computed
+			 - *Privacy:* $y$ is the /only/ new information that is released
+		 - Computing $f$ such that privacy and correctness are achieved are referred to as computing $f$ *securely*
+
+	 - To solve this problem a protocol is specified
+		 - For simplicity is it is assumed for now that players always follow the protocol
+		 - Later the case is handled where some players deviated from the protocol
+		 - It is also assumed that any pair of players can communicate securely
+
+*** Secure Addition and Voting 
+		- Each $x_i$ is a natural number
+			- $f(x_1, \dots, x_n) = \sum_{i=1}^nx_i$
+			- It can be used for secure voting
+				- $\mathsf{P}_1, \dots, \mathsf{P}_n$ wants to vote on some yes/no decision
+				- $x_i=0$ means no 
+				- $x_i=1$ means yes
+				- The result is the number of yes votes
+			- We set $n=3$
+
+**** Secret sharing 
+		 - The point is that sharing provides a way for a party e.g. $\mathsf{P}_1$ to spread information on a secret number $x$ across all the players
+			 - Such that they together hold full information on $x$
+			 - Yet no player has any information on $x$
+		 - We chose a prime $p$ 
+		 - Define $\mathbb Z_p$ as $\mathbb Z_p=\{0,1,\dots, p-1\}$
+			 - The secret is a number in $\mathbb Z_p$
+		 - To share a secret $x$
+			 1. $\mathsf{P}_1$ chooses numbers $r_1, r_2$ uniformly at random in $\mathbb Z_p$ and sets $r_3 = x-r_1-r_2 \text{ mod } p$
+			 2. $\mathsf{P}_1$ sends privately $r_1,r_3$ to $\mathsf{P}_2$ and $r_1,r_2$ to $\mathsf{P}_3$
+			 3. He keeps $r_2,r_3$ to himself
+					- The $r_j$'s are called the shares of the secret $x$  
+		 - Security
+			 - *Privacy.* Even though $\mathsf P_1$ has distributed shares of the secrets $x$ to other players, neither $\mathsf P_2$ nor $\mathsf P_3$ has any idea what $x$ is
+				 - For $\mathsf P_2$ he knows $r_1, r_3$ but not $r_2$ and that $x=r_1+r_2+r_3 \text{ mod } p$
+				 - Take any $x_0 \in \mathbb Z_p$
+				 - From $\mathsf{P}_2$'s point of view the following could be true $x=x_0$
+				 - It would just have to be the case that $r_2 = x_0 - r_1-r_3 \text{ mod } p$
+				 - Since $r_2$ is chosen at random this is certainly possible
+				 - Any other choice is also possible with the same argumentation
+				 - There what $\mathsf{P}_1$ has sent to $\mathsf{P}_2$ reveals nothing about $x$
+				 - A similar arguments holds from $\mathsf{P}_3$'s point of view
+			 - *Correctness.* If two of the three parties pool their information the secret can be reconstructed
+				 - Since then all three share will be known
+				 - One can simply add them modulo $p$
+			 - The privacy property is *information theoretic*
+				 - As long as a party does not know all three summands no amount of computing power can give him any new information
+
+**** Protocol Secure Addition
+		 [[file:Secure Multiparty Computation and Secret Sharing/screenshot_2019-02-07_12-33-37.png]]
+		 - The idea for secure addition is that all players $\mathsf P_1$ $\mathsf P_2$ and $\mathsf P_3$ will distribute shares of their private values $x_1, x_2$ and $x_3$ using secret sharing
+			 - One can compute the sum by locally adding shares and announcing the result 
+			 - The following shows why the result is the correct result
+		 [[file:Secure Multiparty Computation and Secret Sharing/screenshot_2019-02-07_12-46-43.png]]
+	
+		 - Argument for why no new information other than the result $v$ is leaked to any player, where we concentrate on $\mathsf P_1$
+			 - In step 1 $x_1$, $x_2$ and $x_3$ are secret shared and by the argument for secret sharing no new information is learned
+			 - In the final step $s_1, s_2, s_3$ are announced
+				 - $\mathsf P_1$ already knows $s_2$ and $s_3$, so $s_1$ is the only new piece of information
+				 - Seeing $s_1$ only tell $\mathsf P_1$ and nothing more since if one is given $s_2, s_3, v$ one can compute $s_1 = v-s_2-s_3 \text{ mod } p $
+				 - This type of reasoning is called a *simulation argument*
+			 - Given the result the party can compute $x_2 + x_3 = v- x_1$ i.e. the sum of the other peoples votes
+				 - This is not a problem since there is no way around this 
+
+*** Secure Multiplication and Match-Making 
+		- The secret sharing scheme also allows us to do secure multiplication
+			- Suppose two number $a,b \in \mathbb Z_p$ have been secret shared so $a=a_1+a_2+a_3 \text{ mod } p$ and $b=b_1 + b_2 + b_3 \text{ mod } p$ and we which two compute the product $ab \text{ mod } p$ securely
+			- We have $ab = a_1b_1 + a_1b_2 + a_1b_3 + a_2b_1 + a_2b_2 + a_2b_3 + a_3b_1 + a_3b_2 + a_3b_3 \text{ mod } p$ 
+			- If the parts has been distributed as in SECURE ADDITION all the different products can be computed by different people
+
+		[[file:Secure Multiparty Computation and Secret Sharing/screenshot_2019-02-07_14-18-14.png]] 
+		- The reason that this protocol is correct is that no new thing about $a,b$ is reveal in the first step and since the PROTOCOL SECURE ADDITION is private nothing except the sum of the inputs is revealed in the last step and this sum always equals $ab \text{ mod } p$ 
+
+** What is Players Do Not Follow Instructions?
+	 - There are two fundamentally different ways in which players could deviate from expected behavior:
+		 1. They could choose their inputs in a way different from what was expected when the protocol was designed
+		 2. While executing the protocol they could do something different from what the protocol instructs the to do 
+
+	 - Choice of inputs
+		 - To do secure computation we have to assume that players have an incentive to provide inputs that will lead to a meaningful result they would like to learn
+
+	 - Deviation from the Protocol
+		 - A player might deviate from the protocol to learn more information than he was supposed to get
+			 - Or it could allow him to force the computation to give the wrong result
+		 - One solution is to add mechanisms to the procol which ensure that any deviation from the protocol will be detected
+		 - In Protocol SECURE ADDITION we first ask each party to distribute shares of their secrets, there are two ways a party e.g. $\mathsf P_1$ can deviate
+			 1. $\mathsf P_1$ could pick $r'_{1,1},r'_{1,2},r'_{1,3}$ such that $x_1 \ne r_{1,1}' + r_{1,2}' + r_{1,3}' \text{ mod } p$
+					- Not problem since the party could just have picked that input as an input
+					- One could not and should not prevent $\mathsf P_1$ from being able to pick any input it desires 
+			 2. $\mathsf P_1$ could send $r_{1,1},r_{1,3}$ to $\mathsf P_2$ and $r'_{1,1},r_{1,2}$ to $\mathsf P_3$
+					- More serious as now the input $x_1$ of $\mathsf P_1$ is not well-defined
+					- It might of might not lead to an attack but it is at least a clear deviation from the protocol
+					- One can catch this deviation when $\mathsf P_1$ sends it values to the two parties that can check if they are equal
+						- Reveals no new information since the two numbers should be equal
+					- If $\mathsf P_1$ tries the same in the sharing phase both shares it can compute can be checked the same way by the two other parties
+		 - The Protocol SECURE ADDITION has the following property: if any since party does not do what he is supposed to, the two other players will always be able to detect this 
+
+* Multi-Authority Secret-Ballot Elections with Linear Work
+** Introduction
+*** General
+- There is three important requirements to electronic voting schemes
+	- *Universal Verifiability* ensures that any party, including a passive observer, can convince herself that the election is fair
+		- i.e. the published final tally is computed fairly from the ballots that were correctly cast
+	- *Privacy* ensures that an individual vote will be kept secret from any (reasonably sized) coalitrion of parties that does not include the voter herself
+	- *Robustness* ensures that the system can recover from the faulty behavior of any (reasonably sized) coalition of parties
+
+*** Overview of the approach
+- The parties in a voting scheme are modelled as probabilistic polynomial time processes
+
+- For the parties two means of communication are assumed to be available
+	- A *bulletin board* which is a broadcast channel with memory that can be observed and read by all parties
+		- Each party controls their own section of the board
+		- The party can post messages exclusively to its own section
+		- A party cannot erase or overwrite previously posted messages
+	- *Private channels* to support private communication between voters and authorities
+		- Any secure public-key encryption scheme is suitable
+		- One can possibly use the bulletin board to post the corresponding encryption
+
+- The parties of the voting scheme perform the following steps to execute an election
+	- To cast a vote each voter constructs a ballot as an encryption of the desired vote and post the ballot to the bulletin board
+		- A proof of validity is needed that proves to all parties that the posted encryption contains a valid vote
+	- The authorities are able to decrypt the ballots because of the extra information received from the voter through the private channel 
+	- In the end the final tally is published together with some auxiliary information to enable universal verifiability
+		- Any interested party may "accumulate" the encrypted votes and check the final tally, by holding it against this accumulation and the auxiliary information
+
+- The universal verifiability is achieved by requiring the encryption to be suitably homophobic
+	- A different security property of the encryption ensures that the authority cannot accumulate the individual votes in any other way than the voters actually voted
+	- They are available under a wide variety of common cryptography assumptions
+
+- Multiple authorities are used to ensure privacy
+
+** Cryptographic Primitives
+*** The Discrete Logarithm Problem
+- Let $\mathcal G = \{\mathcal G_k\}$ be a family of groups of prime order such that the group operations can be performed efficiently
+	- Groups elements can be efficiently sampled with uniform distribution
+	- Group membership as well as equality of group elements can be efficiently tested
+
+- Let $Gen$ be a probabilistic polynomial time generator that on input $i^k$ outputs a description of a group $G \in \mathcal G_k$ including a group order and two random elements $g,h$ from $G$
+
+- The discrete logarithm problem for $\mathcal G$ is intractable over $Gen$ if there is no probabilistic polynomial time algorithm that on input of $G$, $g$ and $h$ as the output by $Gen(1^k)$ can compute $\log_gh$ with non-negligible probability in $k$   
+
+- Each family $\mathcal G$ for which it is reasonable to assume the intractability of the discrete logarithm problem is suitable for constructing efficient and secure homomorphic encryption schemes with proofs of validity
+	- An well known example is obtained by choosing large primes $p$ and $q$ at random such that $q  \mid p-1$ then $G$ is the unique subgroup of order $q$ in $\mathcal Z_p ^*$
+	- The discrete logarithm problem for elliptic curves over finite fields is also a candidate for implementation
+
+*** Homomorphic Encryption with Efficient Proof of Validity
+[[file:Multi-Authority Secret-Ballot Elections with Linear Work/screenshot_2019-03-19_08-40-14.png]]
+	
+- Let $\mathcal G$ be a family of groups of prime order and generator $Gen$ as above
+- Assume that the discrete logarithm problem for $\mathcal G$ is intractable
+- The following is an encryption scheme with an efficient proof of validity
+	- *Initialization:* The participants, or a subset of them, run $Gen(1^k)$ and obtain a group $G_q$ of prime order $q$ and random group elements $g$ and $h$
+		- A way to do this is that the participants agrees on a program for $Gen$ first
+		- They each run separately $Gen(1^k)$ using some randomness
+	- *Encryption:* A participant encrypts $b \in \mathbb Z_q$ by choosing $\alpha \in \mathbb Z_q$ at random and computing $B \leftarrow g^\alpha h^v$
+	- *Opening:* A participant can open $B$ by revealing both $v$ and $\alpha$
+		- A verifying part checks whether $B = g^\alpha h^v$ and accepts $v$ as the encrypted value
+	- *Homomorphic Property:* Encryption is homomorphic in the sense that if $B_1$ and $B_2$ are encryption of $v_1$ and $v_2$
+		- $B_1B_2$ is an encryption of $v_1 + v_2 \text{ mod } q$
+		- $B_1^{-1}$ flips the sign
+		- $B_1 h$ is an encryption of $v_1 + 1 \text{ mod } q$
+	- *Proof of Validity:* To prove that the encrypted value is in $\{1,-1\}$ the voter and the verifier uses the proof of validity of Figure 1
+
+[[file:Multi-Authority Secret-Ballot Elections with Linear Work/screenshot_2019-03-19_08-45-11.png]]
+	
+- To prove ones identity using a $\mathcal H$ which is a suitable strong cryptographic hash function
+	- The challenge is computed as $c=\mathcal H(B,a_1,a_2)$
+	- The set of values $d_1$, $d_2$, $r_1$ and $r_2$ is denoted $\text{proof}(B)$
+	- Given the values in $\text{proof}(B)$ any participant can check the validity of $B$ of verifying that $d_1 + d_2 = \mathcal H(B, g^{r_1}(Bh)^{-d_1},g^{r_2}(B/h)^{-d_2})$
+
+** Secret Ballot Election Scheme
+*** General
+- The participants in the electron scheme are
+	- $n$ authorities $A_1, \dots, A_n$
+	- $m$ voters $V_1, \dots, V_m$
+
+- Privacy and robustness are as follows
+	- No collusion of fewer than $t$ authorities can reveal an individual vote
+	- The electron will be successful when at least $t$ authorities operate properly $1 \leq t \leq n$
+	- A simple mechanism is incorporated to postpone the decision on what to vote until the preparation of the election has completed
+
+- The scheme works as follows
+	- Each voter $V_i$ prepares a vote by randomly selecting a number $b_i$ in $\{1,-1\}$
+	- The voter encrypts $b_i$ by computing $B_i = g^{a_i}h^{b_i}$, where $\alpha_i \in \mathbf Z_q$ is chosen randomly
+	- $B_i$ is posted to the bulletin board
+	- $b_i$ is considered as a secret which is to be shared among the authorities
+
+- A verifiable secret sharing scheme is used to prevent voters from disrupting elections by sending false shares to authorities
+	- The idea is to let the voter as the dealer sending a verifiable share $b_i$ to each authority using the proper private channels
+	- The voter post $\text{proof}(B_i)$ to the bulletin board to prove that $B_i$ indeed encrypts a value in $\{1,-1\}$
+	- The voter may later cast a vote $v_i \in \{1, -1\}$ by publishing the value $s_i = b_i v_i$
+	- In the end the aggregate value $T= \sum_{i=1}^m v_i$ reduced modulo $q$
+		- Such that $-q/2 < T <q/2$ represents the total number of yes votes minus the number of no votes
+		- The total number of yes-votes is $(m+T)/2$
+		- For these numbers to be correct the requirement is that $m < q/2$
+
+*** Ballot construction
+- Each voter $V_i$ prepares a masked vote $b_i \in \{1,-1\}$ in the following way
+	1. The voter chooses $b_i$ randomly from $\{1,-1\}$ and computes the ballot $B_i =g^{\alpha_i} h^{b_i}$
+		 - Where $\alpha_i$ is randomly chosen from $\mathbb Z_p$
+		 - The voter computes $\text{proof}(B_i)$
+		 - The voter determines polynomial $G_i$ and $H_i$
+			 - $G_i(x) = \alpha _i + \alpha_{i1} x + \dots + \alpha_{i,t-1}x^{t-1}$
+			 - $H_i(x) = b_i + \beta_{i1} x + \dots + \beta_{i,t-1}x^{t-1}$
+		 - The coefficients $\alpha_{il}$, $\beta_{il}$, $1 \leq l <t$ are chosen at random from $\mathbb Z_q$
+		 - For the coefficients the voter computes the commitments $B_{il} = g^{\alpha_{il}}g^{\beta_{il}}$
+	2. The voter post $B_i$, $\text{proof}(B_i)$, $B_{i1}, \dots, B_{i,t-1}$ to the bulletin board
+	3. All participants verify whether ballot $B_i$ is correctly formed by checking $\text{proof}(B_i)$
+	4. The voter sends the respective shares $(a_{ij},b_{ij}) = (G_i(j), H_i(j))$ to authority $A_j$ using a private channel
+	5. Each authroity checks the received share $(a_{ij},b_{ij})$ by verifying that
+[[file:Multi-Authority Secret-Ballot Elections with Linear Work/screenshot_2019-03-19_14-42-58.png]]
+
+*** Vote Casting
+- To cast a vote $s_i \in \{1,-1\}$ such that $v_i = b_i s_i$ represents the desired vote
+
+*** Tallying
+1. Each authority $A_j$ posts
+	 - The sum $S_j = \sum_{i=1}^m a_{ij} s_i$
+	 - The sub-tally $T_j = \sum_{i=1}^m b_{ij}s_i$
+2. Each tallier checks the share $(S_j, T_j)$ posted by authority $A_j$ by verifying that
+[[file:Multi-Authority Secret-Ballot Elections with Linear Work/screenshot_2019-03-19_14-53-28.png]]
+3. From $t$ pairs $(j,T_j)$ that correspond to authorities for which the shares $(S_j,T_j)$ are correct, each tallier can compute the final tally $T$ from the formula
+[[file:Multi-Authority Secret-Ballot Elections with Linear Work/screenshot_2019-03-19_14-53-49.png]]
+where $A$ denotes the set of $t$ correct authorities
+
+- *Theorem 2* Under the discrete logarithm assumption our secret-ballot election scheme satisfies universal verifiability, robustness and privacy 
+
+* Secret Sharing
+** The Concept
+- A *threshold secret sharing scheme* is defined by a probabilistic algorithm $\mathcal S$
+	- It takes as input a secret $s$ chosen from some finite set $S$
+	- It outputs $n$ shares i.e. bit strings $s_1, \dots, s_n$
+
+- The secret sharing scheme comes with a *threshold $t$
+	- A number $0 < t < n$
+
+- The idea is that at most $t$ shares are known
+	- This reveals nothing about $s$
+	- Any set of at least $t+1$ shares determine $s$ uniquely
+
+- One wants:
+[[file:Secret Sharing/screenshot_2019-03-25_10-41-49.png]]
+
+** An implementation 
+- One sets $S = \mathbb Z_p$ for some prime $p$, where $p> n$ and $t$ is the threshold value
+- The algorithm $\mathcal S$ proposed by Shamir can be described as
+	1. Choose elements $a_1, \dots a_t \in \mathbb Z_p$ at random
+		 - Let $f(x)$ be the polynomial $f(x) = s + a_1 x + a_2 x^t + \dots + a_t x^t$
+		 - i.e. chose a random polynomial $f(x)$ over $\mathbb Z_p$ of degree at most $t$, such that $f(x) = s$
+	2. Let the shares be defined by $s_i = f(x) \text{ mod } p$ for $i = 1, \dots, n$
+
+- This scheme satisfies the properties describe because of the so called *Lagrange interpolation*:
+[[file:Secret Sharing/screenshot_2019-03-25_10-49-08.png]]
+
+- A polynomial is called *relevant* if it evaluates to $s$ and $0$ and has degree at most $t$
+	- Any relevant polynomial $f$ leads to a set of shares with indices in $I$ i.e. $\{f(i) \mid i \in I\}$
+	- Consider any set of potential shares $A = \{s_i \mid i \in I\}$
+	- Sharing $s$ results in all potential sets of shares $A$ being equally likely
+		- It is true for any $s$ and $I$ and therefore privacy follows
+
+** Some more general facts on secret sharing
+[[file:Secret Sharing/screenshot_2019-03-25_10-59-14.png]]
+	
+* Commitment Schemes
+** Introduction
+- Commitment in this context means that a player in a protocol is able to
+	- Choose a value from some finite set
+	- Commit to a choice so he can no longer change his mind
+	- He do not have to reveal his choice
+		- He may choose to do this at a later time
+
+- There are two important properties in a commitment scheme
+	- The *binding property* a given party cannot change his choice
+	- The *hiding property* is that another party cannot see what a given party has chosen without the given party revealing it somehow
+
+** (In)distinguishability of Probability Distributions
+- *Definition 1* $\epsilon(l)$ is negligible in $l$ if for any polynomial $p$, $\epsilon(l) \leq 1/p(l)$ for all large enough $l$
+	- It is said that events that occur with negligible probability occur so seldom that polynomial time algorithms will never see them happening
+
+- Consider a probabilistic algorithm $U$
+	- For possible string $y$ there some probability that $y$ is output when $x$ was the input
+	- This is called $U_x(y)$
+	- $U_x$ is the probability distribution of $U$'s output on input $x$
+	- It is required that $U$'s output is polynomial in the input length
+
+- Consider two probabilistic algorithms $U$, $V$ and the following experiment is done
+	- We run both $U$ and $V$ on the same input $x$ and one of the outputs $y$ produced is chosen
+	- $x$ and $y$ are given to a third party $D$ called the *distinguisher*
+	- $D$ is asked which of the two algorithms are used ti produce $y$
+	- $U$, $V$ are *indistinguishable* if $D$ has a hard time
+
+- *Definition 2* Given two probability distributions $P$, $Q$, the *statistical distance* between them is defined to be $SD(P,Q) = \sum_y |P(y)-Q(y)|$
+	- Where $P(y)$ (or $Q(y)$) is the probability $P$ (or $Q$) assigns to $y$
+
+- *Definition 3* Given two probabilistic algorithms (or families of distribution) $U$,$V$ we say that
+	- $U$, $V$ are *perfectly indistinguishable* written $U \sim^p V$, if $U_x = V_x$ for every $x$
+	- $U$, $V$ are *statistically indistinguishable* written $U \sim^s V$, if $\text{SD}(U_x,V_x)$ is negligible in the length of the string $x$
+	- $U$, $V$ are *computationally indistinguishable* written $U \sim^c V$, if the following holds for every probabilistic polynomial time algorithm $D$
+		- Let $p_{U,D}(x)$ be the probability that $D$ outputs "$U$" as its guess, when $D$'s input comes from $U$
+		- Similarly let $p_{V,D}(x)$ be the probability that $D$ outputs "$V$" as its guess when $D$'s input comes from $V$
+		- Then $|p_{U,D}(x) - p_{V,D}(x)|$ is negligible in the length of $x$
+
+- Sometimes one does not want to consider how $U$, $V$ behave on arbitrary input $x$, but only when $x$ is in some language $L$
+	- One e.g. says $U \sim ^c V$ on input $x \in L$
+
+- If $U \sim ^p V$, $D$ has no change of distinguishing at all, no matter how much computing power
+	- The best bet is coin flip
+
+- If $U \sim^s V$, $D$ may have a small advantage over a random guess
+	- It will remain negligible independent of computing power
+
+- If $U \sim^c V$ the distributions $U_x$, $V_x$ may be totally different
+	- It requires a lot of computing power to tell the difference
+	- $D$'s changes of success remain small if it is limited to polynomial time
+	
+** Defining Commitment Schemes
+- A commitment scheme is thought of as being defined by a probabilistic polynomial time algorithm $\mathcal G$ called a *generator*
+	- It takes as input $1^l$ where $l$ is a security parameter and corresponds to e.g. the length of RSA modulus we want
+	- It outputs a string $pk$, the public key of the commitment scheme
+	- The scheme defines for every public key $pk$ a function $\mathsf{commit}_{pk}: \{0,1\}^l \times \{0,1\} \rightarrow \{0,1\}^l$
+		- The idea is that a $0/1$ value can be committed to
+
+- To use the scheme in practice
+	- One first executes a *setup phase* once and for all
+		1. Either $P$ or $V$ runs $\mathcal G$ and sends the public key $pk$ to the other party
+		2. In some schemes it is necessary to convince the other party that $pk$ was correctly chosen
+		3. One may reject the set-up phase i.e. the party refuses to use the public key received 
+	- Assuming that the public key was accepted, to commit to a bit $b$
+		- $P$ chooses $r$ at random from $\{0,1\}^l$ and computes the commitment $C \leftarrow \text{commit}_{pk}(r,b)$
+		- To open a commitment, $r,b$ are revealed,
+			- $V$ checks that indeed $C = \text{commit}_{pk} (r,b)$
+
+- Two flavors of commitment schemes are distinguished
+	- *Unconditional binding and Computational hiding*
+		- *Unconditional binding:* Means that even with infinite computing power, $P$ cannot change his mind after committing
+			- It is required that if $pk$ is correctly generated, then $b$ is uniquely determined from $\text{commit}_{pk}(r,b)$
+				- i.e. for any $c$, there exists at most one pair $(r,b)$ such that $c = \text{commit}_{pk}(r,b)$
+			- An honest $V$ accepts an incorrectly generated $pk$ with probability negligible in $l$
+		- *Computational hiding:* Means that a polynomially bounded $V$ will have a hard time guessing what is inside a commitment
+			- It is required that $(pk,\text{commit}_{pk}(r,0)) \sim ^c (pk,\text{commit}_{pk}(s,1))$
+	- *Computational binding and Unconditional hiding:*
+		- In this type of scheme, $V$ will run the key generator and send the public key to $P$, who verifies the key and either accepts or rejects
+		- *Computational binding:* Unless one has very large computing the ones changes of being able to change ones mind are very small
+			- Take any probabilistic polynomial time algorithm $P^*$ which takes as input a public key produced by the generator $\mathcal G$ on input $1^l$
+			- Let $\epsilon (l)$ be the (over the random choices of $\mathcal G$ and $P^*$) probability with which the algorithm outputs a commitment and two valid opening revealing distinct values
+				- i.e. it outputs $C, b,r,b^{'}, r^{'}$ such $b\ne b'$ and $\text{commit}_{pk} (r,b) = C = \text{commit}_\text{pk}(r^{'},b^{'})$
+			- Then $\epsilon(l)$ is negligible in $l$ 
+		- *Unconditional hiding:* Means that a commitment to $b$ reveals (almost) no information about $b$
+			- Even to an infinitely powerful $V$
+			- It is required that if we restrict to correctly generated $pk$'s then $\text{commit}_{pk}(r,0) \sim^s \text{commit}_{pk}(s,1)$
+				- For randomly independent $r,s$ 
+			- An honest $P$ should accept an incorrectly generated $pk$ with at most negligible probability
+			- In the best case $\text{commit}_{pk}(r,0) \sim^p \text{commit}_{pk}(s,1)$ and $P$ never accepts a bad $pk$ $\text{commit}_{pk}(r,0) \sim^s \text{commit}_{pk}(s,1)$
+				- i.e. commitments reveal no information about the committed values
+				- Then it is called *perfectly hiding commitments* 
+
+** Examples of commitment schemes
+- Any secure public key encryption scheme, where validity of the public key can be checked efficiently can be used as a commitment scheme
+ 
+- Consider any algorithm for generating on input $1^l$ a secure RSA $l$ bit modulus $n$
+	- This can be extended by choosing a prime $q > n$ and defining $f(x) = x^q \text{ mod } n$
+	- Assuming that RSA with modulus $n$ a public exponent $Q$ is secure $f$ is a one-way function
+		- i.e. given $f(x)$ is hard to compute $x$
+	- $f$ is a *homomorphism*
+		- i.e., $f(1) = 1$ and $f(xy) = f(x)f(y)$
+	- Since $q$ is a large prime than $n$, must be prime to $\phi(n)$ and so $q$ is a valid RSA exponent
+		- This means that one directly can check from $n$,$q$ that $f$ is a 1-1 mapping on $Z_n^*$
+	- The algorithm for selecting $n,q$ will be called $\mathcal H$
+
+- *RSA assumption:* Suppose we run $\mathcal H$ on input $1^l$ to get $n$, $q$, choose $x$ at random in $Z_n^*$ and run any probabilistic polynomial time algorithm $A$ on input $n,q,f(x)$. Then the probability that $A$ outputs $x$ is negligible in $l$
+
+- Using the RSA assumption one can build a unconditional hiding commitment scheme as follows
+	- *Set-up Phase:* The key generator $\mathcal G$ for the commitment scheme is defined based on $\mathcal H$ as follows
+		1) It runs $\mathcal H$ on input $1^l$
+		2) It chooses a random element $x \in Z^*_n$ and outputs as public key $n,q$ and $y = f(x)= x^q \text{ mod } n$
+		3) $V$ runs $\mathcal G$ and sends the output $n,q,y$ to $P$, who checks that $y \in \text{Im}(f) = Z_n^*$
+			 - i.e. it checks that $\text{gcd}(y,n) = 1$ 
+	- *Commit function:* is defined as a mapping from $Z^*_n \times \{0,1\}$ to $G$
+		- Concretely, $\text{commit}_{pk}(r,b) = y^bf(r)\text{ mod } n$
+	- *Hiding Property:* is unconditional satisfied
+		- Since $P$ can verify without error that $q$ is a valid exponent and that $y \in \text{Im}(f)$
+		- A commitment to $b$ will have distribution independent of $b$ i.e. the uniform distribution over $Z_n^*$ because
+			- $P$ chooses $r$ uniformly in $Z_n^*$
+			- $f$ is a one-to-one mapping and therefore $f(x)$ is also uniform in $Z_n^*$
+			- Multiplication by the constant $y$ is also a one-to-one mapping in the group $Z_n^*$
+			- $y f(x) \text{ mod } n$ is uniform as well
+		- These commitments are perfectly hiding
+	- *Binding Property:* follows from the following fact
+		- We are given an algorithm $A$ that breaks the binding property with success probability $\epsilon$ in time $T_A$
+		- Then there exists an algorithm $A'$ that breaks RSA encryption as generated by $\mathcal H$ with success probability $\epsilon$ as well and in time $T_A$ plus the time needed for one inversion and one multiplication in $Z_n ^*$
+		- Existence of $A$ implies existence of an algorithm $A'$ that contradicts the assumption on $\mathcal H$
+
+** Theoretical Results of Existence of Commitment Schemes
+- *Theorem 2.1* If one-way functions exist, then commitment schemes with unconditional biding and computation hiding exists
+
+- *Theorem 2.2* If one-way functions exist, then commitment schemes with computational biding and unconditional hiding exists
+
+- *Theorem 2.3* If collision-intractable hash functions exist, then there exists commitment schemes with unconditional hiding and computational biding
+
+- A collision intractable hash function is $h \{0,1\}^k \leftarrow \{0,1\}^l$ such that
+	- $l< k$
+	- $h$ is easy to compute
+	- It is hard to find $x \ne y$ such that $h(x) = h(y)$
+
+* Zero Knowledge Protocols
+** A Simple Example
+- Loose definition of *zero-knowledge*: a protocol is zero-knowledge if it communicates exactly the knowledge that was intended, an no (zero) extra knowledge
+	
+- To prove that a user knows a secret key $sk$ the server can encrypt a random string $x$ under some public key $pk$ and ask the user what $x$ is 
+	
+- The user, who is the one wanting to convince the other about the truth of some claim will be called the *Prover* ($P$)
+- The host, who is interested in checking that the claim is true will be called the verifier ($V$)
+- A simple protocol is as follows
+	1. If the prover claims to be $A$ the verifier chooses a random message $M$ and sends the ciphertext $C = P_A(M)$ to the prover
+	2. The prover decrypts $C$ using $S_A$ and sends the result $M'$ to the verifier
+	3. The verifier accepts the identity of the prover if and only if $M' = M$
+
+- The described protocol is not zero knowledge, since an adversary could pretend to be the verifier and forward the $C$ message from the real verifier thereby using the Prove to falsely prove that it itself was the Prover
+	- Thereby an adversary can use the information send which is not optimal
+
+- Assume that we have a commitment scheme that lets the prover commit to any message that can be encrypted by the public key system
+- Let $\text{commit}_{pk}(r,M)$ denote a commitment to message $M$
+- Consider the following scheme
+	1. If the prover claims to be $A$, the verifier chooses a random messages $M$, and sends the cipher text $C=P_A(M)$ to the prover
+	2. The prover decrypts $C$ using $S_A$ and sends a commitment to the result $\text{commit}_{pk}(r,M')$ to the verifier
+	3. The verifier sends $M$ to the prover
+	4. The prover checks if $M = M'$. If not he stops the protocol he opens the commitments, i.e. he sends $r,M'$ to the verifier
+	5. The verifier accepts the identity of the prover if and only if $M' = M$ and the pair $r,M'$ correctly opens the commitment 
+
+** Definitions
+*** Interactive Proof Systems and Proofs of Knowledge
+- The protocols to follow will take place as interactions between two *Interactive Turing Machines*
+	- i.e. ordinary probabilistic Turing Machines that are in addition equipped with communication tapes allowing a machine to send and receive messages from the other one
+
+- To define interactive proof systems, we assume
+	- The machine called the prover $(P)$ has infinite computing power
+	- The machine called the verifier $(V)$ is polynomial time bounded
+
+- The machines get a common input string usually called $x$
+	- Running the machines on some input $x$ results in $V$ outputting *accept* or *reject* after which the machines halt
+	- It is said that the pair $(P,V)$ accepts or rejects $x$ accordingly
+
+- A binary language $L \subset \{0,1\}^*$ is given
+	- It is specialised to the concrete statement that a certain logical statement is true namely that $x \in L$
+
+- *Definition 4* The pair $(P,V)$ is an interactive proof system for $L$ if it satisfies the following two conditions
+	- *Completeness:* If $x \in L$, then the probability that $(P,V)$ rejects $x$ is negligible in the length of $x$
+	- *Soundness:* If $x \notin L$, then for any prover $P^*$, the probability that $(P^*,V)$ accepts $x$ is negligible in the length of $x$
+
+- There is no way to cheat the verifier even using infinite computing power
+	
+*** Interactive Arguments
+- Another variant of Interactive proof systems is know as *Interactive Arguments* and has more direct relations to practical protocols
+	- In this type of protocol we want the prover to be polynomial time
+	- We are only concerned about the polynomial time provers cheating the verifier
+
+- The simplest way to define an interactive argument for a language $L$, is to say that it is an interactive proof system, but with two changes
+	1. The honest prover is required to be probabilistic polynomial time
+		 - The only advantage over the verifier is that it has a private auxiliary input
+	2. The completeness condition says that for every $x \in L$, there is an auxiliary input that allows the prover to convince the verifier almost always
+	3. The soundness condition says "for any probabilistic polynomial time prover", instead of "for any prover"
+	
+*** Zero-Knowledge
+- Zero-Knowledge can be seen as an extra property that an interactive proof system might have
+- We want to ensure that the whatever strategy the verifier follows and whatever priori knowledge he may have, he learns nothing new except for the truth of the provers claim
+	- Done by requiring assuming the prover's claim is true the interaction between the prover and verifier can be efficiently simulating without interacting with the prover
+
+- A verifier that tries to cheat the prover can be modelled by an arbitrary probabilistic polynomial time machine $V^*$
+	- It gets an auxiliary input $\delta$ of length at most some fixed polynomial of the length of input $x$
+	- The auxiliary input represents the prior knowledge that $V^*$ might have
+
+- A conversation between $P$ and any verifier is the ordered concatenation of all messages sent in an execution of the protocol
+	- This means that the pair $(P,V^*)$ can be modelled as a machine that gets input $x$ and $\delta$ (only to $v^*$) and outputs a conversation
+		
+- *Definition 5* An interactive proof system of argument $(P,V)$ for a language $L$ is zero-knowledge if for every probabilistic polynomial time verifier $V^*$, there is a simulator $M_{V^*}$ running in expected polynomial time, such that we have $M_{V^*} \sim^c (P,V)$ on input $x \in L$ and arbitrary $\delta$ (as input to $V^*$ only)
+	- If for some protocol, one can obtain that $M_{V^*} \sim^p (P,V)$ or $M_{V^*} \sim^s (P,V)$ one speak of respectivly *perfect zero-knowledge* and *statistical zero-knowledge*
+		
+- If a proof system $(P,V)$ for language $L$ is given and there exists a probabilistic poly-time machine $M_{L$ with the property that $(P,V) \sim^p M$ on input $x \in L$.then $M$ is called a perfect *honest-verifier simulator*
+
+- *Lemma 3.1* The rewinding lemma: Let $(P,V)$ be a proof system for language $L$, and let $M$ be a perfect honest-verifier simulator for $(P,V)$. Assume that conversation have the form $(a,b,z)$, where $P$ sends $a$, $V$ responds with a random bit $b$ and $P$ replies with $z$. Then $(P,V)$ is perfect zero-knowledge	
+
+** Known General Results and Open Problems
+*** Results on Interactive Proofs and Arguments
+- For an unbounded prover, where we define $IP = \{L \mid L \text{ has an interactive proof system}\}$:
+	- *Theorem 3.2* /IP = PSPACE/ i.e. the statements that an all powerful prover can prove to a polynomial bounded verifier, are precisely those that can be verified using polynomially bounded memory (but possibly unbounded time)
+
+- If the prover is polynomial bounded, his only advantage over the verifier is that he may have more information than the verifier
+	- The best the prover can do to convince the verifier is to simply send his information, $s$, say, to the verifier who should be able to check the prover's statement based on $s$ with some error probability allowed
+	- The class of languages allowing such probabilistic verification of membership given auxiliary knowledge is known as NBPP OR MA
+
+- Bounded-ProverIP is defined to be the class of languages that have interactive arguments, then we have
+- *Theorem 3.3* /Bounded-ProverIP = MA/
+
+*** Result on Zero-Knowledge
+- Let
+\begin{equation*}
+  ZKIP = \{L \mid L \text{ has a zero-knowledge interactive proof system}\}
+\end{equation*}
+- It has been shown that any $NP \subset ZKIP$ if commitment schemes with unconditional binding exist which can be extended to all IP
+- *Theorem 3.4.* If one-way functions exists, then $ZKIP = IP$ 
+
+- Let $PZKIP$, $SZKIP$ denote the class with resp. perfect, statistical zero-knowledge proof systems.
+	- Except for the trivial $PZKIP \subset SZKIP \subset ZKIP$ very little is known with certainty
+
+- *Non-interactive zero-knowledge* is a model where an unbounded prover and a polynomial time verifier share access to a random string $\alpha$
+	- It is assumed, that $\alpha$ contains independent random vits
+	- The prover must convince the verifier that a common input $x$ is in some language $L$ by sending only $1$ message $\sigma$
+	- The verifier check $\sigma$ against $x$ and $\alpha$ and accepts or rejects
+	- This is called sound if whenever $x \notin L$, no prover can make the verifier accept with non-negligible probability over the choice of $\alpha$
+	- It is zero-knowledge if the pair $\sigma$, $\alpha$ can be simulated with an indistinguishable distribution in expected polynomial time
+
+- Let $NIZK$, $NIPZK$ and $NISZK$ denote the class of language with non-interactive computational, perfect and statistical zero-knowledge proof systems
+
+- *Theorem 3.5* If one-to-one surjective one-way functions exist, then $NP \subset NIZK$ 
+	- It is an open question whether any one-way function would be sufficient
+
+- *Theorem 3.6* We have that $NIZK \subset ZKIP$, $NISZK \subset SKZIP$ and that $NIPZK \subset PZKIP$
+
+- *Theorem 3.7* If one-way functions exist, then any language in $MA$ has a statistical zero-knowledge interactive argument
+
+*** On Composition of Zero-Knowledge Protocols
+- The sequential composition of two zero-knowledge protocols is again zero-knowledge
+- If the protocol run in parallel it is no longer zero knowledge
+
+** Applications of Zero-Knowledge
+- A basic application of zero-knowledge protocols is the usage of them as sub-protocols in large constructions
+	- e.g. voting schemes, key distribution protocols or any multiparty computation
+	- It can be assumed in building such constructions that $NP \subset ZKIP$
+
+- When a player $A$ sends a message in the protocol, he can convince anybody else in zero-knowledge that he has computed his message according to the rules in zero-knowledge
+	- This follows that if what $A$ is suppose to do is feasible in the first place, then the computed message can be verified in polynomial time given all $A$'s data and so is an $NP$ statement
+
+- One can transform a secure protocol where the players always follows the rules into one which they might deviate
+
+- One should not just use a secure zero-knowledge protocol for an NP hard problem by transforming a given problem into this problem
+	- It is not very effective since it can result in large problems and therefore the corresponding zero knowledge protocol is very slow
+
+- Problems that allow construction of particularly efficient protocol are often problems derived from number theory
+
+- The typical use is for the classical user identification problem
+	- Each user $U$ gets a solution to a problem instance $x_{u}$ and can identify himself by proving in zero-knowledge that he knows a solution to $x_{u}$
+	- By zero knowledge none of the proofs conducted by $U$ help the adversary to find a solution to $x_{U}$
+	- Because the problem is hard there is a very small probability that the adversary can find a solution for $x_U$
+	- These are secure for a honest verifier
+
+- Protocols for user identification problems do not need to be zero knowledge
+	- It is enough that the protocol do not help the identifier
+	- Protocols with this property are called *Witness Hiding* (WH)
+
+* On $\Sigma$ protocols
+** Example
+- The follow is an example of a $\Sigma$ protocol suggested by Schnorr 
+[[file:On $\Sigma$ protocols/screenshot_2019-04-21_20-32-04.png]]
+
+** Definitions
+- Let $R$ be a binary relation
+	- i.e $R$ is a subset of $\{0,1\}^* \times \{0,1\}^*$
+	- The only restrictions is that if $(x,w) \in R$ then the length of $w$ is at most $p(|x|)$ for some polynomial $p()$
+	- $w$ is called a *witness* for $x$
+
+- The protocols are one the following form where $x$ is a common input to $P,V$ and a $w$ such that $(x,w) \in R$ is a private input to $P$:
+	1. $P$ sends a message $a$
+	2. $V$ sends a random $t$ bit string $e$
+	3. $P$ sends a reply $z$, and $V$ decides to accept of reject based on the data he has seen
+		 - i.e. $x,a,e,z$
+
+- $P$ and $V$ are assumed to be probabilistic polynomial time machines
+	- $P$'s only advantage over $V$ is that he knows $w$ 
+
+- *Definition 1.* A protocol $\mathcal P$ is said to be a $\Sigma$ protocol for a relation $R$ if:
+	- $P$ is on the 4 move form and have completeness:
+		- If $P,V$ follow the protocol on input $x$ and private input $w$ to $P$ where $(x,w) \in R$, the verifier always accepts
+	- From any $x$ and any pair of accepting conversations on input $x$, $(a,e,z),(a,e',z')$ where $e \neq e'$, one can efficiently compute $w$ such that $(x,w)$ in $R$
+		- This is called the special soundness property
+	- There exists a polynomial-time simulator $M$, which on input $x$ and a random $e$ outputs an accepting conversation of the form $(a,e,z)$ with the same probability distribution as conversations between the honest $P,V$ on input $x$
+		- This is sometimes called special honest-verifier zero-knowledge
+
+- Define $L_R$ to be the set of $x$'s for which there exists $w$ such that $(x,w) \in L$
+	- The special soundness property implies that a $\Sigma$ protocol for $R$ is always an interactive proof system of $L_R$ with error probability $2^{-t}$
+
+- *Lemma 1.* The properties of $\Sigma$ protocols are invariant under parallel composition
+	- i.e. repeating a $\Sigma$ protocol for $R$ twice in parallel produces a new $\Sigma$ protocol for $R$ with challenge length $2t$
+
+- *Lemma 2.* If a $\Sigma$ protocol for $R$ exists, then for any $t$, there exists a $\Sigma$ protocol for $R$ with challenge length $t$ 
+
+** Proofs of Knowledge
+- *Definition 2.* Let $\kappa()$ be a function from bit strings to the interval $[0..1]$. The protocol $(P,V)$ is said to be a proof of knowledge for the relation $R$ with knowledge error $\kappa$ if the following are satisfied
+	- *Completeness* On common input $x$, if the honest prover $P$ get a private input $w$ such that $(x,w) \in R$ then the verifier always accepts
+	- *Knowledge soundness* There exists a probabilistic algorithm $M$ called the knowledge extractor
+		- It gets input $x$ and rewindable black-box access to the prover
+		- It attempts to compute $w$ such that $(x,w) \in R$
+		- It is required that the following holds:
+			- For any prover $P*$, let $\epsilon(x)$ be the probability that $V$ accepts on input $x$
+			- There exists a constant $c$ such that whenever $\epsilon(x) > \kappa(x)$, $M$ will output a correct $w$ in expected time at most 
+\begin{equation}
+  \frac{|x|^c}{\epsilon(x)-\kappa(x)}
+\end{equation}
+where access to $P^*$ counts as one step only and the error $\kappa()$ is the probability that one can convince the verifier without knowing a correct $w$ 
+
+- *Theorem 1.* Let $\mathcal P$ be a $\Sigma$ protocol for relation $R$ with challenge length $t$.
+	- $\mathcal P$ is a proof of knowledge with knowledge error $2^{-t}$ 
+
+** The OR-proof
+- A basic construction with $\Sigma$ protocols allows a prover to show that given two inputs $x_0$ and $x_1$, he knows $w$ such that either $(x_0,w) \in R$ or $(x_1,w) \in R$, but without revealing which case
+	- It is assumed that we are given a $\Sigma$ protocol $\mathcal P$ for $R$
+	- $x_0$, $x_1$ are assumed to be common input to $P$, $V$ and $w$ is private input to $P$ where $(x_b,w) \in R$ for $b=0$ or $1$
+	- The idea is to ask the prover to complete two instances of $\mathcal P$ where
+		- For $x_b$ it is done for real
+		- For $x_{1-b}$ it can be faked using the simulator $M$
+		- A little freedom is given in choosing the challenges to answers, such that he is able to complete both instances
+
+- The following protocol is considered called $\mathcal{P}_{OR}$:
+	1. $P$ computes the first message $a_b$ in $\mathcal P$, using $x_b,w$ as input. 
+		 - P chooses $e_{1-b}$ at random and runs the simulator $M$ on input $x,e_{1-b}$
+		 - Let $(a_{1-b},e_{1-b},z_{1-b})$ be the output
+		 - $P$ sends $a_0, a_1$ to $V$
+	2. $V$ chooses a random $t$ bit string $s$ sends it to $P$
+	3. $P$ sets $e_b = s \oplus e_{1-b}$ and computes the answer $z_b \in \mathcal P$ to challenge $e_b$ using $x_b,a_b,e_b,w$ as input. He sends $e_b, z_0,e_1,z_1$ to $V$
+	4. $V$ checks that $s=e_0 \oplus e_1$ and that conversations $(a_0, e_0, z_0)$, $(a_1, e_1, z_1)$ are accepting conversations in $\mathcal P$, on inputs $x_0$ resp. $x_1$
+
+- Let $R_{OR} = \{((x_0,x_1),w) \mid (x_0,w) \in R \text{ or } (x_1,w) \in R\}$. Then we have:
+	- *Theorem 2.* The protocol $\mathcal P_{OR}$ above is a $\Sigma$ protocol for $R_{OR}$. Moreover for any verifier $V^*$, the probability distribution of conversations between $P$ and $V^*$, where $w$ is such that $(x_b, w) \in R$, is independent of $b$
+
+** Additional Examples
+[[file:On $\Sigma$ protocols/screenshot_2019-04-21_20-38-53.png]]
+[[file:On $\Sigma$ protocols/screenshot_2019-04-21_20-39-07.png]]	
+
+** Hard Relations
+- *Definition 3.* A relation $R$ is said to be hard if
+	- There exists a probabilistic polynomial time algorithm $G$, called the generator, which on input $1^k$ outputs a pair $(x,w) \in R$ where $|x| = k$
+	- The following holds for all probabilistic polynomial time algorithms
+		- Consider the experiment where we run $G$ on input $1^k$
+		- Give the $x$ produced to $A$, and let $w_A$ be the output $A$ produces
+		- Let $p_A(k)$ be the probability that $(x,w_A) \in R$, then $p_{A}(k)$ is negligible in $k$
+
+- Let a relation $R$ with generator $G$ be given and assume $R$ has $\Sigma$ protocol $\mathcal P$, then consider the following game played by an arbitrary poly-time verifier $V^*$:
+	- Run $G$ on input $1^k$ to get pairs $(x,w) \in R$. Give $w$ as private input to the prover $P$ in $\mathcal P$
+	- Let $V^*$ execute $\mathcal P$ with $P$ an arbitrary (polynomial) number of times on common input $x$
+	- $V^*$ outputs a string $w^*$
+	- If $(x,w^*) \in R$ we say that $V^*$ wins the game
+- *Definition 4.* $\mathcal P$ is witness hiding if any poly-time $V^*$ wins the above game with only negligible probability
+
+- *Theorem 3.* If $R$ is a hard relation, then the protocol $\mathcal P_{OR}$ for $R_{OR}$ is witness hiding
+
+** Identification Schemes from $\Sigma$ protocols
+- A secure identification scheme is wanted for users $U_1, \dots, U_n$
+
+- A secure identification scheme can easily be done with a hard relation $R$ with a $\Sigma$ protocol $\mathcal P$
+	- To setup the system a generator $G$ is run $n$ times on input $1^k$ to get pairs $(x_1,w_1), \dots, (x_n,w_n)$
+	- $w_i$ is given as private key to user $U_i$ and the list of $x_i$'s is published
+	- If a given user $U_i$ want to identify himself, he executes $\mathcal P$ with $x_i$ as public input, playing the role of the prover
+	- It is assumed that the length of the challenge is $k$ bits
+		- To ensure that there is an exponentially large number of challenges
+	- It is assumed that $\mathcal P$ is witness hiding
+
+- The described identification scheme is can be exploited by a man in the middle attack
+	- The or construction can be used to target a given prover $U_j$ and avoid a man in the middle attack
+		- i.e. proving that the user either knows $U_i$ or $U_j$
+		- This can only be used if the user knows who to target e.g. using public keys
+	- This solution only works if the prover knows who the target is
+
+- Another way to make identification scheme is to use a secure signature scheme
+	- i.e. each user has a $(pk, sk)$ pair and he just needs to sign some challenge $c$ to prove his identity
+	- This scheme violates /deniability/ as this can be used to prove to others that one had talked with a given user maybe even at a particular time
+		- In contract to the other scheme where the conversation could be simulated by the verifier
+
+** Zero-Knowledge from $\Sigma$ protocols
+- The following is a construction which make an efficient zero-knowledge protocol from $\Sigma$ protocol $\mathcal P$ for a hard relation $R$
+	- It is assumed without loss of generality that $\mathcal P$ is WH
+
+- The protocol goes as follows
+[[file:On $\Sigma$ protocols/screenshot_2019-04-22_09-07-30.png]]
+
+** Commitment Schemes from $\Sigma$ protocols
+- It is assume that a hard relation $R$ with generator $G$ and $\Sigma$ protocol $\mathcal P$ is given
+	- It is also assumed that it is easy to check membership in $L_R$
+	- This can be used to build a perfectly hiding commitment scheme that is efficient and allows commitment to many bits, if $\mathcal P$ is efficient
+[[file:On $\Sigma$ protocols/screenshot_2019-04-22_09-15-15.png]]
+
+* Number Theory and Cryptographic Hardness Assumptions
+** Preliminaries and Basic Group Theory
+*** Primes and Divisibility
+- For $a,b,c \in \mathbb Z$
+	- $a$ divides $b$, written $a \mid b$ if there exists an integer $c$ such that $ac =b$
+	- $a$ not dividing $b$ is written as $a \nshortmid b$
+	- If $a \mid b$ and $a \mid c$ then $a \mid (Xb+Yc)$ for any $X,Y \in \mathbb Z$
+	- If $a \mid b$ and $a$ is positive, then $a$ is a divisor of $b$
+		- If $a \notin \{1,b\}$ then a is a nontrivial factor of $b$
+
+- A positive integer $p>1$ is a prime if it has no non-trivial factors
+	- A positive integer greater than $1$ can be expressed uniquely as a produced of primes
+
+- *Proposition 7.1* Let $a$ be an integer and $b$ a positive integer. Then there exist unique integers $q$, $r$ with $a = qb+r$ and $0\leq r <b$
+	- It is possible to compute $q$ and $r$ in polynomial timeGiven integers $a$ and $b$
+
+- *Proposition 7.2* Let $a$, $b$ be positive integers. Then there exists integers $X$, $Y$ such that $Xa+Yb = \text{gcd}(a,b)$. $\text{gcd}(a,b)$ is the smallest positive integer that can be expressed in this way
+
+- *Proposition 7.3* If $c \mid ab$ and $\text{gcd}(a,c)=1$, then $c \mid b$. In particular if $p$ is prime and $p\mid ab$ then either $p \mid a$ or $p \mid b$
+
+- *Proposition 7.4* Say $p \mid N$, $q \mid N$, and $\text{gcd}(p,q)= 1$. Then $pq \mid N$ 
+
+*** Modular Arithmetic
+- Let $a,b,N \in \mathbb Z$ with $n>1$
+	- The notation $[a \text{ mod } N ]$ is used to denote the remainder of $a \in \mathbb Z$ upon division by $N$
+	- Mapping $a$ to $[a \text{ mod } n]$ is referred to as *reduction modulo* $N$
+	- $a$ and $b$ are congruent modulo $N$ written $a = b \text{ mod } N$ if $[a \text{ mod } n] = [b \text{ mod }N]$
+		- $a=b \text{ mod } N$ if and only if $N \mid (a-b)$
+	- Congruence modulo $N$ is an equivalence relation
+		- Since it is reflective, symmetric and transitive
+		- It obeys the standard rules of arithmetic with respect to addition, subtraction and multiplication
+		- It does not in general respect division
+
+- For a given integer $b$ there exists an integer $b^{-1}$ such that $bb^{-1} = 1 \text{ mod } N$
+	- $b^{-1}$ is a multiplicative inverse of $b$ modulo $N$
+	- $b$ is called *invertible* modulo $N$
+	- If $\beta$ is a multiplicative inverse of $b$ modulo $N$ then so is $[\beta \text{ mod } N]$
+		- If $\beta'$ is another multiplicative inverse then $[\beta \text{ mod } N] = [\beta' \text{ mod } N]$
+	- $b^{-1}$ should denote the unique multiplicative inverse of $b$ that lies in the range $\{0,\dots, N-1\$}
+	- When $b$ is invertible modulo $N$ division is defined by $b$ modulo $N$ as multiplication by $b^{-1}$ modulo $N$
+		- i.e. it is defined that $a/b = ab^{-1} \text{ mod } N$
+
+- *Proposition 7.7* Let $a$,$N$ be integers, with $N > 1$. Then $a$ is invertible modulo $N$ iff $\text{gcd}(a,N) = 1$ 
+
+*** Groups
+- Let $\mathbb G$ be a set
+	- A binary operation $\circ$ on $\mathbb G$ is a function $\circ(\cdot,\cdot)$ that takes as input elements of $\mathbb G$
+	- If $g,h \in \mathbb G$ then $\circ(g,h)$ is written as $g \circ h$
+
+- *Definition 7.9* A *group* is a set $\mathbb G$ along with a binary operation $\circ$ such that
+	- *Closure:* For all $g,h \in \mathbb G$, $g \circ h \in \mathbb G$
+	- *Existence of an Identity:* There exists an identity $e \in G$ such that for all $g \in \mathbb G$, $e \circ g=g=g \circ e$
+	- *Existence of Inverses:* For all $g \in \mathbb G$ there exists an element $h \in \mathbb G$ such that $g \circ h = e = h \circ g$.
+		- Such an $h$ is called an *inverse* of g
+	- *Associativity:* For all $g_1,,g_2,g_3 \in \mathbb G$, $(g_1 \circ g_2) \circ g_3 = g_1 \circ (g_2 \circ g_3)$
+	- When $\mathbb G$ has a finite number it is called a *finite group*
+		- Let $|G|$ denote the *order* of the group i.e. the number of elements in $\mathbb G$
+	- A group $\mathbb G$ with operation $\circ$ is *abelian* if the following additional condition holds:
+		- *Commutativity:* For all $g,h \in \mathbb G$, $g \circ h = h \circ g$
+	- When the binary operation is understood, the set $\mathbb G$ a group
+
+- If $\mathbb G$ is a group, a set $\mathbb H \subseteq \mathbb G$ is a *subgroup* of $\mathbb G$ if $\mathbb H$ itself forms a group under the same operation associated with $\mathbb G$
+	- To check that $\mathbb H$ is a subgroup one should verify closure, existence of identity and inverses and associativity
+	- Every group $\mathbb G$ has the trivial subgroups $\mathbb G$ and $\{1\}$
+	- $\mathbb H$ is a *strict subgroup* if $\mathbb H \neq \mathbb G$
+	- Every group has a unique identity element
+	- Every group has a unique inverse 
+
+- Let $N \geq 2$ be an integer. The set $\{0, \dots, N-1\}$ with respect to addition modulo $N$ is an abelian group of order $N$
+	- Denoted by $\mathbb Z_N$
+
+- *Lemma 7.13* Let $\mathbb G$ be a group and $a,b,c \in \mathbb G$. If $ac = bc$, then $a=b$
+	- If $ac =c$ then $a$ is the identity in $\mathbb G$
+
+- Notation for using group operation $m$ times, when using additive notation:
+[[file:Number Theory and Cryptographic Hardness Assumptions/screenshot_2019-04-28_12-18-02.png]]
+
+- Notation for using group operation $m$ times, when using multiplicative notation: 
+[[file:Number Theory and Cryptographic Hardness Assumptions/screenshot_2019-04-28_12-18-11.png]]
+- All the familiar rules of these to notations hold
+
+- When using additive notation we have
+	- $0 \cdot g \overset{\mathrm{def}}{=} 0$
+	- $(-m) \cdot g \overset{\mathrm{def}}{=} m \cdot (-g)$
+
+- When using multiplicative notation we have
+	- $g ^0 \overset{\mathrm{def}}{=} 1$
+	- $g^{-m} \overset{\mathrm{def}}{=} (g^{-1})^m$
+
+- Let $g \in \mathbb G$ and $b \geq 0$ be an integer then the exponentiation $g^{b}$ can be computed using a polynomial number of underlying group operations in $\mathbb G$
+	- Therefore if the group operation can be computed in polynomial time then so can exponentiation.
+
+- *Theorem 7.14* Let $\mathbb G$ be a finite group with $m = |\mathbb G|$, the order of the group. Then for any element $g \in \mathbb G$, $g^m =1$
+
+- *Corollary 7.15* Let $\mathbb G$ be a finite group with $m=|\mathbb G | > 1$. Then for any $g \in \mathbb G$ and any integer $i$, we have $g^i = g^{[i \text{ mod } m]}$
+
+- *Corollary 7.17* Let $\mathbb G$ be a finite group with $m = |\mathbb G| > 1$ Let $e >0$ be an integer and define the function $f_e: \mathbb G \rightarrow \mathbb G$ by $f_e(g) = g^e$.
+	- If $\text{gcd}(e,m) = 1$, then $f_e$ is a permutation
+	- Moreover if $d=[e^{-1} \text{ mod } m]$ then $f_d$ is the inverse of $f_e$
+
+*** The Group $\mathbb Z_N^*$ and the Chinese Remainder Theorem
+- The following set for $N > 1$ is defined
+\begin{equation*}
+  \mathbb Z_N^* \overset{\mathrm{def}}{=} \{a\in \{1, \dots, N-1\} \mid \text{gcd}(a,N) = 1\}  
+\end{equation*}
+- i.e. it consists of integers that are relatively prime to $N$
+
+- *Proposition 7.18* Let $N>1$ be an integer. Then $\mathbb Z_N^*$ is abelian group under multiplication modulo $N$
+
+- Define $\phi(N) \overset{\mathrm{def}}{=} |Z_N^*|$, the order of the group $\mathbb Z_N^*$
+	- $\phi$ is called the *Euler phi function*
+	- If $N = p$ is a prime then $\phi = p-1$ 
+
+- *Theorem 7.19* Let $N= \prod_i p_i^{e_i}$ where $\{p_i\}$ are distinct primes and $e_i \geq 1$. Then $\phi(N)= \prod_i p_i^{e_i-1}(p_i-1)$
+
+- *Corollary 7.21* Take arbitrary $N>1$ and $a \in \mathbb Z_N^*$ then $a^\phi(N)=1 \text{ mod } N$
+	- For the specific case when $N=p$ is prime and $a \in \{1,\dots, p-1\}$ we have $a^{p-1} = 1 \text{ mod } p$
+
+- *Corollary 7.22* Fix $N > 1$. For integer $e >0$ define $f_e : \mathbb Z_N^* \rightarrow \mathbb Z_N^*$ by $f_e(x) = x^e \text{ mod } N$
+	- If $e$ is relatively prime to $\phi(N)$ then $f_e$ is a permutation
+	- Moreover if $d=[e^{-1} \text{ mod } \phi(N)]$ then $f_d$ is the inverse of $f_e$
+
+- *Definition 7.23* Let $\mathbb G$,$\mathbb H$ be groups with respect to the operations $\circ_{\mathbb G}$, $\circ_{\mathbb H}$ respectively
+	- A function $f:\mathbb G \rightarrow \mathbb H$ is an *isomorphism* from $\mathbb G$ to $\mathbb H$ if
+		1. $f$ is a bijection
+		2. For all $g_1$, $g_2 \in \mathbb G$ we have $f(g_1 \circ_{\mathbb G}) = f(g_1) \circ_{\mathbb H} f(g_2)$
+	- If there exists an isomorphism from $\mathbb G$ to $\mathbb H$ then these groups are *isomorphic* and it is written as $\mathbb G \simeq \mathbb H$
+
+- If $\mathbb G$ is finite and $\mathbb G \simeq H$, then $\mathbb H$ must be finite and have the same size as $\mathbb G$
+	- If there exists an isomorphism $f$ from $\mathbb G$ to $\mathbb H$ then $f^{-1}$ is also an isomorphism
+
+- Given groups $\mathbb G$, $\mathbb H$ with the group operations $\circ_{\mathbb G}$,$\circ_{\mathbb H}$ a new group $\mathbb G \times \mathbb H$ are defined as follows:
+	- The elements of $\mathbb G \times \mathbb H$ are ordered pairs $(g,h)$ with $g \in \mathbb G$ and $h \in \mathbb H$1
+	- If $\mathbb G$ has $n$ elements and $\mathbb H$ has $n'$ elements $\mathbb G \times \mathbb H$ has $nn'$ elements
+	- The group operation $\circ$ on $\mathbb G \times \mathbb H$ is applied component-wise i.e.
+\begin{equation*}
+  (g,h) \circ (g',h') \overset{\mathrm{def}}{=} (g \circ_{\mathbb g'}, h \circ_{\mathbb H} h') 
+\end{equation*}
+
+- *Theorem 7.24 (Chinese Remainder Theorem)* Let $N=pq$ where $p$ and $q$ are relatively prime. Then $\mathbb Z_N \simeq \mathbb Z_p \times \mathbb Z_q \text{ and } \mathbb Z_N^* \simeq \mathbb Z_p^* \times \mathbb Z_q^*$
+	- Let $f$ be the function mapping elements $x \in {0, \dots, N-1\}$ to pairs $(x_p,x_q)$ with $x_p \in \{0,\dots, p-1\}$ and $\{0,\dots, q-1\}$ defined by $f(x) = ([x \text{ mod } p],[x \text{ mod } q])$
+	- Then $f$ is an isomorphism from $\mathbb Z_N$ to $\mathbb Z_p \times \mathbb Z_q$ as well as an isomorphism from $\mathbb Z_N^*$ to $\mathbb Z_p^* \times \mathbb Z^*_q$
+
+
+[[file:Number Theory and Cryptographic Hardness Assumptions/screenshot_2019-04-28_15-00-22.png]]
+
+- The notation $x \leftrightarrow (x_p,x_q)$ is used when for $x_p = [x \text{ mod } p]$ and $x_q=[x \text{ mod }q]$
+
+*** Using the Chinese Remainder Theorem
+- If two groups are isomorphic, they both serve as representations of the same underlying "algebraic structure"
+	- The choice of which representation to use can affect the computational efficiency of group operations.
+
+- Let $\mathbb G$, $\mathbb{H}$ be groups with corresponding operations $\circ_{\mathbb G}$, $\circ_{\mathbb H}$ let $f$ define an isomorphism from $\mathbb G$ to $\mathbb H$ where both $f$ and $f^{-1}$ can be computed efficiently (not the case in general) for $g_1, g_2 \in \mathbb G$ we can compute $g = g_1 \circ_\mathbb G g_2$ either by computing the group operation in $\mathbb G$, or by carrying out the following steps:
+	1. Compute $h_1 = f(g_1)$ and $h_2 = f(g_2)$
+	2. Compute $h = h_1 \circ_\mathbb H h_2$ using the group operation in $\mathbb H$
+	3. Compute $g=f^{-1}(h)$
+
+- To convert an element represented as $(x_p, x_q)$ to its representation modulo $N$ ins the following way (assuming $p$ and $q$ are known):
+	1. Compute $X$ and $Y$ such that $X_p + Y_q = 1$
+	2. Set $1_p = [Yq \text{ mod } N]$ and $1_q = [Xp \text{ mod } N]$
+	3. Compute $x= [(xp \cdot 1_p + x_q \cdot 1_q) \text{ mod } N]$
+
+** Primes, Factoring and RSA
+*** General
+- Given a composite integer $N$, the factoring problem is to find positive integers $p$ $q$ such that $pq = N$
+	- Is a classic hard problem
+	- It can be solved in exponential time $O(\sqrt N \cdot \text{polylog}(N))$ using *trial division*
+		- Done my exhaustively checking
+	- Consider the following experiment for a given algorithm $\mathcal A$ and parameter $n$
+[[file:Number Theory and Cryptographic Hardness Assumptions/screenshot_2019-04-28_15-46-24.png]]
+
+- The hardest numbers to factor are those with only large prime factors
+	- To use this problem to do any kind of cryptography one should be able to generate $n$ bit primes efficiently
+
+*** Generating Random Primes
+[[file:Number Theory and Cryptographic Hardness Assumptions/screenshot_2019-04-28_15-53-05.png]]	
+
+- A random $n$ bit prime can be generated by repeatedly choosing random $n$ bit integers until we find the first prime (Algorithm 7.31)
+	- One can instead of outputting fail output a random $n$ bit number
+	- $t$ should be set such as it only outputs fail with negligible probability
+
+- *Theorem 7.32* There exists a constant $c$ such that, for any $n>1$, the number of $n$ bit primes is at least $c \cdot 2^{n-1}/n$  
+	- This implies if we set $t=n ^2/c$ the probability that no prime is found is negligible in $n$ 
+
+- The *Miller-Rabin* probabilistic algorithm for testing whether a number is prime, it takes as input $N$ which is being tested and $t$ which determines the error probability and it does it in time polynomial in $||N||$ and $t$
+- *Theorem 7.33* If $N$ is prime, then the Miller-Rabin test always outputs "prime". If $N$ is composite, then the algorithm outputs "prime" with probability at most $2^{-t}$ (and outputs the correct answer "composite" with the remaining probability)
+
+[[file:Number Theory and Cryptographic Hardness Assumptions/screenshot_2019-04-28_16-14-20.png]]
+
+*** Primality Testing
+[[file:Number Theory and Cryptographic Hardness Assumptions/screenshot_2019-04-28_16-22-47.png]]
+- An $a$ that proves that a given number is a composite is refereed to as a witness
+
+- *Proposition 7.36* Let $\mathbb G$ be a finite group and $\mathbb H \subseteq G$. Assume that $\mathbb H$ contains the identity element of $\mathbb G$, and that for all $a,b \in \mathbb H$ it holds that $ab \in \mathbb H$. Then $\mathbb H$ is a subgroup of $\mathbb G$
+
+- *Lemma 7.37* Let $\mathbb H$ be a strict subgroup of a finite group $\mathbb G$ (i.e. $\mathbb H \neq \mathbb G$). Then $|\mathbb H| \leq |\mathbb{G}| /2$
+
+- *Theorem 7.38* Fix $N$. If there exists a witness that $N$ is composite. Then at least half the elements of $\mathbb Z_N^*$ are witnesses that $N$ is composite
+	- This implies that the that probability that we do not hit a witness in $t$ iterations is $2^{-t}$
+
+- There are infinitely many composite number $N$ which do not have any witness that they are composite
+	- They are known as *Carmichael numbers*
+
+- $a \in \mathbf{Z}_n^*$ is a *strong witness* that $N$ is composite if for all $i \in \{1,\dots,r-1\}$
+	1) $a^u \neq \pm 1 \text{ mod } N$ 
+	2) $a^{2^iu} \neq -1 \text{ mod } N$
+- If $a$ is not a *strong witness* it is also not a witness 
+
+- *Lemma 7.39* Say $x$ is a square root of $1$ modulo $N$ if $x^2 = 1 \text{ mod } N$. If $N$ is an odd prime then the only square roots of $1$ modulo $N$ are $[\pm 1 \text{ mod } N]$
+
+- *Theorem 7.40* Let $N$ be an odd, composite number that is not a prime power. Then at least half the elements of $\mathbb Z_N^*$ are strong
+
+- An integer $N$ is *perfect power* if $N=\hat N^e$ for some integers $\hat N$ and $e>1$
+
+[[file:Number Theory and Cryptographic Hardness Assumptions/screenshot_2019-04-29_13-03-36.png]]
+
+*** The factoring assumption
+- Let $\text{GenModulus}$ be a polynomial-time algorithm that, on input $1^n$, outputs ($N,p,q$) where
+	- $N=pq$ and $p$ and $q$ are $N$ bits
+	- $p$ and $q$ generate two random primes except with probability negligible in $n$
+
+- Consider the following experiment for a given algorithm $\mathcal A$ and parameter $n$:
+	- *The factoring experiment* $\text{FACTOR}_{\mathcal A, \text{GenModulus}}(n)$ 
+		1. Run $\text{GetModulus}(1^n)$ to obtain $(N,p,q)$
+		2. $\mathcal A$ is given $N$ and outputs $p',q' > 1$
+		3. The output of the experiment is defined to be $1$ is $p' \cdot q' = N$, and $0$ otherwise
+	- Except with negligible probability, the output of the experiment is $1$
+
+
+[[file:Number Theory and Cryptographic Hardness Assumptions/screenshot_2019-04-29_14-18-39.png]]
+- It is simply the assumption that there exists a $\text{GenModulus}$ for which factoring is hard
+
+*** The RSA Assumption
+- $\mathbb Z_N^*$ is a group of order $\phi(N) = p(n-1) (q-1)$
+	- If the factorization of $N$ is known it is easy to compute the group order $\phi(N)$
+	- If the factorization of $N$ is unknown then it is difficult to compute $\phi(N)$
+		- It is as hard as factoring $N$
+
+- *RSA problem*: Given a modulus $N$ and an integer $e > 0$ that is relatively prime to $\phi(N)$, and an element $y\in \mathbb Z_N^*$ compute $y^{1/e} \text{ mod } N$
+	- i.e. given $N,e,y$ find $x$ such that $x^e = y \text{ mod } N$
+
+- Let $\text{GenRSA}$ be a polynomial-time algorithm that, on input $1^n$, outputs
+	- A modulus $N$ that is the product of two $n$ bit primes
+	- An integer $e>0$ with $\text{gcd}(e, \phi(N)) = 1$
+	- An integer $d$ satisfying $ed = 1 \text{ mod } \phi(N)$
+
+- *The RSA experiment* $\text{RSA}-\text{inv}_{\mathcal A, \text{GetRSA}(n)}$
+	1. Run $\text{GenRSA}(1^n)$ to obtain $(N,e,d)$
+	2. Choose $y \leftarrow \mathbb Z_N^*$
+	3. $\mathcal A$ is given $N,e,y$ and outputs $x \in \mathbb Z_n^*$
+	4. The output of the experiment is defined to be $1$ if $x^e = y \text{ mod } N$, and $0$ otherwise
+
+
+[[file:Number Theory and Cryptographic Hardness Assumptions/screenshot_2019-04-29_14-41-24.png]]
+- It is simply the assumption that there exists an $\text{GetRSA}$ for which the RSA problem is hard
+
+[[file:Number Theory and Cryptographic Hardness Assumptions/screenshot_2019-04-29_14-42-50.png]]
+
+- IT can not be concluded that the RSA problem is as hard as factoring
+
+** Assumptions in Cyclic Groups
+*** Cyclic Groups and Generators
+- Let $\mathbb G$ be a finite group of order $m$. For arbitrary $g \in \mathbb G$, consider the set
+\begin{equation}
+	\langle g \rangle \overset{\mathrm{def}}{=}  \{g^0, g^1, \dots\}
+\end{equation}
+- Be Theorem $7.14$, we have $g^m=1$. Let $i \leq m$ be the smallest positive integer for which $g^i = 1$ i.e.
+\begin{equation}
+	\langle g \rangle \overset{\mathrm{def}}{=}  \{g^0, \dots, g^{i-1}\}
+\end{equation}
+
+- $\langle g \rangle$ exactly at most $i$ elements
+	- It is a subgroup of $\mathbb G$ for any $g$
+	- It is called the subgroup generated by $g$
+	- If the order of the subgroup is $i$, then $i$ is called the order of $g$
+
+- *Definition 7.48* Let $\mathbb G$ be a finite group and $g \in \mathbb G$. The order of $g$ is the smallest positive integer $i$ with $g^i = 1$
+
+- *Proposition 7.49* Let $\mathbb G$ be a finite group, and $g \in \mathbb G$ an element of order $i$. Then for any integer $x$, we have $g^x = g^{[x \text{ mod } i]}$
+
+- *Proposition 7.50* Let $\mathbb G$ be a finite group, and $g \in \mathbb G$ be an element of order $i$. Then $g^x = g^y$ if and only if $x=y \text{ mod } i$
+
+- The identity element of any group $\mathbb G$ has order $1$ and generates the group $\langle 1 \rangle = \{1\}$
+
+- If there exists an element $g \in \mathbb G$ that has order $m$, then $\langle g \rangle = \mathbb G$
+	- If this is the case $\mathbb G$ is called a *cyclic group*
+	- $g$ is called a *generator* of $\mathbb G$
+	- A cyclic group will have multiple generators
+
+- *Proposition 7.51* Let $\mathbb G$ be a finite group of order $m$, and say $g \in \mathbb G$ has order $i$. Then $i \mid m$
+
+- *Corollary 7.52* If $\mathbb G$ is a group of prime order $p$, then $\mathbb G$ is cyclic. Furthermore, all element of $\mathbb G$ except the identity are generators of $\mathbb G$
+
+- *Theorem 7.53* If $p$ is prime then $\mathbb Z_p^*$ is cyclic
+
+*** The Discrete Logarithm and Diffie-Hellman Assumptions
+- If $\mathbb G$ is a cyclic group of order $q$, then there exists a generator $g \in \mathbb G$ such that $\{g^0,g^1, \dots, g^{q-1}\} = \mathbb G$
+	- For every $h \in \mathbb G$ there is a unique $x \in \mathbb Z_q$ such that $g^x = h$
+	- When the underlying group $\mathbb G$ is understood $x$ is called the *discrete logarithm* of $h$ with respect to $g$ and write $x=\log_gh$
+	- If $g^{x'}=h$ for some arbitrary integer $x'$, then $\log_gh=[x' \text{ mod } q]$
+	- Discrete logarithms obey man*y of the same rules as "standard" logarithms
+
+- The *discrete logarithm problem* in a cyclic group $\mathbb G$ with given generator $g$ is to compute $\log_gh$ given a random element $h \in \mathbb G$ as input
+	- Let $\mathcal G$ be a polynomial-time algorithm that, on input $1^n$ outputs a (*description* of a) cyclic group $\mathbb G$, its order $q$ (with $||q|| = n$), and a generator $g \in \mathbb G$.
+	- It is also required  that a group operation in $\mathbb G$ can be compute efficiently
+
+- The *discrete logarithm experiment* $\text{DLog}_{\mathcal A, \mathcal G}(n)$ for a given algorithm $\mathcal A$ and parameter $n$:
+	1. Run $\mathcal G(1^n)$ to obtain output $(\mathbb G, q,g)$, where $\mathbb G$ is a cyclic group of order $q$ (with $||q|| = n$) and $g$ is a generator of $\mathbb G$
+	2. Choose $h \leftarrow \mathbb G$ - which can be done by choosing $x' \leftarrow \mathbb Z_q$ and settings $h:=g^{x'}$
+	3. $\mathcal A$ is given $\mathbb G,q,g,h$, and outputs $x \in \mathbb Z_q$
+	4. The output of the experiment is defined to be $1$ if $g^x=h$, and $0$ otherwise
+
+[[file:Number Theory and Cryptographic Hardness Assumptions/screenshot_2019-04-29_19-36-32.png]]
+- It is simply the assumption that there exists a $\mathcal G$ for which the discrete logarithm problem is hard
+
+- Related to the discrete logarithm problems are the *Diffie-Hellman* problems.
+- There are two important variants:
+	- The *computational* Diffie-Hellman (CDH) problem
+	- The *decisional* Diffie-Hellman (DDH) problem
+
+- Fix a cyclic group $\mathbb G$ and generator $g \in \mathbb G$
+	- Given two group elements $h_1$ and $h_2$, define $\text{DH}_g(h_1,h_2) \overset{\mathrm{def}}{=} g^{\log_gh_1 \cdot log_gh_2}$, where $h_1 = g^{x_1}$ and $h_2=g^{x_2}$
+	- Then $\text{DH}_g(h_1,h_2) = g^{x_1 \cdot x_2} = h_1^{x_2} = h_2^{x_1}$
+
+- The *CDH problem* is to compute  $\text{DH}_g(h_1,h_2)$ given randomly chosen $h_1$ and $h_2$
+	- If the discrete logarithm problem in $\mathbb G$ is easy, then the CDH problem s to
+	- It is not clear if the *CDH problem* is as hard as the discrete logarithm problem
+
+- The *DDH problem*, is to distinguish $\text{DH}_g(h_1,h_2)$ from a random group element
+	- i.e. given randomly-chosen $h_1, h_2$ and a candidate solution $y$ is to decide whether $y= \text{DH}_g(h_1,h_2)$ or $y$ is a randomly chosen group element
+
+[[file:Number Theory and Cryptographic Hardness Assumptions/screenshot_2019-04-29_20-23-59.png]] 
+- When $z$ is chosen at random from $\mathbb Z_q$, the element $g^z$ is uniformly distributed in $\mathbb G$
+
+- It is a general preference to use cyclic groups with *prime order*
+	- The discrete logarithm problem is harder in such groups
+	- It does not mean that it is easy in *non prime order groups* but just easier
+	- Another motivation is that it is easier finding a generator and testing if that given element is a generator
+		- Following from Corollary 7.52
+	- It takes probabilistic polynomial time to find a generator i an arbitrary cyclic group
+
+[[file:Number Theory and Cryptographic Hardness Assumptions/screenshot_2019-04-29_21-38-22.png]]	
+
+*** Working in (Subgroups of) $\mathbb Z_p^*$
+[[file:Number Theory and Cryptographic Hardness Assumptions/screenshot_2019-04-30_10-11-14.png]]	
+	
+- Groups of the form $\mathbb Z_p^*$ for $p$ prime, are one class of cyclic groups for which the discrete logarithm problem is believed to be hard.
+	- They are not believed to be hard for the Diffie Hellman problem
+
+- If $p$ is a strong prime (i.e. $p=2q+1$ with $q$ prime) then the subgroup of quadratic residues modulo $p$ has exactly $(p-1)/2=q$ elements
+	- This subgroup is cyclic by Corollary 7.52
+	- This class of groups are very useful for cryptography since the DDH problem is assumed to be hard for such groups
+
+** Applications of Number-Theoretic Assumptions in Cryptography
+*** One-Way Functions and Permutations
+- *Definition 7.66* A function $f:\{0,1\}^* \rightarrow \{0,1\}^*$ whose output length is polynomially related to its input length it is a *one-way* function if the following two conditions hold:
+	1. *Easy to compute:* There exists a polynomial-time algorithm that on input $x \in \{0,1\}^*$ outputs $f(x)$
+	2. *Hard to invert:* Consider the following experiment for a given algorithm $\mathcal A$ and parameter $n$:
+		 - *The inverting experiment* $\text{Invert}_{\mathcal A, f}(x)$
+			 a) Choose input $x \leftarrow \{0,1\}^n$. Compute $y:= f(x)$
+			 b) $\mathcal A$ is given $y$ as input, and outputs $x'$
+			 c) The output of the experiment is defined to be $1$ if $f(x') = y$, and $0$ otherwise
+
+[[file:Number Theory and Cryptographic Hardness Assumptions/screenshot_2019-04-30_10-46-00.png]]
+
+[[file:Number Theory and Cryptographic Hardness Assumptions/screenshot_2019-04-30_10-51-10.png]]	
+- *Theorem 7.68* If the factoring problem is hard relative to $\text{Gen}$, then $f_{\text{Gen}}$ is one way function
+
+[[file:Number Theory and Cryptographic Hardness Assumptions/screenshot_2019-04-30_10-51-55.png]]
+
+[[file:Number Theory and Cryptographic Hardness Assumptions/screenshot_2019-04-30_11-34-33.png]]	
+
+*** Construction Collision-Resistant Hash Functions
+[[file:Number Theory and Cryptographic Hardness Assumptions/screenshot_2019-04-30_11-37-29.png]]
+
+- *Theorem 7.73* If the discrete logarithm problem is hard relative to $\mathcal G$, then Construction 7.72 is collision resistant
+- _side 277_
+
+* On Electronic Voting Schemes
+** El-Gamal Encryption
+- We are given a group $G_q$ of large prime order $q$, and a generator $g$ of $G_q$
+	- $G_q$ could be a subgroup of $\mathbb Z_p^*$, where $p$ is a prime with $p=2q+1$
+- The El-Gamal cryptosystem has a secret key $s$ chosen at random from $\mathbb Z_q$, and public key $h = g^s$
+
+- To encrypt a message $m \in G_q$ the following is computed
+\begin{equation}
+  (c,d) = (g^r mh^r)
+\end{equation}
+where $r$ is random in $\mathbb Z_q$ 
+- To decrypt, compute $c^{-s}d = m$
+
+- It is assumed that this the cryptosystem is semantically secure
+	- i.e. from a ciphertext, no information on $m$ can be efficiently computed
+
+- This system can be used to encrypt numbers in $Z_q$ e.g. $0$ or $1$ and to encrypt a number $b$, one can compute
+\begin{equation}
+  E_h(b,r) = (g^r, g^bh^r) 
+\end{equation}
+- When this is decrypt using El-Gamal decryption we get $g^b$
+	- If $b$ could be arbitrary, one would have to find the discrete logarithm problem to find $b$ which is hard
+	- If $b$ is in some small set of possibilities one could just check for each $b'$ if $g^b = g^{b'}$
+
+- This system is *homomorphic* if the product on the cipher text is defined to be 
+\begin{equation}
+	(c,d) \cdot (c',d') = (cc', dd')
+\end{equation}
+- Then it is easy to see that 
+\begin{equation}
+  E_h(b,r) \cdot E_h(b',r') = E_h(b+b' \text{ mod } q, r + r' \text{ mod } q)
+\end{equation}
+
+** A Simple-Minded Voting Protocol
+- Assume a trusted third party, ~TTP~, whose generates and posts an El-Gamal public key $g$ and keeps the secret key $s$ for himself
+- We should execute a yes/no vote, and fix the rule that the number $0$ means NO and $1$ means YES
+- Every voter $V_i$ has a number $v_i$ which represents his vote
+- Each $V_i$ posts $E_h(v_i,r_i)$ and the ~TTP~ computes 
+\begin{equation}
+  \prod_i E_h(v_i,r_i) = E_h(\sum_i v_i \text{ mod } q, \sum_i r_i \text{ mod } q)
+\end{equation}
+- The sum is the decrypted and the result is $g^{\sum_i v_i \text{ mod } q}$
+	- The result can be found by trying all possibilities
+
+** Removing Trust in Voters
+- A dishonest voter can mess up the result by sending an encryption of some number other than $0$ or $1$
+- It is required for each voter that he proves that the encryption posted it correctly constructed
+
+- It is observed that
+	- If $(c,d) = E_h(0,r)$ then $(c,d) = (g^r, h^r)$ and therefore $\log_g(c) = \log_h(d)$
+	- If $(c,d) = E_h(1,r)$ then $(c,d) = (g^r, gh^r)$ and therefore $\log_g(c) = \log_h(g^{-1}d)$
+
+- There exists sigma protocols for proving equality of discrete logarithms
+	- Therefore the standard or-construction can be used for proving that either $\log_g(c) = \log_h(d)$ or $\log_g(c) = \log_h(g^{-1}d)$
+	- This can be used to prove that the encryption contains $0$ or $1$
+	- This can be made non-interactive using the Fiat-Shamir heuristic
+		- When computing the challenge using the hash function the identity of the voter should be included such that he cannot vote the same as another voter
+
+** Removing trust in the TTP
+- ~TTP~ forms a single point of attack
+	- Since it could start decrypting single votes
+	- To avoid this it is replaced by a set of authorities $A_1, \dots, A_n$
+
+- An $A_i$ is equip with some pieces of public and private information
+	- This should allow them to securely encrypt ciphertexts assuming that at most $t$ of them will misbehave
+	- $t = \lfloor (n-1) / 2 \rfloor$ i.e. $t$ is maximal such that $t < n/2$
+	- Security means that if the honest players agree to execute a decryption it will always succeed and no other information besides the desired plaintext will be released
+	- Decryption will require participation of at lease $t+1$ players i.e. no ciphertext can be decrypted by the dishonest players alone
+	
+- The information needed is as follows:
+	- Each authority $A_i$ knows a private value $s_i \in \mathbb Z_q$
+		- Where $s_i = f(i)$ and $f()$ is random polynomial over $\mathbb Z_q$ of degree at most $t$
+		- $f$ is chosen such that $f(0) = s$
+	- For each $A_i$, the value $h_i = g^{s_i}$ is publicly known
+	- A trusted dealer $TD$ is assumed that who initially generates and distributes this information privately and reliably
+	- Using $t+1$ $s_i$'s the secret can be efficiently computed by computing the coefficients $\lambda_i$ such that $s=\sum_i \lambda_i s_i \text{ mod } q$ 
+
+- It can be used to decrypt a ciphertext $(c,d)$ as follows (which can be done by computing $c^s$):
+	- Each $A_i$ posts $c_i = c^{s_i}$ and a proof that $\log_c(c_i) = \log_g(h_i)$
+	- Anyone can compute $c_s$
+		- Contributions with bad proofs are rejected
+		- At least $t+1$ correct contributions will be present
+		- If $c_1, \dots, c_{t+1}$ where okay one can compute $\prod_i c_i^{\lambda_i} = c^{\sum_i s_i \lamda_i \text{ mod } q} = c^s$
+
+** Removing the Trusted dealer
+- The first basic steps is the following:
+	- Each $A_i$ chooses a random polynomial $f_i()$ of degree at most $t$, $f_i(x) = v_i + a_{i1} x + \dots + a_{it} x^t$
+	- He publishes $g^{v_i}, \dots, g^{a_{it}}$
+	- $f_i(j)$ is send in private to each $A_j, j=1, \dots,n$
+
+- The values $g^{v_i}, g^{a_i1}, \dots, g^{a_it}$ serve as a commitment to the coefficients of $f_i()$
+	- Having seen the values everyone can compute $g^{f_i(j)}$ for any $i,j$ as follows
+\begin{equation}
+  g^{f_i(j)} = g^{v_i + a_{i1}j+ \cdots + a_{it}j} = g^{v_i} \cdot \big (g^{a_{i1}} \big ) ^j \cdots (g^{a_{it}} \big )^{j^t}
+\end{equation}
+
+- Using these facts the next step can be done:
+	- Each $A_j$ checks the value $u_i$ received from $A_i$ and checks whether $g^{f_i(j)} \stackrel{?}{=} g^{u_i}$ using the public information
+	- If the check succeeds it is used throughout the rest of the protocol
+		- If not $A_j$ posts a complain and $A_i$ must make $f_i(j)$ public and is disqualified from the rest of the protocol
+		- The reason that $A_i$ must make it public is to prove that he is not corrupt and if $A_j$ id corrupt the corrupt parties do not learn anything new
+
+- Then the following is done
+	- Each $A_j$ computes $s_j = f_1(j) + f_2(j) + \dots + f_n(j)$
+	- The public key is set to be $h=g^{f_1(0)} \cdot g^{f_2(0)} \cdots g^{f_n(0)} = g^{v_1 + \dots + v_n}$
+	- The following is defined $h_j = g^{f_1(j)} \cdot g^{f_n(j)}$
+	- Everyone can compute this information from the public information
+
+- The polynomial $f()$ is defined as $f() = f_1() + \dots + f_n()$ and $s = f(0)$
+
+* Helios: Web-based Open-Audit Voting
+** Introduction
+- Even if all election administrators are corrupts they cannot convincingly fake a tally
+- Privacy is only guaranteed if one trust ~Helios~
+
+** Helios Protocol
+*** Vote Preparation & Casting
+- A ballot for an election can be viewed and filled in by anyone at any time, without authentication
+- The voter is authenticated only at *ballot casting* time
+	- This means gives an increased auditability
+	- Anyone can test the ballot preparation mechanism
+
+- The process is as follows between Alice, the voter and the Ballot Preparation System (BPS):
+	1. Alice begins the voting process by indicating in which election she wishes to participate
+	2. The BPS leads Alice through all ballot questions, recording her answers
+	3. Once Alice has confirmed her choices the BPS
+		 a. encrypts her choices
+		 b. commits to this encryption by displaying a hash of the ciphertext
+	4. Alice can now choose to audit this ballot
+		 a. The BPS displays the ciphertext and the randomness used to create it
+		 b. Alice can verify that the BPS correctly encrypted her choices
+		 c. If this option is selected, the BPS prompts Alice to generate a new encryption of her choices
+	5. Alice can Alternatively choose to seal her ballot
+		 - The BPS discards all randomness and plaintext information, leaving only the ciphertext, ready for casting
+	6. Alice is then prompted to authenticate
+		 - If successful, the encrypted vote, which the BPS committed to earlier, is recorded as Alice's vote
+
+*** Bulletin Board of Votes
+- On the bulletin board, cast votes are displayed next to some identification of the voter
+- There is only one single bulletin board in ~Helios~
+
+*** Sako-Kilian/Benaloh Mixnex
+- A *mixnet* is used to preserve individual ballots and potentially support write-in votes anonymization
+	- The trustees each shuffle and re-randomize the case ciphertexts before jointly decrypting them
+	- Both the shuffling and decryption of encrypted ballots are accompanied by proofs of correctness
+
+- El-Gamal cryptosystems has simple *re-encryption*
+	- Given a ciphertext $c = (\alpha, \beta)$, a ciphertext $c'$ can be computed by selecting $s \in \mathbb Z_q$ and computing $c' = (g^s\alpha, y^s\beta)$
+	- $c'$ and $c'$ decrypt the same plaintext, $c$ with randomness $r$ and $c'$ with randomness $r+s$ 
+
+- In the Sako-Kilian mixnet, all inputs are El-Gamal ciphertexts
+	- A mix server
+		1. takes $N$ inputs
+		2. re-encrypts them using re-encryption factors $\{s_i\}_{i\in [1,N]}$
+		3. permutes them according to random permutation $\pi_N$ so that $d_i = \text{Reenc}(c_{\pi(i)}, s_i)$
+	- To prove that it mixed its input correctly it produces a second "shadow mix"
+		- The verifier then challenges the mix server to revel the permutation and re-encryption factors of either the shadow mix of the differences between the two mixes
+		- A cheating mix server can answer at most one of the questions convincingly with at least 50% probability
+	- To increase the assurance of integrity we can ask the mix server to produce a few shadow mixes
+		- The verifier then provides the appropriate number of challenge bits, one for each shadow mix
+		- If the mix server succeeds at responding to all challenges, then the primary mix is correct with probability $1-2^{-1}$
+			- Where $t$ is the number of shadow mixes
+			- Choosing $t=80$ guarantees integrity with overwhelming probability
+	- In Helio the Shamir heuristic is used
+		- The challenge bits are therefore computed as the hash of all shadow mixes
+
+- *Proof of Decryption.* Given a ciphertext $c=(\alpha, \beta)$ and claimed plaintext $m$, the prover shows that $\log_g(y) = \log_\alpha(\beta / m)$ (Honest Verifier Zero Knowledge)
+	1. The prover selects $w \in \mathbb Z_q$ and sends $A=g^w$, $B = \alpha^w$ to the verifier
+	2. The verifier challenges with $c \in \mathbb Z_q$
+	3. The prover responds with $t=w+xc$
+	4. The verifier checks that $g^t = Ay^c$ and $\alpha^t = B(\beta/m)^c$ 
+
+*** The whole process
+- The entire ~Helios~ protocol unfolds as follows:
+	1. Alice prepares and audits as many ballots as she wishes
+		 - While ensure that all of the audited ballots are consistent
+		 - When she is satisfied Alice cast an encrypted ballot, which requires her to authenticate
+	2. The ~Helios~ bulletin board posts Alice's name and encrypted ballot
+		 - Anyone including Alice, can check the bulletin board and find her encrypted vote posted
+	3. When the election closes
+		 a. ~Helios~ shuffles all encrypted ballots
+		 b. Produces a non-interactive proof of correct shuffling /(correct with overwhelming probability/)
+	4. After a reasonable complaint period Helio (allows the auditors to check the shuffling)
+		 a. decrypts all shuffled ballots
+		 b. provides a decryption proof for each
+		 c. performs a tally
+	5. An auditor can download the entire election data and verify the shuffle, decryption and tally
+

@@ -1,0 +1,479 @@
+* Algorithm Engineering – An Attempt at a Definition
+** Introduction
+[[file:Algorithm Engineering – An Attempt at a Definition/screenshot_2020-08-30_11-03-20.png]]	
+
+- The subject of *Algorithmics* is the systematic development of efficient algorithms
+	- Is very important in the effective development of reliable and resource-conserving technology
+
+- Traditionally algorithmics used the methodology of *algorithm theory* using stems from mathematics
+	- Algorithms are designed using simple models of problem and machine
+	- Main results are provable performance guarantees for all possible inputs
+	- Typically leads to elegant, timeless solutions that can be adapted to many applications
+	- Taking up and developing up and implementing an algorithmic idea is part of application development
+		- This mode of transferring results is usually a slow process
+		- With growing requirements for innovative algorithms this causes growing gaps between theory and practice
+	- In extreme cases promising algorithmic approaches are neglected because a mathematical analysis would be difficult
+
+- Algorithm engineering (AE) is sometimes equated with *experimental algorithms*
+	- This view is too limited
+	- It makes little sense to view design and analysis on one hand and implementation and experimentation on the other hand as separate activities
+
+- A feedback loop of design, analysis, implementation and experimentation that leads to new design ideas materializes as the central process of algorithmics
+	- Is quite similar to the cycle of theory building and experimental validation in Popper's scientific method
+	- A cycle is driven by *falsifiable hypotheses* validated by experiments
+		- An experiment can not prove a hypotheses but it can support it
+		- Hypotheses can come from creative ideas or result for inductive reasoning stemming from previous experiments
+	- Experiments have to be *reproducible*
+		- Other researchers have to be able to repeat an experiment to the extent that they draw the same conclusions or uncover mistake in the previous experimental setup
+
+- Design, analysis and evaluation of algorithms are based on some *model* of the problem and the underlying machine
+	- Gaps between theory and practice often relate to these model and thus they are an important aspect of AE
+
+- *Applications* are also an important aspect since the algorithms should be practical
+	- Applications are typically viewed outside the methodology of AE, since it otherwise would become to open ended and one algorithm typically has uses in many different applications
+
+- In order to reduce gaps between theory and practise as many interactions as possible between the application and the activities of AE should be taken into account
+	- Applications are the basis for realistic models and thus they influence the type of analysis done
+		- The put constraints on useful implementations and supply *realistic inputs* and other design parameters for experiments
+	- The results of analysis and experiments influence they way an algorithm is used
+
+- *Algorithm libraries* of highly tested codes with clear simple user interfaces are an important link between AE and applications
+
+** Models
+- A big difficult for defining models for problems and machines is that:
+	- only complex models are adequate images
+	- only simple models lead to simple, widely usable, portable and analyzable algorithms
+
+- A successful example for a machine model is the external memory model (I/O model)
+	- Instead of a uniform memory there are two levels of memory
+		- A fast memory of limited size $M$
+		- A slow memory that is accessed in blocks of size $B$
+	- Only counting I/O steps in this model can become a highly theoretical game
+		- An abstraction useful for AE can be achieved if 
+			- one additionally take internal work into account
+			- the values of the parameters $M$ and $B^2$ are chosen carefully
+	- Algorithms good in the I/O model are often good in practice although the model oversimplifies many real world aspects
+	- This model has been successfully generalized by adding parameters for the number of disks $D$, number of processors $P$
+
+** Design
+- In AE it is just as important as efficiency to look for simplicity, implementability and possibilities for code reuse
+
+- Efficiency means not just asymptotic worst case efficiency but the constants factors involved are also studied and the performance on real world inputs
+
+** Analysis
+- Simple and proven practical algorithms are often difficult to analyze
+	- One of the main reasons for gaps between theory and practice
+	- Thus an important aspect of AE
+
+** Implementation
+- Implementation only appears to be the most clearly prescribed and boring activity in the cycle of AE
+	- One reason is that there are huge semantic gaps between abstractly formulated algorithm, imperative programming languages and real hardware
+		- An example is that geometric algorithms are often designed assuming exact arithmetic's with real numbers
+	- Even the implementation of relatively simple basic algorithms can be challenging
+		- Even small implementations details can make a big difference
+
+** Experiments
+- Meaningful experiments are the key to closing the cycle of the AE process
+	- They can also have a direct influence on the analysis
+
+- AE can compared to other natural sciences perform many experiments with relatively little effort
+	- The other side of the coin is highly nontrivial planning, evaluation, archiving, postproccesing and interpretation of results
+		- The result is a confirmation, falsification or refinement of the hypothesis
+	- This leads to a better understanding of the algorithms and provide ideas for improved algorithms, more accurate analysis or more efficient implementation
+	- Experiments with external memory algorithms are challenging because they require huge inputs and execution times measuring in hours
+		- When comparing against a bad algorithm running times can easily reach months
+
+** Algorithm Libraries
+- Algorithm libraries are made by assembling implementations of a number of algorithms using the methods of software engineering
+	- The result should be efficient, easy to use, well documented, and portable
+	- They accelerate the transfer of know-how into applications
+
+- In algorithmics, libraries simplify comparisons of algorithms and the construction of software that builds on them
+
+- The software engineering involved is particularly challenging, since
+	- the applications to be supported are unknown at library implementation time
+	- the separation of interface and implementation is very important for these libraries to be useful
+
+- Using a library should save development time without leading to inferior performance
+
+- The triangle between generality, efficiency and ease of use leads to challenging tradeoffs
+	- optimizing one of these aspects will often deteriorate the others
+
+- Software correctness of algorithm libraries is even more important than for other software
+	- Since it is extremely difficult for a user to debug library code that has not been written by his team
+	- It is sometimes not even sufficient for a library to be correct as long as the user does not trust it sufficiently to first look for bugs outside the library
+		- This is a reason why result checking, certifying algorithms, or even formal verification are an important aspect of algorithm libraries
+
+** Instances
+- Collections of realistic program instances for benchmarking have proven crucial for improving algorithms
+	- e.g. NP-hard problems like TSP, the Steiner, tree problem, SAT, set covering and graph partitioning
+	
+* How Not To Do It
+** Introduction
+- If one selects an algorithm that one wishes to investigate experimentally some of the important features is
+	- *DON'T TRUST YOURSELF*
+		- Bugs always find their way into the most harmful parts of your code
+	- *DO USE DIFFERENT HARDWARE*
+		- This can be used to better discover bugs
+	- *DO MAKE IT FAST ENOUGH*
+		- It is not always necessary to have optimal code, but it does have to be fast enough
+		- It has to be fast enough to do what you need it does not need to be the fastest in the world
+
+** Experimental Design
+- In devising experiments to test hypotheses about the code there are many possible mistakes
+	- *DO COLLECT ALL DATA POSSIBLE*
+		- Usually there are several obvious statistics to collect as well as CPU time
+		- One should collect as many interesting aspects of data as you can think of
+		- It pays to collect everything you can think of whether or not you expect it to be important
+	- *DO IT ALL AGAIN*
+		- Or at least be able to do it all again
+		- Reproducibility is always an important aim
+		- One should be able to run the same experiment on the same seed if necessary
+			- Thus one is also able to test different procedures on identical problems not merely problems generated in the same way (*DO USE THE SAME PROBLEMS*)
+	- *DON'T IGNORE CRASHES*
+		- These typically reveal some bug or problem with the code2
+	- *DO IT OFTEN AND DO IT BIG*
+		- A reason for making the code efficient is so that one can perform lots of experiments on large problems
+		- Important since emergent behaviour is often not apparent with small problems
+		- Running lots of experiments will reduce noise and may uncover rare but important hard cases
+	- *DO BE STUPID*
+		- Stupid experiments can sometimes give fascinating results
+
+** Analysis of Data
+- *DO LOOK AT THE RAW DATA*
+	- Summaries of the data inevitably present an approximate view
+	- By looking at the raw data one can often spot trends and interesting odd cases which are hidden in the summaries
+
+- *DO LOOK FOR GOOD VIEWS*
+	- Almost all the insights we have had into the behaviour of our algorithms have come from finding a good of the data
+	- Sometimes an experiment will suggest a good view of old data
+	- It is important not to throw away data (*DON'T DISCARD DATA*)
+
+- *DON'T REJECT THE OBVIOUS*
+	- Sometimes a result have been studied and reject or not considered an obvious interpretation
+
+** Presentation of Results
+- *DO PRESENT STATISTICS*
+	- Even the simplest of statistics can provide considerably more information
+		- This gives the audience some feel for the spread of values or the accuracy of a fit
+	- Using e.g. a minimum, mean, maximum, median and standard deviation of the data give a more complete picture of the data
+
+- *DO REPORT NEGATIVE RESULTS*
+	- Reporting the negative results can be just as valuable as reporting positive results
+
+- *DON'T PUSH DEADLINES*
+
+* Testing Heuristics: We Have It All Wrong
+** Introduction
+- Competitive Testing tells us which algorithms are faster but not why
+	- The understanding thus derives from initial tinker that takes place in the design stages of the algorithm
+	- It diverts time and resources from productive investigation
+
+- Much empirical work on algorithms can be carried out on a workstation by a single investigator
+	- This should be exploited by conducting more experiments rather than implementing each one in the fastest possible code
+	- An alternative to competitive testing is controlled experimentation
+		- Design a controlled experiment that checks how the presence or absence of this characteristic affects performance
+		- Or build an explanatory mathematical model that captures the insight
+	
+** The Evils of Competitive Testing
+- The most obvious difficulty of competitive testing is making the competition fair
+	- Challenges are typically in coding skill, tuning and effort invested
+
+- A new implementation often face off against established codes on which enormous labor has been invested e.g. simplex codes for LP
+
+- Another course of evils concern the choice of test problems which are obtained in two ways:
+	1. Generating a random sample of problems
+		 - Random problems does not generally resemble real problems
+	2. Using benchmark problems
+		 - They first appear in publications that report the performance of a new algorithm that is applied to them
+		 - Thus existing algorithms perform well on these problems
+
+- Once a set of canonical problems is accepted new methods that have other strengths have a disadvantage
+
+- The most informative testing usually takes place during the algorithm's initial design phase
+
+- Competitive testing often diverts time away from writing efficient code 
+
+** A More scientific Alternative
+- *Factorial design* begins with a list of $n$ factors that could affect performance
+	- Each factor $i$ has several *levels* $k_i = 1, \dots, m_i$ corresponding to different problem size densities etc.
+		- They do not need to correspond on levels on a scale
+	- A sizeable problem set is generated for each cell $(k_1, \dots, k_n)$ of an $n$ dimensional array and average performance is measured for each set
+	- Statistical analysis can now check whether some factor has a significant effect on performance when the remaining factors are held constant at any given set of levels $(k_2, \dots, k_n)$
+
+** What To Measure
+- Most computational experiments measure solution quality or running time
+	- The former is unproblematic
+	- The latter, however, is better suited to competitive than scientific testing
+* Computation Geometry - Introduction
+** Convex Hulls
+*** Definition
+- Good solutions to algorithmic problems of a geometric nature are mostly based on two ingredients
+	1. A thorough understanding of the geometric properties of the problem
+	2. A proper application of algorithmic techniques and data structures
+
+- A subset $S$ of the plane is called *convex* if and only if for any pair of points $p,q \in S$ the line segment $\overline{pq}$ is completely contained in $S$
+
+- The *convex hull* $\mathcal{CH}(S)$ of a set $S$ is the smallest convex set that contains $S$ 
+	- i.e. the intersection of all convex sets that contain $S$
+	- An alternative definition is the unique convex polygon whose vertices are points from $P$ and that contains all points of $P$
+
+- The problem of computing the convex hull can be formalized as follows:
+	- Given a set $P=\{p_1, \dots, p_n\}$ of points in the plane compute a list that contains those points from $P$ that are the vertices of $\mathcal{CH}(P)$ listed in the clockwise order
+
+- Both endpoints $p$ and $q$ of an edge of the convex hulls are points such that all other points $p' \in P$ lies to the right of the line $\overline{pq}$
+
+*** Brute force algorithm
+[[file:Computation Geometry - Introduction/screenshot_2020-09-06_12-57-51.png]]
+[[file:Computation Geometry - Introduction/screenshot_2020-09-06_12-58-11.png]]	
+- It is assumed in line 5 that we have a function that can perform this test in constant time
+- The time complexity of $\textsc{SlowConvexHull}(P)$ is $O(n^3)$ time in total since
+	a) $n^2-n$ pairs of points are checked
+	b) For each this pairs $n-2$ other points are checked
+- $\textsc{SlowConvexHull}(P)$ is too slow to be of any practical use
+
+- A point $r$ does not always lie to the right or to the left of the line through $p$ and $q$ it might lie on this lie
+	- It is called a *degenerate case*
+	- These kind of situations are ignored when we first think about the problem
+
+- To make the algorithm correct in the presence of degeneracies the problem must be reformulated as follows:
+	- A directed edge $\overrightarrow{pq}$ is an edge of $\mathcal{CH}(P)$ if and only if all the other points $r \in P$ lie either strictly to the right of the direct line through $p$ and $q$ or the line on the open line segment $\overline{pq}$
+
+- Floating point arithmetic might lead to errors in the code
+	- e.g. testing whether a point lies below the line
+
+- The 
+
+*** Incremental algorithm
+[[file:Computation Geometry - Introduction/screenshot_2020-09-06_15-36-50.png]]
+[[file:Computation Geometry - Introduction/screenshot_2020-09-06_15-37-10.png]]	
+
+- In the *incremental algorithm* we add the points in $P$ one by one updating the solution after each addition
+	- The points are sorted by $x$ coordinate obtaining a sorted sequence $p_1, \dots, p_n$ and are added in that order
+	- First the convex hull vertices that lie on the upper hull is first computed - The part of the convex hull running from the leftmost point $p_1$ to the rightmost point $p_n$ when the vertices are listed in clockwise order
+	- In the second scan performed from right to left the remaining part of the convex hull is computed i.e. the lower hull
+
+- The basic step in the incremental algorithm is the update of the upper hull after adding a point $p_i$
+	- i.e. given the upper hull of the point $p_1, \dots, p_{i-1}$ we have to compute the upper hull of $p_1,\dots,p_i$
+	- It can be done as follows:
+		- Walk around the boundary of a polygon in clockwise order
+		- Make a turn at every vertex
+			- For a convex polygon every turn must be left turn
+
+- It is assumed that no two points have the same $x$ coordinate
+	- If this is not the case the order of the points is not well defined
+	- It can be fixed using a lexicographic order i.e. first sorting with respect to x and then y
+
+- If all three points lie on a straight line the middle point should be treated as if they make a left turn
+	- i.e. a test should be made to check if it is a right turn and false otherwise
+
+- Rounding errors can be resolved by interpreting points close together as being the same point using rounding
+
+- *Theorem 1.1* The convex hull of a set of $n$ points in the plane can be computed in $O(n \log n)$ time 
+
+** Degeneracies and Robustness
+- The development of a geometric algorithm often goes through three phases:
+	1. Everything that will clutter our understanding of the geometric concepts we are dealing with are ignored
+	2. Adjust the algorithm designed in the first phase to be correct in the presence of degenerate cases
+		 - In many cases there is a better way than adding a number of case distinctions to their algorithms
+	3. Actual implementation
+		 - One needs to think about primitive operations
+		 - The assumption of precise arithmetic breaks down
+		 - It is possible to predict based on the input the precision in the number representation required to solve the problem correctly
+
+* Linear Programming
+** The Geometry of Casting
+- To determine whether an object can be manufactured by casting a suitable mold should be found
+	- The shape of the cavity in the mold is determined by the shape of the object
+		- Different orientations of the object give rise to different models
+	- Choosing the right orientation can be crucial
+		- Some orientations may give rise to molds which cannot be removed
+	- An important restriction is that the object must have a horizontal *top facet*
+		- It will be the only one not in contact with the model
+		- There are many potential orientation or possible models as the object has facets
+	- An object is *castable* if it can be removed from its model for at least one of these orientations
+		- To decide the castability of the object every potential orientation must be tried
+
+- Let $\mathcal P$ be a 3-dimensional polyhedron i.e. a 3-dimensional solid bounded by planar facets and with a designated top facet
+	- The model is assumed to be a rectangular block with a cavity that corresponds exactly to $\mathcal P$
+	- When it is placed in the mold its top facet should be coplanar with the topmost facet of the mold that is assumed to be parallel to the $xy$ plane
+		- Thus the model has no unnecessary parts sticking out on the top that might prevent $\mathcal P$ from being removed
+	- A facet of $\mathcal P$ that is not the top facet is called an *ordinary facet*
+		- Every ordinary facet $f$ has a corresponding facet in the model denoted $\hat f$
+
+- It should be decided whether $\mathcal P$ can be removed from its mold by a single translation 
+	- i.e. whether a direction $\overrightarrow{d}$ exists such that $\mathcal P$ can be translated to infinity in direction $\overrightarrow{d}$ without intersecting the interior of the mold during the translation
+	- $\mathcal P$ is allowed to slide along the mold
+	- Let $f$ be an ordinary facet of $\mathcal P$ this must move away from, or slide along its corresponding facet $\hat{f}$ of the mold
+		- To make this constraint precise the angle of two vectors in 3-space has to be defined
+		- Take the plane spanned by the vectors (rooted at the same origin) the angle of the vectors is the smaller of the two angles measured in this plane
+			- $\hat f$ blocks any translation in a direction making an angle of less that $90^\circ$ with $\overrightarrow{\eta}(f)$ the outward normal of $f$
+		- The necessary condition on $\overrightarrow{d}$ is that it makes an angle of at least $90^\circ$ with the outward normal of every ordinary facet of $\mathcal P$
+
+- *Lemma 4.1* The polyhedron $\mathcal P$ can be removed from its mold by a translation in direction $\overrightarrow d$ if and only if $\overrightarrow{d}$ makes an angle of at least $90^\circ$ with the outward normal of all ordinary facets of $\mathcal P$
+	- If $\mathcal P$ can be removed by a sequence of small translations, then it can be removed by a single translation.
+
+- Let $\overrightarrow \eta = (\overrightarrow{\eta}_x, \overrightarrow\eta_y,\overrightarrow \eta_z)$ be the outward normal of an ordinary facet
+	- The direction $\overrightarrow d = (d_x, d_y, 1)$ makes an angle at least $90^\circ$ with $\overrightarrow \eta$ if and only if the dot product of $\overrightarrow d$ and $\overrightarrow \eta$ is non_positive
+	- An ordinary facet induces a constraint of the form $\overrightarrow \eta_x d_x + \overrightarrow \eta_y d_y + d_z \leq 0$
+		- Describes a half-plane on the plane $z=1$ i.e. the area left or the area right of a line on the plane
+	- Every non-horizontal facet of $\mathcal P$ defines a closed half-plane on the plane $z = 1$
+		- Any point in the common intersection of these half-planes corresponds to a direction in which $\mathcal P$ can be removed
+		- If the common intersection of these half-planes is empty $\mathcal P$ cannot be removed from the given mold
+
+- The manufacturing problem has been transformed into a purely geometric problem in the plane: given a set of half-planes, find a point in their common intersection or decide that the common common intersection is empty
+	- If the polyhedron to manufactured has $n$ facets the planar problem has at most $n-1$ half-planes
+
+- *Theorem 4.2* Let $\mathcal P$ be a polyhedron with $n$ facets. In $O(n^2)$ expected time and using $O(n)$ storage it can be decided whether $\mathcal P$ is castable
+	- If $\mathcal P$ is castable, a mold and a valid direction for removing $\mathcal P$ from it can be computed in the same amount of time
+
+** Half-Plane Intersection
+- Let $H= \{h_1, h_2, \dots, h_n\}$ be a set of linear constraints in two variables i.e. constraints of the form $a_i x + b_i y \leq c_i$
+	- where $a_i$, $b_i$ and $c_i$ are constants such that at least one of $a_i$ and $b_i$ is non-zero
+	- Such a constraint can be interpreted as a closed half-plane in $\mathbb R^2$ bounded by the line $a_ix + b_iy = c_i$
+	- The problem considered is to find the set of all points $(x,y) \in \mathbb R^2$ that satisfy all $n$ constraints at the same time.
+		- i.e. all the points lying in the common intersection of the half-planes in $H$
+
+- The shape of the intersection of a set of half-planes is easy to determine
+	- A half-plane is convex
+	- The intersection of half-planes is again a convex region in the plane
+		- Thus every bounding line can contribute at most one edge
+	- The intersection of $n$ half-planes is a convex polygonal region bounded by at most $n$ edges
+
+- The divide-and-conquer algorithm $\textsc{IntersectHalfplanes}$ uses the routine $\textsc{IntersectConvexRegions}$ to compute the intersection of $n$ half planes
+[[file:Linear Programming/screenshot_2020-09-16_09-50-44.png]]
+
+- The procedure $\textsc{IntersectConvexRegions}$ can be computed in $O(n \log n + k \log n)$ time, where $n$ is the total number of vertices in the two polygons
+	- $n$ is the total number of vertices in the two polygons
+	- The total running time becomes $T(n) = O(n \log^2n)$
+
+- The convex polygonal region $C$ is represented as follows
+	- The left and the right boundary of $C$ is stored separately as sorted lists of half-planes
+	- The list are sorted in the order in which the bounding lines of the half-planes occur when the boundary is traversed from top to bottom
+	- The left boundary list is denoted by $\mathcal{L}_{\text{left}}(C)$ and the right boundary list is denoted by $\mathcal{L}_{\text{right}}(C)$
+
+- *Theorem 4.3* The intersection of two convex polygonal regions in the plane can be computed in $O(n)$ time
+
+- *Corollary 4.4* The common intersection of a set of $n$ half-planes in the plane can be computed in $O(n \log n)$ time and linear storage
+
+** Incremental Linear Programming
+- Any algorithm that solves the half-plane intersection problem must take $\Omega (n \log n)$ time in the worst case
+
+- Let $f_{\overrightarrow c}$ denotes the objective function defined by a direction vector $\overrightarrow c$
+
+- The set of $n$ linear constraints in our 2-dimensional linear programming problem is denoted by $H$
+	- The vector defining the objective function is $\overrightarrow c = (c_x, c_y)$
+	- The objective function is $f_{\overrightarrow c}(p) = c_x p_x + c_y p_y$
+	- The goal is to find a $p \in \mathbb R^2$ such that $p \in \bigcap H$ and $f_{\overrightarrow c}(p)$ is maximized
+	- The linear program is denoted by $(H, \overrightarrow c)$
+	- $C$ is used to denote its feasible region
+
+- Cases for the linear program:
+[[file:Linear Programming/screenshot_2020-09-16_13-48-43.png]]
+
+- The algorithm for 2-dimensional linear programming is incremental
+	- It adds the constraints one by one and maintains the optimal solution to the intermediate linear programs
+- It requires that the solution to each intermediate problem is well-defined as unique
+	- To fulfill this requirement two additional constraints are added to guarantee that the linear program is bounded.
+	- If e.g. $c_x > 0 $ and $c_y > 0$ the constraints $p_x \leq M$ and $p_y \leq M$ is added for some large $M \in \mathbb R$
+	- The idea is that $M$ should be chosen so large that the additional constraints do not influence the optimal solution, if the original linear program was bounded
+	- The two new constraints are defined as follows
+[[file:Linear Programming/screenshot_2020-09-16_14-00-22.png]]
+
+- If there are several optimal points we want the smallest lexicographically smallest one
+
+- With the two new conventions, any linear program that is feasible has a unique solution which a vertex of the feasible region
+	- This vertex is called the *optimal vertex*
+
+- Let $(H, \overrightarrow c)$ be a linear program
+	- The half-planes are numbered $h_1, h_2, \dots, h_n$
+	- Let $H_i$ be the set of the first $i$ constraints, together with the special constraints $m_1$ and $m_2$
+	- Let $C_i$ be the feasible region defined by the these constraints
+	- By the choice of $C_0$, each feasible region $C_i$ has a unique optimal vertex denoted $vi$
+	- It must clearly be the case that
+\[
+	C_0 \supseteq C_1 \supseteq C_2 \cdots \supseteq C_n = C
+\]
+- This implies that if $C_i = \emptyset$ for some $i$ the $C_j = \emptyset$ for all $j \geq i$ and thus the linear program is infeasible
+	- The algorithm can stop once the linear program becomes infeasible
+
+- *Lemma 4.5* Let $1 \leq i \leq n$, and let $C_i$ and $v_i$ be defined as above. Then we have
+	a) If $v_{i-1} \in h_i$ then $v_i = v_{i-1}$
+	b) If $v_{i-1} \notin h_i$ then either $C_i = \emptyset$ or $v_i \in \ell_i$ where $\ell_i$ is the line bounding $h_i$
+
+- *Lemma 4.6* A 1-dimensional linear program can be solved in linear time
+
+[[file:Linear Programming/screenshot_2020-09-16_14-37-01.png]]
+[[file:Linear Programming/screenshot_2020-09-16_14-37-17.png]]	
+
+- *Lemma 4.7* Algorithm $\textsc{2dBoundedLP}$ computes the solution to a bounded linear program with $n$ constraints and two variable in $O(n^2)$ time and linear storage	
+
+** Randomized Linear Programming
+[[file:Linear Programming/screenshot_2020-09-16_14-53-09.png]] 
+- This algorithm relies on a random number generator $\textsc{Random}(k)$, which has an integer $k$ as input and generates a random integer between $1$ and $k$ in constant time
+	- Computing a random permutation can be done using the following algorithm
+[[file:Linear Programming/screenshot_2020-09-16_15-06-19.png]]
+
+- *Lemma 4.8* The 2-dimensional linear programming problem with $n$ constraints can be solved in $O(n)$ randomized expected time using worst case linear storage	
+
+** Unbounded Linear Programs
+- *Lemma 4.9* A linear program $(H, \overrightarrow c)$ is unbounded if and only if there is a vector $\overrightarrow d$ with $\overrightarrow d \cdot \overrightarrow c > 0$ such that $\overrightarrow d \cdot \overrightarrow \eta (h) \geq 0$ for all $h \in H$ and the linear program $(H', \overrightarrow c)$ is feasible, where $H' = \{h \in H \mid \overrightarrow \eta (h) \cdot \overrightarrow d = 0\}$
+
+* Line Segment Intersection
+** General
+- The problem is the following in a geometric setting: given two sets of line segments, compute all intersections between a segment from one set and a segment from the other
+	- The endpoint of a segment lying on another segment counts as an intersection
+	- It is simplified by putting segments from the two sets into one set and computing all the intersections among the segments in that set
+		- From a solution to this problem a solution to the two set case can easily be achieved by filtering out intersections from the same set
+
+- *Line Segment Intersection problem:* The problem specification is thus as follows: given a set $S$ of $n$ closed segments in the plane, report all intersection points among the segments in $S$
+	- It can be solved by taking each pair of segments, compute whether they intersect and if so report their intersection point
+		- A brute force solution in $O(n^2)$ time
+		- This is optimal when each pair of segments intersects since then any algorithm must take $\Omega(n^2)$ time
+	- In practical situations most segments intersect no or only a few other segments
+		- The total number of intersection points is thus much solver that quadratic
+		- Thus an algorithm which not only depends on the number of segments in the input but also on the number of intersection points
+			- Called an *output-sensitive algorithm* i.e. and algorithm that is sensitive to the size of the output
+
+- Let $S:= \{s_1, s_2, \dots, s_n\}$ be the of segments for which we want to compute all intersections
+	- We want to test pairs of segments whose y-intervals overlap i.e. pairs for which there exists a horizontal line that intersects both segments
+		- To find these pairs a sweeping line $\ell$ can be imagined sweeping downwards over the plane starting from a position above all segments
+	- This type of algorithm is called a *plane sweep algorithm* and the line $\ell$ is called the *sweep line*
+		- The *status* of the sweep line is the set of segments intersecting it
+		- Only at particular points is an update of the status required these are called *event points* of the plane
+	- The moments at which the sweep line reaches an event points are the only moments when the algorithm does something
+		- It updates the status of the sweep line and performs some intersection tests
+		- If the event points is the upper endpoint of a segment, then a new segment starts intersecting the sweep line
+		- Segments are only tested when they are adjacent in the horizontal ordering to avoid quadratic amount of tests
+			- Done by sorting in the horizontal direction
+			- Thus the status corresponds to the ordered sequence of segments intersecting the sweep line
+
+- *Lemma 2.1* Let $s_i$ and $sj$ be two non-horizontal segments whose interiors intersect in a single point $p$ and that there is no third segment passing through $p$. Then there is an event point above $p$ where $s_i$ and $s_j$ become adjacent and are tested for intersection.
+
+- The algorithms needs a data structure called the *event queue*, which stores events
+	- The event queue is denoted by $\mathcal Q$
+	- An operation that removes the next that will occur from $\mathcal Q$ and removes it such that it can be treated is needed
+		- The highest event below the sweep line $\mathcal Q$
+		- If two event points have the same $y$ coordinate then the one with smaller $x$ coordinate will be returned
+	- It is implemented as follows:
+		- Define an order $\prec$ on the event points that represents the order in which they will be handled
+		- $p \prec q$ if and only if $p_y > q_y$ holds or $p_y = q_y$ and $p_x < q_x$ holds
+		- The event points are stored in a balanced binary search tree ordered according to $\prec$
+
+- The status denoted $\mathcal T$ is used to access the neighbors of a given segment $s$, so they can be tested for intersection with $s$
+	- Should support insertion or deletion from the structure
+	- Since there is a well-defined order on the segments in the status a binary search tree is used as this
+
+- The global algorithm can be described as follows:
+[[file:Line Segment Intersection/screenshot_2020-09-21_11-53-29.png]]
+	
+[[file:Line Segment Intersection/screenshot_2020-09-21_11-54-14.png]]	
+	
+[[file:Line Segment Intersection/screenshot_2020-09-21_11-55-11.png]]
+
+- *Lemma 2.2* Algorithm $\textsf{FindIntersections}$ computes all intersection points and the segments that contain it correctly
+
+- *Lemma 2.3* The running time of Algorithm $\textsc{FindIntersections}$ for a set $S$ of $n$ line segments in the plane is $O(n \log n + I \log n)$, where $I$ is the number of intersection points of segments in $S$
+
+- *Theorem 2.4* Let $S$ be a set of $n$ line segments in the plane. All intersection points in $S$, with for each intersection point the segments involved in it, can be reported in $O(\n \log n + I \log n)$ time and $O(n)$ space, where $I$ is the number of intersection points
+

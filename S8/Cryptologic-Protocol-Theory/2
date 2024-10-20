@@ -1,0 +1,115 @@
+* Graph Nonisomorphism 
+- $P$ is trying to convince $V$ that two graphs $G_0$ and $G_1$ are not isomorphic
+	- The graphs has $n$ vertices and $n$ edges
+	- Let $B = \{0,1\}$
+	- Making a *random isomorphic copy* of $G$ means: choose a random permutation $\phi$ on $n$ points and compute $\phi(G$)
+
+- Protocol for Graph Nonisomorphism which are repeated $n$ times
+	1. $V$ chooses a random bit $\alpha$ and constructs a graph $H$ as a random isomorphic copy of $G_{\alpha}$. He then does the following for $i= 1, \dots, s$
+		 a) Choose $\alpha_i \in B$
+		 b) Construct a pair $(H_0^i, H_1^i)$ of graphs, such that
+				- if $\alpha_i = 0$ then $H_0^i$ is a random isomorphic copy of $G_0$ and $H_1^i$ is a random isomorphic copy of $G_1$
+				- otherwise $H_0^i$ is a random isomorphic copy of $G_1$ and $H_1^i$ is a random isomorphic copy of $G_0$
+		 c) He sends $H$ and all pairs $(H_0^i, H_1^i)$ to $P$
+	2. $P$ chooses $b_1, \dots, b_s$ at random in $B$ and sends them to $V$
+	3. For each $i=1,\dots, s$, $V$ sends the following to $P$
+		 - If $b_i = 0$ the isomorphisms between $(H_0^i, H_1^i)$ and $(G_0, G_1)$ are sent
+		 - If $b_i = 1$ an isomorphism from $H$ to one of $(H_0^i, H_1^i)$ is sent
+	4. For each value of $i$, $P$ checks that the appropriate isomorphisms were sent
+		 - If not he stops
+		 - Otherwise, he computes $b$ such that $G_b$ is isomorphic to $H$ and sends $b$ to $V$
+		 - If no such $b$ exists he sends a randomly chosen value
+	5. $V$ accepts, if $\alpha = b$, otherwise he reject
+
+- *Theorem 1.* The above protocol is an interactive proof system for graph nonisomorphism
+
+- *Theorem 2.* The above protocol is perfect zero-knowledge
+
+* Zero-Knowledge for all of NP
+- If the prover $P$ claims $x \in L$ for some $L \in NP$ it can be assumed that $P$ knows some witness $w$ either he can computed it using his infinite computing power or he knows it in advance
+
+- *Theorem 3.* If a perfectly hiding and computational binding commitment scheme is used, then the Graph Hamiltonicity protocol is a perfect zero-knowledge interactive argument for Graph Hamltonicity
+	- *Remark 1.* If the commitment scheme was only unconditionally, the protocol would have been statistically and not perfect zero-knowledge
+
+- *Lemma 1.* Consider any matrix of commitments $C$ sent in step (a). Let $R_{0}$ be a possible reply from a (not necessarily honest) prover to $b=0$ ,similarly $R_{1}$ is a possible reply to $b=1$. If $V$ accepts both $R_{0}$ and $R_{1}$ and if every commitment from $C$ that is opened in $R_{1}$ is also opened to reveal 1 's in $R_{0}$, then $G$ is Hamiltonian.
+
+* MPC Protocols with Passive Security
+** Introduction
+- *Semihonest* or *passive security* is when all the players learn nothing more than their own inputs and the outputs they were supposed to receive even if their computing power is unbounded if all the players follow the protocol
+- It is assumed that each pair of players can communicate through a perfectly secure channel
+
+** Secret Sharing
+*** Sharmir's secret-sharing scheme
+ - It is based on polynomials over a finite field $\mathbb F$
+ - The only restriction on $\mathbb F$ is that $|\mathbb F| > n$
+	 - It is assumed for correctness and simplicity that $\mathbb F = \mathbb Z_p$ for some prime $p>n$
+ - A value $s \in \mathbb F$ is *shared* by
+	 a) Choosing a random polynomial $f_s(X) \in \mathbb F[X]$ of degree at most $t$ such that $f_s(0) = s$
+	 b) Sending privately to player $P_j$ the share $s_j = f_s(j)$
+ - Any set of $t$ or fewer shares contains no information on $s$
+
+*** *Lagrange Interpolation*
+- If $h(X)$ is a polynomial over $\matbb F$ of degree at most $l$, and if $C$ is a subset of $\mathbb F$ with $|C| = l+1$ then
+\[
+	h(X) = \sum_{i \in C} h(i) \delta_i(X)
+\]
+- where $\delta_i(X)$ is the degree $l$ polynomial such that for all $i,j \in C$, $\delta_i(j) = 0$ if $i \neq j$ and $\delta_i(j) = 1$ if $i=j$ i.e.
+\[
+	\delta_i(X) = \prod_{j \in C, j \neq i} \frac{X-j}{i-j}
+\]	
+	
+- A consequence of Lagrange interpolation is that there exist easily computable values $\mathbb r = (r_1, \dots, r_n)$ such that 
+\[
+	h(0) = \sum_{i=1}^n r_i h(i)
+\]
+- for all polynomials $h(X)$ of degree at most $n-1$ i.e. $r_i = \delta_i(0)$
+	- $\bf r = (r_1, \dots, r_n)$ is called the recombination vector
+	- The *same* recombination vector $\bf r$ works for all $h(X)$ since $\delta_i(X)$ does not depend on $h(X)$
+
+- Another consequence is that for all secrets $s \in \mathbb F$ and all $C \subset \mathbb F$ with $|C| = t$ and $0 \notin C$, if one sample a uniformly random $f$ of degree $\leq t$ and with $f(0) = s$, then the distribution of the $t$ shares 
+\[
+	(f(i))_{i \in C}
+\]
+- is the uniform distribution on $\mathbb F^t$	
+
+** A Passively Secure Protocol
+*** Arithmetic Circuits
+- A protocol that can securely evaluate a function with inputs and outputs in a finite field $\mathbb F$
+	- It is constructed for the case where each party has exactly one input and one output from $\mathbb F$ i.e. $f: \mathbb F^n \to \mathbb F^n$, $(x_1, \dots, x_n) \to (y_1, \dots, y_n)$
+	- It is assumed that the mapping is described using an arithmetic circuit
+
+- An arithmetic circuit is an acyclic directed graph where each node is called a *gate* and the edges are called *wires*
+	- Each gate has at most two incoming wires
+	- Types of gates
+		- $n$ input gates
+			- No incoming wires and any number of outcoming wires
+			- Labeled by $i$ for a player $P_i$
+			- Player $P_i$ supplies that secret input value $x_i$ which it copied onto all outgoing wires
+		- Some number of internal addition and multiplication gates
+			- Two incoming wires and any number of outcoming wires
+			- Add or multiply their two inputs onto the outgoing wires
+		- Multiply-by-constant gates
+			- One input wire and any number of output wires
+			- Labeled by a constant $\alpha \in \mathbb F$ and does multiplication by $\alpha$
+		- $n$ output gates
+			- Labeled by $i$ for a player $P_i$
+			- Assigned to the input wire of this gate is eventually $y_i$
+	- Evaluating a circuit can be done as follows
+		1) Assign the value $x_i$ to the wire(s) coming out of the input gate labeled $i$
+		2) Take the first gate for which all input values have been assigned to (some numbering is assumed)
+			 a) Compute the output value
+			 b) Assign it to the output wire(s) of the gate
+			 c) Repeat until all wires have had values assigned
+	- The order in which one visit the gates in this procedure is called the *computational ordering*
+	- This can be used to simulate a boolean circuit with and negation and therefore be used to compute any function
+		- It can be simulated by operatiosn in $\mathbb F$
+		- Boolean values ~true~ or ~false~ can be encoded as 1 resp. 0
+		- The negation of bit $b$ is $1-b$
+		- The and of bits $b$ and $b'$ is $b \cdot b'$
+
+- It is assumed that a circuit that is to computed securely contains a multiplication gate immediately before each output gate and this only has one output wire
+	- If the circuit does not satisfy the condition for output $y_j$ one can introduce an extra input $x_j'$ from $P_j$ and then change to a new circuit that multiplies $y_j$ by $x_j'$ just before the output gate
+	- It makes the circuit at most a constant factor larger
+	- By choosing $x_j' = 1$, $P_j$ will still learn the same value
+
+*** The Protocol

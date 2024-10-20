@@ -1,0 +1,603 @@
+* General
+** Info
+- *Lectures:* https://aarhusuniversity.zoom.us/j/721082224k
+
+** Header
+*** DNO
+#+LaTeX_HEADER: \renewcommand{\Names}{\mathsf{Names}}
+#+LaTeX_HEADER: \renewcommand{\Inputs}{\mathsf{Inputs}}
+#+LaTeX_HEADER: \renewcommand{\Outputs}{\mathsf{Outputs}}
+#+LaTeX_HEADER: \renewcommand{\Times}{\mathsf{Times}}
+#+LaTeX_HEADER: \renewcommand{\States}{\mathsf{States}}
+#+LaTeX_HEADER: \renewcommand{\State}{\mathsf{State}}
+#+LaTeX_HEADER: \renewcommand{\EXEC}{\mathtt{EXEC}}
+#+LaTeX_HEADER: \renewcommand{\vk}{\mathsf{vk}}
+#+LaTeX_HEADER: \renewcommand{\tid}{\text{tid}}
+#+LaTeX_HEADER: \renewcommand{\S}{\mathsf{S}}
+#+LaTeX_HEADER: \renewcommand{\R}{\mathsf{R}}
+#+LaTeX_HEADER: \renewcommand{\RCS}{\mathsf{RCS}}
+
+* The Protection of Information in Computer Systems
+** Basic Principles of Information Protection
+*** Considerations Surrounding the Study of Protection
+- Potential security violations can be placed in three categories
+	a) *Unauthorized information release:*
+		 - An unauthorized person is able to read and take advantage of information stored in the computer
+		 - Sometimes extends to "traffic analysis"
+		 - Also includes unauthorized use of a proprietary program
+	b) *Unauthorized information modification:*
+		 - An unauthorized person is able to make changes in stored information
+		 - It is not required that the intruder see the information he has changed
+	c) *Unauthorized denial of use:*
+		 - An intruder can prevent an authorized user from referring to or modifying information
+		 - It is another form of sabotage
+
+- The term *authentication* is used for those security techniques that verify the identity of a person
+
+- Protection schemes can be divides according to their functional properties as follows
+	a) *Unprotected systems:*
+		 - Have no provision for preventing a determined user from having access to every piece of information stored in the system
+	b) *All-or-nothing systems:*
+		 - Provide isolation of users
+		 - Sometimes moderated by total sharing of some information
+		 - If only isolation is provided the user of such a system might as well be using his own private computer
+	c) *Controlled sharing:*
+		 - It should control explicitly who may access each data item stored in the system
+		 - Significantly more complex machinery is required
+	d) *User-programmed sharing controls:*
+		 - Restrict access to a file in a way not provided in the standard facilities for controlling sharing
+		 - One can use user-defined *protected objects* and *subsystems*
+		 - A *protected subsystem* is a collection of programs and data with the property that only the programs of the subsystems have direct access to the data
+			 - Access to those programs is limited to calling specified entry points
+	e) *Putting strings on information:*
+		 - Maintain some control over the user of the information even after it has been released
+
+- Secure Design Principles 
+	a) *Economy of mechanism:*
+		 - Keep the design as simple and small as possible
+		 - To solve errors techniques such as the following are necessary
+			 - Line-by-line inspection of the soft
+			 - Physical examination of hardware that implements protection mechanisms are necessary
+	b) *Fail-safe defaults:*
+		 - Base access decision on permissions rather than exclusions
+		 - The default situation is lack of access and the protection scheme identifies conditions under which access is permitted
+		 - It must be based on arguments why objects should be accessible rather than why they should not
+		 - Applies both to the outward appearance of the protection mechanism and to its underlying implementation
+	c) *Complete mediation:*
+		 - Every access to every object must be checked for authority
+		 - Time of check time of use attack
+			 - Privileges might be revoked when trying to use 
+	d) *Open design:*
+		 - The design should not be secret
+		 - Should not depend on the ignorance of potential attackers
+		 - Should instead depend on more easily protected, keys or passwords
+	e) *Separation of privilege:*
+		 - Where feasible a protection mechanism that requires two keys to unlock is more robust and flexible
+		 - The two keys can be separated such that no single accident, deception or breach of trust is sufficient to compromise the protected information
+	f) *Least privilege:*
+		 - Every program and every user of the system should operate using the least set of privileges necessary to complete the job
+		 - need-to-know
+	g) *Least common mechanism:*
+		 - Minimize the amount of mechanism common to more than one user and depended on by all users
+	h) *Psychological acceptability:* 
+		 - The interface should be designed for ease of use so that users routinely and automatically apply the protection mechanisms correctly
+	
+- Two design principles apply imperfectly to computer systems
+	a) *Work factor:*
+		 - Compare the cost of circumventing the mechanism with the resources of a potential attacker
+	b) *Compromise recording:*
+		 - It is sometimes suggested that mechanisms that reliably record that a comprise of information has occurred can be used in place of more elaborate mechanisms that completely prevent loss
+		 - Rarely used in computer systems 
+
+*** Technical Underpinnings
+- Implementations of protection mechanisms that permit sharing fall into the two general categories described by Wilkes
+	a) *"List-oriented" implementations:*
+		 - The guard holds a list of identifiers of authorized users
+		 - The user carries a unique unforgeable identifier
+			 - Must appear on the guard's list for access to be permitted
+		 - Not used where the amount of traffic is high
+	b) *"Ticked-oriented" implementations:*
+		 - The guard holds the description of a single identifier
+		 - Each user has a collection of unforgeable identifiers
+			 - Corresponds to the objects of which it has been authorized access
+		 - There should be some way of ensuring that the identifiers cannot be shared between users
+
+- A *principal* is the entity accountable for the activities of a virtual processor
+	- e.g. the user outside the system
+	- To use a principal some kind of identification must be used
+* The Confinement Problem
+** The Problem
+- An arbitrary program should be confined
+	- This does not mean that any program which works when free will still work under confinement
+	- Any program if confined will be unable to leak data
+
+** Confinement Rules
+- The following rule is sufficient to ensure confinement
+	- *Total isolation:* A confined program shall make no calls on any other program
+
+- A way to ensure confinement is that all programs called from a confined program is also confined
+	- Not possible since the supervisor is not confined
+	- The supervisor must be trusted
+
+- A more flexible rule to try and get confinement:
+	- *Transitivity:* If a confined program calls another program which is not trusted, the called program must also be confined
+
+
+- The channels where there might be leakages fall into three categories:
+	- *Storage* of various kinds maintained by the supervisor which can be written by the service and read by an unconfined program, either shortly after it is written or at some later time
+		- It is hard to identify all the kinds of storage which the supervisor implements
+	- *Legitimate* channels used by the confined service such as the bill
+	- *Covert* channels i.e. those not intended for information transfer at all
+		- e.g. the service program's effect on the system load
+	
+- The following priciple is sufficient to block all legitimate and covert channels
+	- *Masking:* A program to be confined must allows its caller to determine all its inputs into legitimate and covert channels.
+	- The channels are said to be masked by the caller
+	- *Enforcement:* The supervisor must ensure that a confined program's input to covert channels conforms to the caller's specifications
+
+* Smashing The Stack For Fun And Profil
+** 
+* Papers
+1. Stack Overflow Snippets in Android Apps
+	 - Security related
+	 - Found vounable snippets
+
+2. Jasmin
+	 - Ensure absence of vurnabilities
+	 - Ensures no sidechannels
+	 - Low level language
+	 - No need for deep understanding
+
+3. Design hardware using information flow
+	 - RISC processor that tracks information flow at runtime
+	 - Description of the instruction set
+
+4. Implementations of crypto
+	 - Try to write the program without any kind of branches
+	 - If one programs in C using the low level bit operators then the compiled code is free of branches
+	 - The execution of the code does not depend on any secret
+	 - Optimization breaks this
+		 - Introduces branches
+	 - Similar to the Jasmin paper
+	 - The compiler should know that certain parts of the code should be free of branches
+
+5. Using programming languages techniques for MPC compilers
+	 - SoK: system of knowledge
+	 - Review implementations of these techniques
+	 - The properties one wants from these kinds of compilers
+
+6. Avoid stack overflow using Shadow Stacks
+	 - SoK: system of knowledge
+	 - Old technique
+	 - Review a bunch of techniques and implementation to avoid stack overflows
+	 - Both tries to make it secure and performance
+
+7. Different techniques for information flow control
+	 - Run the program with two inputs one time with dummy input and one time with secret input
+	 - The output should not rely on the secret input
+	 - Relatively inefficient
+	 - Blackbox techniques
+	 - How one can optimize this techniques
+	 - Also some implementation
+
+8. CompCert
+	 - CompCert is a fully verified compiler for C written in Coq
+	 - Have optimizations that support information flow
+	 - Slightly more technical
+
+9. Cross-site scripting vurnabilities
+	 - Client site web security
+	 - Why are they a problem?
+	 - Defences
+
+10. Secure isolation of programs using enclaves
+		- Running a computation that is fully isolated from the rest of the environment
+		- Running secure computation even when the operating system is completely untrusted
+		- How should one do it?
+			- What kind of language
+			- The operating system cannot look into the computation of the enclave
+		- New paper
+
+11. Information flow for databases
+
+12. Static analysis of java applications to find attacks
+		- Given an application can one synthesizes an optimal attack
+		- Maximize the entropy that one gets
+		- Symbolic execution
+
+13. Using capabilities
+		- Introduces capabilities at the level of shell scripting
+		- Proposing a scripting language
+			- Concrete capabilities to accessing files
+		- Shell is implemented on top of FreeBSD
+
+14. Attacks on machines that look at DNA sequences
+		- How to synthesize a malicious DNA sequence
+		- Malicious inputs can come in any form
+
+15. Fuzzing
+		- General techniques
+		- Generate a program that is resilient against fuzzing
+		- How to improve the fuzzing techniques
+		- More than one thing to talk about
+
+* Projects
+- Look at past projects
+- 12-18 pages
+- Ideas
+	- Survey of smart contracts
+		- Three different smart contracts ideas
+		- Go through different smart contract languages
+			- Smart contracts that uses different alternatives to gas
+		- Good possibility for learning for what is going on
+		- Read about different programming languages
+		- Can be very ambigous
+			- e.g. implement three examples in the three different programming language
+		- Categories
+
+	- Smart contracts and fuzzing
+		- Possibility for implementing something
+
+	- MPC smart contracts
+		- Little too risky
+
+	- Attacks on smart contracts
+	- Smart contracts and information flow
+	- Zero-knowledge smart contracts
+	- Low level smart contracts features
+	
+* An Overview on Smart Contracts: Challenges, Advances and Platforms
+** Introduction
+- Smart contracts have the following advantages compared with conventional contracts:
+	- *Reducing risks.*
+		- Smart contracts cannot be arbitrarily altered once they are issued
+			- Due to the immutability of smart contracts
+		- All the transactions are traceable and auditable
+		- Malicious behaviors like financial frauds can be greatly mitigated
+	- *Cutting down administration and service costs.*
+		- Trust of the whole system by distributed consensus mechanisms
+		- No need for a central broker or a mediator
+		- Smart contracts stored in blockchains can be triggered in a decentralized way
+		- The administration and services costs due to the intervention from the third party which can be saved
+	- *Improving the efficiency of business processes.*
+		- The elimination of the dependence on the intermediary
+
+** Overview of Blockchain and Smart Contract
+*** Blockchain
+- A blockchain can be regarded as a public ledger in which all transactions cannot be falsified
+	- When a new block is generated all the nodes in the network will participate in validating the block
+		- Once it is validated it will be appended to the blockchain
+	- To validate the trustfulness of blocks consensus algorithms are used
+		- They determine which node to store the next block and how the new appended block is to be validated by other nodes
+		- e.g. proof of work (PoW), proof of stake (PoS) and practical byzantine-fault tolerance (PBFT)
+		- They are usually done by users who first solve the puzzle (called *miners*) (i.e PoW or PoS)
+			- Each miner keeps a full copy of the blockchain
+		- PBFT requires a multi-round voting process to reach the consensus
+		- The distributed consensus algorithms can ensure that transactions are done without the intervention of third parties like banks
+			- Transaction costs can be saved
+	- Users transact with their virtual addresses instead of real identities
+		- Ensures the privacy of users
+
+*** Smart Contract
+- Smart contracts are essentially implemented on top of blockchains
+	- The approved contractual clauses are converted into executable computer programs
+	- The logical connections between contractual clauses have also been preserved in the form of logical flows in programs
+		- e.g. the ~is-else-if~ statement
+	- The execution of each contract statement is recorded as an immutable transaction stored in the blockchain
+	- They guarantee appropriate access control and contract enforcement
+		- Developers assign access permission for each function in the contract
+		- Once a condition in a smart contract is satisfied, the triggered statement will automatically execute the corresponding function in a predictable manner
+	- The life cycle of smart contracts consists of four consecutive phases
+		1) *Creation*
+			 - Several involved parties first negotiate on the obligations, right and prohibitions on contracts
+			 - After multiple rounds of discussions and negotiation an agreement can reach
+			 - Lawyer or counselors will help parties draft an initial contractual agreement
+			 - Software engineers convert this agreement written in natural languages into a smart contract written in computer languages including declarative languages and logic-based rule languages
+				 - It is composed of design, implementation and validation (i.e. testing)
+		2) *Deployment*
+			 - They can be deployed on platforms on top of blockchains
+			 - They cannot be modified due to the immutability of block-chains
+			 - Any change requires the creation of a new contract
+			 - Once deployed all parties can access the contracts through the blockchains
+				 - Digital assets of both involved parties are locked via freezing the corresponding digital wallets
+		3) *Execution*
+			 - After the deployment the contractual clauses have been monitored and evaluated
+			 - Once the contractual conditions reach, the contractual procedures will be automatically executed
+			 - Smart contracts consists of a number of declarative statements with logical connections
+				 - When a condition is triggered the corresponding statement will be automatically executed
+				 - Consequently a transaction being executed and validated by miners in the blockchains
+			 - The committed transactions and updated states have been stored on the blockchains thereafter
+		4) *Completion*
+			 - After a smart contract has been executed new states of all involved parties are updated
+			 - The transactions during the execution of the smart contracts as well as the updated states are stored in the blockchains
+			 - The digital assets have been transferred from one party to another party
+
+** Challenges and Advances of Smart Contract
+*** Creation challenges
+- Since contracts cannot be modified after deployment developers need to carefully address the following problems:
+	1) *Readability:*
+		 - Most smart contracts are written in high level programming languages
+		 - The source code is compiled and executed
+		 - In different time periods programs have different forms of codes
+		 - Methods:
+			 - *Recover source code:* since the source code is not available for many contracts reverse engineering tools have been developed
+			 - *Human readable code:* a translation system that can convert human-readable contract representations into human readable programs
+			 - *Human readable execution:* make it possible to understand the execution
+	2) *Functional issues:*
+		 a) *Re-entracy* the interrupted function can be safely recalled again which can be used to steal digital currency
+				- Methods:
+					- Named states
+					- Data flow analysis
+					- Fuzz testing
+		 b) *Block randness* Some smart contract applications such as lotteries and betting pools may require randomness of generated blocks
+				- It can be achieved by generating psuedo-random numbers in a block timestamp of nonce
+				- Some malicious miners may fabricate some blocks to deviate from the outcome of the pseudo random generator
+				- Attackers can control the probability distribution of the outcomes
+				- Methods:
+					- Delay function to generate randomness
+					- The random value only be known to others after a short time period since its generation
+		 c) *Overcharging* Smart contracts can be overcharged due to the under-optimization of smart contracts
+				- Methods:
+					- Tools that can detect gas-costly patterns and replace under-optimized bytecode with efficient bycode
+
+*** Deployment challenges
+1) *Contract correctness:*
+	 - It is important to evaluate the correctness before deployment since it is nearly impossible to make any revisions when deployed
+	 - Methods:
+		 - *Bytecode analysis:* done on bytecode to detect security threats
+		 - *Source code analysis:* requires the avaiability of smart contract sorce codes
+		 - *Machine learning based analysis*
+
+2) *Dynamic Control flow:* The control flow of smart contracts is not guaranteed to be immutable
+	 - A smart contract can interact with other contracts
+		 - e.g. transferring funds to the contract or creating a new contract
+	 - The interaction of smart contracts can result in an increased number of interconnected contracts over time.
+	 - It is significant to check whether the execution environment is reliable
+	 - Methods:
+		 - *Graph based analysis:* Analyzing the call graph of all smart contracts on the block chain
+		 - *Path-searching:* Searches depth first and checks whether a given contract triggers a property violation
+		 - *Execution environment:* detect vulnerabilities of the execution environment of smart contracts
+
+*** Execution challenges
+1) *Trustworthy oracle:*
+	 - Smart contracts cannot work without real-world information
+	 - It is designed to run in a sandbox isolating it from the outside network
+	 - In a smart contract, an *oracle* plays a role of an agent who finds and verifies real-world occurrences and forwards this information to the smart contract
+	 - The challenge is how to determine a trustworthy oracle
+	 - Methods:
+		 - *Third-party involved:* the data is scraped from reliable web sites and it being feed to the smart contracts
+		 - *Decentralized:* the oracle is decentralized
+			 - The voters place a reasonable amount of stakes to vote the random proposition selected from the system
+			 - A reputation contract is used to record each oracle-service-provider's reputation according to its previous performance
+			 - An aggregating contract will calculate the final results of a query from users and finalize the result
+
+2) *Transaction-ordering dependence:* The order of the transactions is not deterministic which can lead to different states of the smart contracts on different paths
+	 - Methods:
+		 - *Sequential execution:* A smart contract transaction counter is introduced
+			 - The transaction counter expects a transition number in each function as a parameter
+			 - It ensures the number is increased by one after each function execution
+			 - Through analysing the transition number the problem is solved
+		 - *Predefining contract:*
+			 - smart contracts should be written instead of transactions
+
+3) *Execution Efficiency:* Smart contracts are serially executed by miners
+	 - They will not execute another contract until the current contract is completed
+	 - This limits system performance
+	 - It is challenging to do concurrently because of the shared data between multiple smart contracts
+	 - Being able to inspect the contracts data without prescribed interface is also important to improving the smart contract execution efficiency
+		 - Removes the need to redeploy a new contract
+	 - Methods:
+		 - *Execution serialization:* tries to make it possible to execute contracts concurrently by using rollback if a conflict occurs
+		 - *Inspection of contract:* using decompilation capabilities encapsulated in mirrors such that one can introspect the current state of a smart contract instance without redeploying it
+
+*** Completion challenges
+- After the execution of smart contract, the modification to the states in the system will be packed as a transaction and broadcasted to each node
+
+- Challenges
+	1) *Privacy and security:*
+		 - Many smart contract and blockchain platforms lack privacy-preserving mechanisms
+			 - All the transactions are visible to everyone in the networks
+		 - Some uses some public key crypto to improve the anonymity of the transactions, but most of the data are still publicly visible
+		 - Smart contract systems also have software vulnerabilities which are susceptible to malicious attacks
+			 - Smart contracts that run on top of blockchain systems are also suffering from system vulnerability
+		 - Methods:
+			 - *Privacy:* compile a contract into a cryptographic protocol
+	2) *Scams:*
+		 - The detection of scams is very important for contract user since it enables them to terminate their investments at an early phase to avoid unnecessary loss
+
+** Applications of Smart Contract
+A. *Internet of things:* Integrate "smart" object into the Internet and provide various services to users
+	 - Can be used to issue firmware updates
+	 - Can help speed up conventional supply chains
+
+B. *Distributed system security:*
+	 - Can help with DDoS attacks
+		 - Once a server is attacked the IP addresses of attackers will be automatically stored in a smart contract
+	 - Can help verify the trustfulness of a cloud service provider
+		 - The smart contracts are used to stimulate tension, betrayal and distrust between the clouds
+
+C. *Finance:*
+	 - Can help cut down administration and service costs and improve the efficiency of financial services
+	 - The benefits of smart contracts in the following financial services:
+		 - *Capital markets and investment banking:* can shorten the settlement period from 20 days or more to 6 to 10 days
+		 - *Commercial and retail banking:* can be used to reduce the costs and delays through automating the mortgage processes with the digitization of legal documents in blockchains
+		 - *Insurance:* can reduce the processing overheads and save the costs especially in claim handling
+
+D. *Data provenance:*
+	 - It can also be used to ensure information quality in scientific research and public health
+		 - Data activities are often stored along with privacy sensitive information
+		 - How to preserve this information is a challenge
+	 - It can be used to protect intellectual property of creative digital media
+		 - If there is any infringement the law enforcement officer can trace the illegal file with the original file via extracting the digital watermark and comparing the digital wallet address
+
+E. *Sharing economy:* reduces consumer cost by borrowing and recycling items, improving resource ussage, enhancing quality of service, lowering the environment impacts
+	 - Platforms suffers from high transaction costs of customers, privacy exposure and unreliability of truest third parties due to centralization
+	 - Smart contracts can potentially fix this by decentralizing these platforms
+	 - Fusion of IoS and smart contracts can also advance these applications
+
+F. *Public sector:*
+	 - Blockchain can essentially prevent data fraudulence and provide the transparency of public information
+	 - Can be used in e.g.
+		 - Public bidding (prove identities of both bidders and bidding entities and automate the process)
+		 - e-voting system
+	 - It can also be used to establish personal digital identity and reputation
+
+* DNO Book
+** Smart Contracts, Informally
+- Some crypto currencies have a notion of *smart contracts*
+	- A smart contract is simply a state machine $M$ that can be "uploaded" to the replicated machine
+	- Programs have to be associated to an account and can send money from the account
+		- To prevent abuse and upload should be signed with the secret key of the account it is uploaded to
+	- Uploading a program would simply mean that one broadcasts something line $(\mathtt{CREATE},M,\mathsf{vk},\sigma)$ on the TOB
+		- If the signature is valid, the contract is associated to account $\mathsf{vk}$
+
+** Smart Contracts, more Formally
+- A smart contract is abstracted by a named state machine $M$
+	- There is a global set $\Names$ of names
+	- There is a global set $\Inputs$ of possible inputs and a global set $\Outputs = \Inputs$ of global outputs
+	- There is a set $\Times = \{0,1,\dots\}$ of possible points in time, e.g. just counting nanoseconds since the systems started to run
+
+- *Definition (Timed, Named State Machine)* A $\mathsf{TN}$ state machine $M$ consists of :
+	- A name $N \in \Names$
+	- A set $\States$
+	- A start state $\mathsf{State}_0 \in \States$
+	- A transition function $T: \States \times \Times \times \Names \times \Inputs \to \States \times \Names \times \Outputs$
+
+- A state machine starts in $\State_0$ when it is in state $\State_i$ and receives input $x$ from $N'$ at time $t$ then it
+	- computes $(State_{i+1}, N'', y) = T(\State_i, t, N', x)$
+	- changes state to $\State_{i+1}$
+	- sends $y$ to $N''$ at time $t$
+
+- The definition can be generalized to taking several inputs and giving several outputs
+
+** Ideal Functionality for Replicated Smart Contracts
+- A replicated contracts is protocol for $n$ servers which makes them behave as if they are running one single set of smart contracts
+	- These contracts can get external input from the party controlling the account they are associated to
+	- Smart contracts can also send messages to other smart contracts
+	- In the ideal functionality and in the protocols transactions identifiers ~tid~ are used
+		- Are used to ensure one can make the otherwise same transaction twice
+	- A tuple of the form $(\EXEC, \vk_\S, \vk_\R, x, E, \tid)$ means that account $\vk_\S$ sends $x$ to $\vk_R$ with energy $\E$
+		- When $x=\mathtt{KEEP}$ it means the sends keeps the money and nothing else happens
+
+- *Definition (Replicated Smart Contracts)* The Replicated Smart Contracts ideal functionality $\mathsf{RSC}$ for the $\mathtt{KEEP}$ smart contract language is for $n$ servers $\S_1, \dots, \S_n$. Then syntax is as follows:
+	- There is a protocol port $\RCS_i$ for receiving inputs from server $\S_i$ and giving outputs to $\S_i$
+	- There is a special port $\mathtt{RECEIVED}_i$ for reporting what messages have been input to the ideal functionality by $\S_i$
+	- There is a special port $\mathtt{PROCESS}$ for specifying which message to process next
+	- There is a special port $\mathtt{DELIVER}_i$ for instructing the ideal functionality to deliver the next message to $\S_i$
+	- There is a time $t$
+		- Initially set to $0$
+	- There is a special port $\mathtt{TIME}$ for instructing the ideal functionality to increase the time
+		- On any input on this port it lets $t = t+1$
+
+- The ideal functionality runs as follows:
+	
+	
+[[file:DNO Book/screenshot_2020-04-21_17-31-12.png]]
+[[file:DNO Book/screenshot_2020-04-21_17-32-07.png]]	
+
+- A liveness property can be formulated which basically says that if $x$ is added to Transactions, then it will eventually be processed and that all outputs will eventually be delivered
+
+- If a message is sent to a non-exiting smart contract, then it is returned
+
+- An important safety property is that the outputs that the parties see
+
+** Replicated SmartContracts from Totally-Ordered Broadcast
+[[file:DNO Book/screenshot_2020-04-21_17-36-57.png]]	
+
+* Smart Contracts and Solidity
+** Introduction
+- There are two different types of accounts in Ethereum
+	- Externally owner accounts (EOAs)
+		- Controlled by users often via software such as a wallet application
+		- Controlled by transactions created and cryptographically signed with a private key in the "real world"
+	- 
+	- Contract accounts
+		- Controlled by program code (smart contracts)
+		- Executed by the Ethereum Virtual Machine
+		- Have both associated code and data storage
+		- Do not have private key and "control themselves"
+
+** What is a Smart Contract?
+- The term *smart contract* is used to refer to immutable computer programs that run deterministically  in the context of an Ethereum Virtual Machine as part of the Ethereum network protocol
+	- *Computer programs:* They are simply computer programs and the word contract has no legal meaning
+	- *Immutable:* Once deployed the code of a smart contract cannot change
+		- The only way to modify a smart contract is to deploy a new instance
+	- *Deterministic:* The outcome of the execution of a smart contract is the same for everyone who runs it
+		- Given the context of the transaction that initiated its executed and the state of the Ethereum blockchain at the moment of execution
+	- *EVM context:* They operate with a very limited execution context
+		- They can access their own state, the context of the transaction that called them, and some information about the most recent blocks.
+	- *Decentralized world computer:*
+		- The EVM runs as a local instance on every Etherum node
+		- Since the instances of EVM operate on the same initial state and produces the same final state, the system as a whole operates as a single "world computer"
+
+** Life Cycle of a Smart Contract
+- Smart contracts are typically written in a high-level language e.g. Solidity
+	- To run they must be compiled to the low-level bytecode that runs in the EVM
+
+	- Once compiled they are deployed on the Ethereum platform using a special contract creation transaction
+		- It is identified as such by being sent to the special contract creation address 0x0
+
+- Each contract is identified by an Ethereum address
+	- Derived from the contract creation transaction as a function of the originating account and nonce
+	- Can be used in a transaction as the recipient sending funds to the contract or calling one of the contract's functions
+- There are no keys associated with an account created for a new smart contract
+	- The contract creator does not get any special privileges at the protocol level
+
+- Contracts only run if they are called by a transactions
+	- All smart contracts in Ethereum are executed ultimately because of a transaction initiate from an EOA
+	- Contracts never run on their own
+	- They are not executed "in parallel"
+	- The Ethereum world computer can be considered a single-threaded machine
+
+- Transactions are atomic
+	- They execute in their entirety with any changes in the global state recorded only if all execution terminates successfully
+	- If execution fails due to an error, all of its effects are "rolled back" as if the transaction never ran
+	- A failed transaction is still recorded as having been attempted
+		- Ether spent on gas for the execution is deducted from the originating account
+		- No other effects on contract or account state.
+
+- A contract can be deleted removing the code and its internal state from its address leaving a blank account
+	- Any transactions sent to that account address after the contract has been deleted do not result in any code execution
+	- To delete a contract, one executes an EVM opcode called SELFDESTRUCT
+		- That operation costs "negative gas", a gas refund
+		- It incentives the release of network client resources from the deletion of stored state
+	- It does no remove the transaction history of the contract
+		- Since the blockchain is immutable
+	- The SELFDESTRUCT capability will only be available if the contract author programmed the smart contract to have that functionality
+		- Otherwise it is not possible to delete the smart contract
+
+* Project
+** TODOs
+- [ ] Midlang
+- [ ] Report
+	- [ ]	Difference between smart contract languages
+	- [ ]	Attacks
+	- [ ] Related Work
+	- [ ] Biliography
+
+** General differences between smart contract languages
+- Syntax
+- Blockchain used
+- Compiled to
+- Examples
+	- Wallet
+	- Auction
+	- Charity
+	- Game
+	
+** Attacks
+- Reentrance
+- Ponzi Schemes
+- Handling of exception
+	
+** Related Work
+- An Overview on Smart Contracts: Challenges, Advances and Platforms
+- A Survey of attacks on Ethereum Smart Contracts
+
+** Sources
+- An Overview on Smart Contracts: Challenges, Advances and Platforms
+- A Survey of attacks on Ethereum Smart Contracts
+- Smart Contracts and Solidity: https://t.ly/Nul7
+- Liquidity tutorial: https://t.ly/1Hzw
+- Midlang Cheatsheet
+- DNO
